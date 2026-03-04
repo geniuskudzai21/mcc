@@ -1,0 +1,92 @@
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+async function main() {
+
+    await prisma.payment.deleteMany({});
+    await prisma.serviceRequest.deleteMany({});
+    await prisma.billItem.deleteMany({});
+    await prisma.bill.deleteMany({});
+    await prisma.userProperty.deleteMany({});
+    await prisma.property.deleteMany({});
+    await prisma.announcement.deleteMany({});
+    // We keep Tariffs and Admins as they are system configuration
+
+    // 1. Tariffs (Essential for billing engine)
+    const tariffs = [
+        { service_type: 'Water', cost_per_unit: 1.25 },
+        { service_type: 'Sewer', cost_per_unit: 10.00 },
+        { service_type: 'Refuse', cost_per_unit: 8.50 },
+        { service_type: 'Rates', cost_per_unit: 25.00 }
+    ];
+
+    for (const t of tariffs) {
+        await prisma.tariff.upsert({
+            where: { service_type: t.service_type },
+            update: { cost_per_unit: t.cost_per_unit },
+            create: t
+        });
+    }
+
+    // 2. Core Administrative Accounts
+    const adminPassword = await bcrypt.hash('admin123', 12);
+
+    // Main Admin
+    await prisma.admin.upsert({
+        where: { email: 'admin@mutare.gov.zw' },
+        update: {},
+        create: {
+            name: 'Mutare City Admin',
+            email: 'admin@mutare.gov.zw',
+            password_hash: adminPassword,
+            role: 'SUPER_ADMIN'
+        }
+    });
+
+    // Departmental Admins
+    const departments = [
+        { name: 'Billing Department', email: 'billing@mutare.gov.zw', role: 'BILLING_OFFICER' },
+        { name: 'Public Works Desk', email: 'service@mutare.gov.zw', role: 'SERVICE_OFFICER' }
+    ];
+
+    for (const dept of departments) {
+        await prisma.admin.upsert({
+            where: { email: dept.email },
+            update: {},
+            create: {
+                name: dept.name,
+                email: dept.email,
+                password_hash: adminPassword,
+                role: dept.role as any
+            }
+        });
+    }
+
+    // 3. Municipal Properties
+    const properties = [
+        { stand_number: 'ST-1001', address: '12 Main Street', suburb: 'Mutare CBD', owner_name: 'City Management', account_number: 'ACC-0001' },
+        { stand_number: 'ST-2002', address: '45 Second Avenue', suburb: 'Chikanga', owner_name: 'Resident Alpha', account_number: 'ACC-0002' },
+        { stand_number: 'ST-3003', address: '78 Third Road', suburb: 'Sakubva', owner_name: 'Resident Beta', account_number: 'ACC-0003' }
+    ];
+
+    for (const p of properties) {
+        await prisma.property.upsert({
+            where: { stand_number: p.stand_number },
+            update: {},
+            create: p
+        });
+    }
+
+    console.log('✅ System initialized with Tariffs, Admins, and Municipal Properties.');
+}
+
+main()
+    .catch((e) => {
+        console.error(e);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });

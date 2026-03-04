@@ -1,0 +1,98 @@
+/* responsive.css - Responsive layout overrides */
+
+/* 1. App Layout (Layout.tsx) */
+@media (max-width: 768px) {
+    .app-layout-wrapper {
+        flex-direction: column !important;
+    }
+
+    .app-sidebar {
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .sidebar-nav-container {
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        padding: 0.5rem !important;
+    }
+
+    .sidebar-nav-link {
+        white-space: nowrap !important;
+    }
+}
+
+/* 2. Authentication Pages (LoginPage.tsx, RegisterPage.tsx) */
+@media (max-width: 768px) {
+    .auth-container {
+        flex-direction: column !important;
+    }
+
+    .auth-left-panel {
+        width: 100% !important;
+        padding: 2rem 1.5rem !important;
+        min-height: 40vh !important;
+    }
+
+    .auth-right-panel {
+        padding: 2rem 1.5rem !important;
+    }
+
+    .auth-hero-title {
+        font-size: 2.25rem !important;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* 3. Dashboard Page (DashboardPage.tsx) */
+@media (max-width: 1024px) {
+    .dash-metrics-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .dash-main-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .dash-actions-col {
+        grid-column: span 2 !important;
+    }
+
+    .dash-bottom-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .dash-metrics-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dash-main-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dash-actions-col {
+        grid-column: span 1 !important;
+    }
+
+    .dash-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+}
+
+/* 4. Profile Page (ProfilePage.tsx) */
+@media (max-width: 768px) {
+    .profile-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .profile-form-grid {
+        grid-template-columns: 1fr !important;
+    }
+}

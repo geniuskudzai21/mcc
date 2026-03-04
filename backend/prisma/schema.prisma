@@ -1,0 +1,152 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum BillStatus {
+  UNPAID
+  PAID
+  OVERDUE
+}
+
+enum ServiceRequestStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CANCELLED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  BILLING_OFFICER
+  SERVICE_OFFICER
+}
+
+model User {
+  id            String          @id @default(uuid())
+  name          String
+  email         String          @unique
+  phone         String?
+  password_hash String
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  properties    UserProperty[]
+  payments      Payment[]
+  requests      ServiceRequest[]
+}
+
+model Property {
+  id             String          @id @default(uuid())
+  stand_number   String          @unique
+  address        String
+  suburb         String
+  owner_name     String
+  account_number String          @unique
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  users          UserProperty[]
+  bills          Bill[]
+  requests       ServiceRequest[]
+}
+
+enum UserPropertyStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model UserProperty {
+  id          String             @id @default(uuid())
+  user_id     String
+  property_id String
+  status      UserPropertyStatus @default(PENDING)
+  user        User               @relation(fields: [user_id], references: [id])
+  property    Property           @relation(fields: [property_id], references: [id])
+
+  @@unique([user_id, property_id])
+}
+
+model Bill {
+  id            String     @id @default(uuid())
+  property_id   String
+  billing_month Int
+  billing_year  Int
+  total_amount  Decimal    @db.Decimal(10, 2)
+  due_date      DateTime
+  status        BillStatus @default(UNPAID)
+  created_at    DateTime   @default(now())
+  property      Property   @relation(fields: [property_id], references: [id])
+  items         BillItem[]
+  payments      Payment[]
+}
+
+model BillItem {
+  id          String @id @default(uuid())
+  bill_id     String
+  description String
+  amount      Decimal @db.Decimal(10, 2)
+  bill        Bill   @relation(fields: [bill_id], references: [id])
+}
+
+model Payment {
+  id                    String   @id @default(uuid())
+  bill_id               String
+  user_id               String
+  amount                Decimal  @db.Decimal(10, 2)
+  payment_method        String
+  transaction_reference String   @unique
+  status                String   @default("COMPLETED")
+  paid_at               DateTime @default(now())
+  bill                  Bill     @relation(fields: [bill_id], references: [id])
+  user                  User     @relation(fields: [user_id], references: [id])
+}
+
+model ServiceRequest {
+  id          String               @id @default(uuid())
+  user_id     String
+  property_id String
+  category    String
+  description String
+  media_url   String?
+  status      ServiceRequestStatus @default(PENDING)
+  created_at  DateTime             @default(now())
+  user        User                 @relation(fields: [user_id], references: [id])
+  property    Property             @relation(fields: [property_id], references: [id])
+}
+
+model Admin {
+  id            String     @id @default(uuid())
+  name          String
+  email         String     @unique
+  password_hash String
+  role          AdminRole  @default(BILLING_OFFICER)
+  audit_logs    AuditLog[]
+}
+
+model Tariff {
+  id             String   @id @default(uuid())
+  service_type   String   @unique
+  cost_per_unit  Decimal  @db.Decimal(10, 2)
+  effective_date DateTime @default(now())
+}
+
+model Announcement {
+  id         String   @id @default(uuid())
+  title      String
+  body       String
+  created_at DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  admin_id   String
+  action     String
+  entity     String
+  entity_id  String
+  timestamp  DateTime @default(now())
+  admin      Admin    @relation(fields: [admin_id], references: [id])
+}
