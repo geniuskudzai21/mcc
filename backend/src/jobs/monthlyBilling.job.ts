@@ -28,60 +28,11 @@ export const generateMonthlyBills = async (targetMonth?: number, targetYear?: nu
                 users: {
                     where: { status: 'VERIFIED' },
                     include: { user: true }
-                }
             }
-        });
-
-        for (const property of propertiesWithUsers) {
-            // Check if bill already exists for this property and month
-            const existing = await prisma.bill.findFirst({
-                where: {
-                    property_id: property.id,
-                    billing_month: month,
-                    billing_year: year
-                }
-            });
-
-            if (existing) continue;
-
-            // Determine Account Name for the bill. 
-            // If there's a verified user, we can ensure the property record reflects their name.
-            if (property.users.length > 0 && property.owner_name === 'City Management') {
-                await prisma.property.update({
-                    where: { id: property.id },
-                    data: { owner_name: property.users[0].user.name }
-                });
-            }
-
-            // Define charges
-            const charges = [
-                { description: `Water Consumption (${month}/${year})`, amount: tariffMap['Water'] || 15.00 },
-                { description: 'Sewer & Sanitation', amount: tariffMap['Sewer'] || 10.00 },
-                { description: 'Refuse Collection', amount: tariffMap['Refuse'] || 8.00 },
-                { description: 'Fixed Property Rates', amount: tariffMap['Rates'] || 25.00 }
-            ];
-
-            const totalAmount = charges.reduce((sum, item) => sum + Number(item.amount), 0);
-
-            await prisma.bill.create({
-                data: {
-                    property_id: property.id,
-                    billing_month: month,
-                    billing_year: year,
-                    total_amount: totalAmount,
-                    due_date: dueDate,
-                    status: 'UNPAID',
-                    items: {
-                        create: charges.map(c => ({
-                            description: c.description,
-                            amount: c.amount
-                        }))
-                    }
-                }
-            });
         }
 
-        console.log(`✅ Successfully generated bills for ${propertiesWithUsers.length} properties for ${month}/${year}.`);
+        const billsCreated = propertiesWithUsers.filter(p => p.users.length > 0).length;
+        console.log(`✅ Successfully generated bills for ${billsCreated} properties with verified users for ${month}/${year}.`);
     } catch (err) {
         console.error('❌ Error generating monthly bills:', err);
     }

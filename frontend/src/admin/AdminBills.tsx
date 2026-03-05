@@ -8,7 +8,8 @@ import {
     DollarSign,
     Trash2,
     Edit2,
-    X
+    X,
+    CreditCard
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -67,6 +68,19 @@ const AdminBills: React.FC = () => {
         },
         onError: () => {
             alert('Failed to delete bill');
+        }
+    });
+
+    const markPaidMutation = useMutation({
+        mutationFn: async (id: string) => {
+            return api.put(`/admin/bills/${id}`, { status: 'PAID' });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-bills'] });
+            alert('Bill marked as paid!');
+        },
+        onError: () => {
+            alert('Failed to mark bill as paid');
         }
     });
 
@@ -249,6 +263,26 @@ const AdminBills: React.FC = () => {
                                     </td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                                            {bill.status !== 'PAID' && (
+                                                <button
+                                                    onClick={() => markPaidMutation.mutate(bill.id)}
+                                                    disabled={markPaidMutation.isPending}
+                                                    style={{
+                                                        padding: '0.5rem',
+                                                        background: '#16a34a',
+                                                        border: 'none',
+                                                        borderRadius: '6px',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: 'white'
+                                                    }}
+                                                    title="Mark as Paid"
+                                                >
+                                                    <CreditCard style={{ width: '14px' }} />
+                                                </button>
+                                            )}
                                             <button
                                                 className="btn-secondary"
                                                 style={{ width: 'auto', padding: '0.5rem' }}
