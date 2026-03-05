@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
     Home, FileText, CreditCard, MessageSquare,
     User as UserIcon, LogOut, LayoutDashboard,
-    AlertCircle, Bell, Users
+    AlertCircle, Bell, Users, ShieldUser
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,7 +22,8 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
 
     const adminNavItems = [
         { name: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
-        { name: 'Account Approvals', icon: Users, path: '/admin/account-approvals' },
+        { name: 'Users', icon: Users, path: '/admin/users' },
+        { name: 'Account Approvals', icon: ShieldUser, path: '/admin/account-approvals' },
         { name: 'Billing', icon: FileText, path: '/admin/bills' },
         { name: 'Requests', icon: AlertCircle, path: '/admin/requests' },
     ];

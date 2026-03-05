@@ -12,6 +12,7 @@ import AdminDashboard from './admin/AdminDashboard.tsx';
 import AdminAccountApprovals from './admin/AdminAccountApprovals.tsx';
 import AdminBills from './admin/AdminBills.tsx';
 import AdminRequests from './admin/AdminRequests.tsx';
+import AdminUsers from './admin/AdminUsers.tsx';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -67,6 +68,7 @@ function App() {
             <Route path="/admin/account-approvals" element={<ProtectedRoute adminOnly><AdminAccountApprovals /></ProtectedRoute>} />
             <Route path="/admin/bills" element={<ProtectedRoute adminOnly><AdminBills /></ProtectedRoute>} />
             <Route path="/admin/requests" element={<ProtectedRoute adminOnly><AdminRequests /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
 
             {/* Default */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

@@ -36,6 +36,7 @@ const AdminAccountApprovals: React.FC = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-pending-users'] });
+            queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
             setShowApproveModal(false);
             alert('User account approved successfully!');
         },
@@ -50,6 +51,7 @@ const AdminAccountApprovals: React.FC = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-pending-users'] });
+            queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
             setShowRejectModal(false);
             alert('User account rejected successfully!');
         },

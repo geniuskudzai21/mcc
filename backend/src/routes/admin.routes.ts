@@ -114,6 +114,19 @@ router.get('/users/:userId/properties', authenticate, async (req, res, next) => 
     }
 });
 
+// Get all user properties
+router.get('/all-user-properties', authenticate, authorizeAdmin, async (req, res, next) => {
+    try {
+        const userProperties = await prisma.userProperty.findMany({
+            include: { property: true, user: true }
+        });
+        res.json(userProperties);
+    } catch (err) {
+        console.error('Error fetching all user properties:', err);
+        next(err);
+    }
+});
+
 router.put('/users/:id', authenticate, authorizeAdmin, async (req, res, next) => {
     try {
         const id = req.params.id as string;
