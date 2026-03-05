@@ -545,4 +545,104 @@ router.put('/users/:id/reject', authenticate, authorizeAdmin, async (req: AuthRe
     }
 });
 
+// Meter Readings Management
+router.get('/meter-readings', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
+    try {
+        const { propertyId, month, year } = req.query;
+        
+        const where: any = {};
+        
+        if (propertyId) {
+            where.property_id = propertyId as string;
+        }
+        
+        if (month && year) {
+            const startDate = new Date(parseInt(year as string), parseInt(month as string) - 1, 1);
+            const endDate = new Date(parseInt(year as string), parseInt(month as string), 0, 23, 59, 59);
+            where.reading_date = {
+                gte: startDate,
+                lte: endDate
+            };
+        }
+
+        const readings = await prisma.meterReading.findMany({
+            where,
+            include: { property: true },
+            orderBy: { reading_date: 'desc' }
+        });
+
+        res.json(readings);
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.post('/meter-readings', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
+    try {
+        const { property_id, reading, reading_date, officer_name, notes } = req.body;
+
+        // Get previous reading for this property to calculate consumption
+        const previousReading = await prisma.meterReading.findFirst({
+            where: { property_id },
+            orderBy: { reading_date: 'desc' }
+        });
+
+        const newReading = await prisma.meterReading.create({
+            data: {
+                property_id,
+                reading: parseFloat(reading),
+                reading_date: new Date(reading_date),
+                officer_name,
+                notes
+            },
+            include: { property: true }
+        });
+
+        res.json(newReading);
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.get('/properties/:id/readings/history', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
+    try {
+        const propertyId = req.params.id;
+
+        const readings = await prisma.meterReading.findMany({
+            where: { property_id: propertyId },
+            orderBy: { reading_date: 'desc' }
+        });
+
+        // Calculate consumption between readings
+        const readingsWithConsumption = readings.map((reading, index) => {
+            const nextReading = readings[index + 1];
+            const consumption = nextReading 
+                ? parseFloat(reading.reading.toString()) - parseFloat(nextReading.reading.toString())
+                : null;
+            return {
+                ...reading,
+                consumption
+            };
+        });
+
+        res.json(readingsWithConsumption);
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.delete('/meter-readings/:id', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
+    try {
+        const id = req.params.id;
+        
+        await prisma.meterReading.delete({
+            where: { id }
+        });
+
+        res.json({ message: 'Meter reading deleted successfully' });
+    } catch (err) {
+        next(err);
+    }
+});
+
 export default router;

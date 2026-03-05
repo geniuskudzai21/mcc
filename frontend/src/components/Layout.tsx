@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
     Home, FileText, CreditCard, MessageSquare,
     User as UserIcon, LogOut, LayoutDashboard,
-    AlertCircle, Bell, Users, ShieldUser
+    AlertCircle, Bell, Users, ShieldUser, Gauge
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -24,6 +24,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
         { name: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
         { name: 'Users', icon: Users, path: '/admin/users' },
         { name: 'Account Approvals', icon: ShieldUser, path: '/admin/account-approvals' },
+        { name: 'Meter Readings', icon: Gauge, path: '/admin/meter-readings' },
         { name: 'Billing', icon: FileText, path: '/admin/bills' },
         { name: 'Requests', icon: AlertCircle, path: '/admin/requests' },
     ];

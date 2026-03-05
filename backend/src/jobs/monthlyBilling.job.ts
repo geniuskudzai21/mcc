@@ -33,6 +33,7 @@ export const generateMonthlyBills = async (targetMonth?: number, targetYear?: nu
         });
 
         let billsCreated = 0;
+        let skippedNoReading = 0;
 
         for (const property of propertiesWithUsers) {
             // Skip properties that have no verified users
@@ -59,9 +60,46 @@ export const generateMonthlyBills = async (targetMonth?: number, targetYear?: nu
                 });
             }
 
-            // Define charges
+            // Get meter readings for this property
+            const readings = await prisma.meterReading.findMany({
+                where: { property_id: property.id },
+                orderBy: { reading_date: 'desc' }
+            });
+
+            // Calculate water consumption from meter readings
+            let waterConsumption = 0;
+            let waterCharge = 0;
+            
+            if (readings.length > 0) {
+                // Get the reading for this month (or the latest one if no reading for this month)
+                const currentReading = readings[0];
+                const previousReading = readings[1]; // Second most recent reading
+
+                if (previousReading) {
+                    waterConsumption = parseFloat(currentReading.reading.toString()) - parseFloat(previousReading.reading.toString());
+                    // Only charge for positive consumption (prevent negative if meter replaced)
+                    if (waterConsumption < 0) waterConsumption = 0;
+                } else if (readings.length === 1) {
+                    // First reading - use it as baseline but don't charge yet
+                    waterConsumption = 0;
+                }
+
+                // Calculate water charge: consumption × tariff
+                const waterRate = parseFloat(tariffMap['Water']?.toString() || '15.00');
+                waterCharge = waterConsumption * waterRate;
+            } else {
+                // No meter readings - skip this property
+                skippedNoReading++;
+                console.log(`⏭️ Skipping ${property.address} - no meter readings`);
+                continue;
+            }
+
+            // Define charges - water is now based on actual consumption
             const charges = [
-                { description: `Water Consumption (${month}/${year})`, amount: tariffMap['Water'] || 15.00 },
+                { 
+                    description: `Water Consumption (${waterConsumption.toFixed(2)} kL @ $${tariffMap['Water'] || 15.00}/kL)`, 
+                    amount: waterCharge 
+                },
                 { description: 'Sewer & Sanitation', amount: tariffMap['Sewer'] || 10.00 },
                 { description: 'Refuse Collection', amount: tariffMap['Refuse'] || 8.00 },
                 { description: 'Fixed Property Rates', amount: tariffMap['Rates'] || 25.00 }
@@ -89,7 +127,10 @@ export const generateMonthlyBills = async (targetMonth?: number, targetYear?: nu
             billsCreated++;
         }
 
-        console.log(`✅ Successfully generated bills for ${billsCreated} properties with verified users for ${month}/${year}.`);
+        console.log(`✅ Successfully generated ${billsCreated} bills for ${month}/${year}.`);
+        if (skippedNoReading > 0) {
+            console.log(`⚠️ Skipped ${skippedNoReading} properties due to missing meter readings.`);
+        }
     } catch (err) {
         console.error('❌ Error generating monthly bills:', err);
     }

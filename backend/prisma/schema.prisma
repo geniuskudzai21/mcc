@@ -51,6 +51,7 @@ model Property {
   users          UserProperty[]
   bills          Bill[]
   requests       ServiceRequest[]
+  meterReadings  MeterReading[]
 }
 
 enum UserPropertyStatus {
@@ -132,6 +133,17 @@ model Tariff {
   service_type   String   @unique
   cost_per_unit  Decimal  @db.Decimal(10, 2)
   effective_date DateTime @default(now())
+}
+
+model MeterReading {
+  id            String   @id @default(uuid())
+  property_id   String
+  reading       Decimal  @db.Decimal(10, 2)
+  reading_date  DateTime @default(now())
+  officer_name  String?
+  notes         String?
+  created_at    DateTime @default(now())
+  property      Property @relation(fields: [property_id], references: [id])
 }
 
 model Announcement {
