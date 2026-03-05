@@ -17,7 +17,14 @@ const ProfilePage: React.FC = () => {
 
     const { data: user, isLoading } = useQuery({
         queryKey: ['user-me'],
-        queryFn: async () => { const res = await api.get('/users/me'); return res.data; }
+        queryFn: async () => { 
+            const token = localStorage.getItem('token');
+            console.log('Token from localStorage:', token);
+            console.log('Fetching user profile...');
+            const res = await api.get('/users/me'); 
+            console.log('User profile response:', res.data);
+            return res.data; 
+        }
     });
 
     const linkPropertyMutation = useMutation({

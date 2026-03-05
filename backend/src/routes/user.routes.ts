@@ -1,21 +1,20 @@
 import { Router } from 'express';
 import { authenticate, AuthRequest } from '../middlewares/auth.middleware';
 import { prisma } from '../config/database';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = Router();
 
 router.get('/me', authenticate, async (req: AuthRequest, res, next) => {
     try {
+        console.log('Fetching user profile for ID:', req.user?.id);
         const user = await prisma.user.findUnique({
-            where: { id: req.user?.id },
-            include: {
-                properties: {
-                    include: { property: true }
-                }
-            }
+            where: { id: req.user?.id }
         });
+        console.log('Found user:', user);
         res.json(user);
     } catch (err) {
+        console.error('Error fetching user profile:', err);
         next(err);
     }
 });
@@ -48,10 +47,11 @@ router.post('/link-property', authenticate, async (req: AuthRequest, res, next) 
         });
 
         if (!property) {
-            // Create new property with a generated account number
+            // Create new property with a generated account number and UUID
             const count = await prisma.property.count();
             property = await prisma.property.create({
                 data: {
+                    id: uuidv4(),
                     stand_number,
                     address,
                     suburb,

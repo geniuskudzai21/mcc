@@ -35,6 +35,7 @@ const AdminDashboard: React.FC = () => {
         queryKey: ['admin-dashboard'],
         queryFn: async () => {
             const res = await api.get('/admin/dashboard');
+            console.log('Dashboard metrics:', res.data);
             return res.data;
         }
     });

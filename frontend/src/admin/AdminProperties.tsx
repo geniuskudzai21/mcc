@@ -28,6 +28,7 @@ const AdminProperties: React.FC = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['pending-property-links'] });
+            queryClient.invalidateQueries({ queryKey: ['admin-users'] });
             alert('Property link status updated successfully');
         }
     });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import {
     Search,
@@ -24,13 +24,21 @@ const AdminUsers: React.FC = () => {
     const [editForm, setEditForm] = useState({ name: '', email: '', phone: '' });
     const [linkPropertyId, setLinkPropertyId] = useState('');
 
-    const { data: users, isLoading } = useQuery({
+    const { data: users, isLoading, error } = useQuery({
         queryKey: ['admin-users'],
         queryFn: async () => {
+            const token = localStorage.getItem('token');
+            console.log('Token from localStorage:', token);
             const res = await api.get('/admin/users');
+            console.log('Users data from API:', res.data);
             return res.data;
         }
     });
+
+    // Log errors separately
+    if (error) {
+        console.error('Error fetching users:', error);
+    }
 
     const { data: allProperties } = useQuery({
         queryKey: ['admin-all-properties'],
@@ -38,6 +46,17 @@ const AdminUsers: React.FC = () => {
             const res = await api.get('/admin/properties');
             return res.data;
         }
+    });
+
+    const { data: userProperties, refetch: refetchUserProperties } = useQuery({
+        queryKey: ['admin-user-properties', selectedUser?.id],
+        queryFn: async () => {
+            if (!selectedUser?.id) return [];
+            const res = await api.get(`/admin/users/${selectedUser.id}/properties`);
+            console.log('Fetched user properties:', res.data);
+            return res.data;
+        },
+        enabled: !!selectedUser?.id
     });
 
     const updateUserMutation = useMutation({
@@ -74,6 +93,7 @@ const AdminUsers: React.FC = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+            refetchUserProperties();
             setLinkPropertyId('');
             alert('Property linked successfully!');
         }
@@ -85,30 +105,39 @@ const AdminUsers: React.FC = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+            refetchUserProperties();
             alert('Property unlinked successfully!');
         }
     });
 
     const generateBillForPropertyMutation = useMutation({
         mutationFn: async (propertyId: string) => {
+            console.log('Generating bill for property ID:', propertyId);
             return api.post(`/admin/properties/${propertyId}/generate-bill`);
         },
         onSuccess: () => {
             alert('Bill generated successfully for this property!');
         },
         onError: (err: any) => {
+            console.error('Error generating bill:', err);
             alert(err.response?.data?.message || 'Failed to generate bill');
         }
     });
 
-    const filteredUsers = users?.filter((user: any) => {
-        const term = searchTerm.toLowerCase();
-        return (
-            user.name?.toLowerCase().includes(term) ||
-            user.email?.toLowerCase().includes(term) ||
-            user.phone?.includes(term)
-        );
-    }) || [];
+    const filteredUsers = (users || []) as any[];
+    
+    console.log('Total users:', (users as any[])?.length);
+    console.log('Filtered users:', filteredUsers.length);
+    console.log('Search term:', searchTerm);
+    console.log('Raw users data:', users);
+
+    // Debug properties modal
+    useEffect(() => {
+        if (showPropertiesModal && selectedUser) {
+            console.log('Properties modal opened - selectedUser:', selectedUser);
+            console.log('Properties modal opened - selectedUser.properties:', selectedUser.properties);
+        }
+    }, [showPropertiesModal, selectedUser]);
 
     const handleEdit = (user: any) => {
         setSelectedUser(user);
@@ -126,6 +155,8 @@ const AdminUsers: React.FC = () => {
     };
 
     const handleManageProperties = (user: any) => {
+        console.log('Managing properties for user:', user);
+        console.log('User properties:', user.properties);
         setSelectedUser(user);
         setShowPropertiesModal(true);
     };
@@ -146,6 +177,10 @@ const AdminUsers: React.FC = () => {
         return <Layout isAdmin><div>Loading users...</div></Layout>;
     }
 
+    if (error) {
+        return <Layout isAdmin><div>Error loading users: {error.message}</div></Layout>;
+    }
+
     return (
         <Layout isAdmin>
             <div className="page-header" style={{ marginBottom: '2rem' }}>
@@ -162,7 +197,7 @@ const AdminUsers: React.FC = () => {
                         fontSize: '12px',
                         fontWeight: 600
                     }}>
-                        {users?.length || 0} Users
+                        {(users as any[])?.length || 0} Users
                     </span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', width: 'auto' }}>
@@ -436,9 +471,11 @@ const AdminUsers: React.FC = () => {
 
                         <div>
                             <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '0.75rem' }}>Linked Properties</h4>
-                            {selectedUser.properties?.length > 0 ? (
+                            {userProperties && userProperties.length > 0 ? (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                    {selectedUser.properties.map((up: any) => (
+                                    {userProperties.map((up: any) => {
+                                        console.log('Rendering user property:', up);
+                                        return (
                                         <div key={up.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: '#f9fafb', borderRadius: '8px' }}>
                                             <div>
                                                 <p style={{ fontWeight: 600, fontSize: '14px' }}>{up.property.address}</p>
@@ -462,7 +499,8 @@ const AdminUsers: React.FC = () => {
                                                 </button>
                                             </div>
                                         </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             ) : (
                                 <p style={{ textAlign: 'center', padding: '1.5rem', color: '#64748b', fontSize: '14px', background: '#f9fafb', borderRadius: '8px' }}>

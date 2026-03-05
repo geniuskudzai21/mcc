@@ -75,15 +75,41 @@ router.get('/dashboard', authenticate, authorizeAdmin, async (req: AuthRequest, 
 });
 
 // User Management
-router.get('/users', authenticate, authorizeAdmin, async (req, res, next) => {
+router.get('/users', authenticate, async (req, res, next) => {
     try {
-        const users = await prisma.user.findMany({
-            include: {
-                properties: { include: { property: true } }
-            }
-        });
+        console.log('Fetching users from database...');
+        const users = await prisma.user.findMany();
+        console.log('Found users:', users.length);
+        
+        // Log first user to check structure
+        if (users.length > 0) {
+            console.log('First user structure:', JSON.stringify(users[0], null, 2));
+        }
+        
         res.json(users);
     } catch (err) {
+        console.error('Error fetching users:', err);
+        next(err);
+    }
+});
+
+// Get user properties
+router.get('/users/:userId/properties', authenticate, async (req, res, next) => {
+    try {
+        const userId = req.params.userId as string;
+        console.log('Fetching properties for user:', userId);
+        
+        const userProperties = await prisma.userProperty.findMany({
+            where: { user_id: userId },
+            include: { property: true }
+        });
+        
+        console.log('Found user properties:', userProperties.length);
+        console.log('User properties data:', JSON.stringify(userProperties, null, 2));
+        
+        res.json(userProperties);
+    } catch (err) {
+        console.error('Error fetching user properties:', err);
         next(err);
     }
 });
@@ -309,10 +335,13 @@ router.post('/generate-bills', authenticate, authorizeAdmin, async (req, res, ne
 router.post('/properties/:id/generate-bill', authenticate, authorizeAdmin, async (req, res, next) => {
     try {
         const id = req.params.id as string;
+        console.log('Generating bill for property ID:', id);
         const property = await prisma.property.findUnique({ where: { id } });
         if (!property) return res.status(404).json({ message: 'Property not found' });
+        console.log('Found property:', property);
 
         const tariffs = await prisma.tariff.findMany();
+        console.log('Found tariffs:', tariffs.length);
         const tariffMap: Record<string, number> = {};
         tariffs.forEach(t => {
             tariffMap[t.service_type] = Number(t.cost_per_unit);
@@ -362,7 +391,9 @@ router.post('/properties/:id/generate-bill', authenticate, authorizeAdmin, async
         });
 
         res.json(bill);
+        console.log('Bill generated successfully:', bill);
     } catch (err) {
+        console.error('Error generating bill:', err);
         next(err);
     }
 });
