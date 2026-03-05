@@ -9,7 +9,14 @@ router.get('/me', authenticate, async (req: AuthRequest, res, next) => {
     try {
         console.log('Fetching user profile for ID:', req.user?.id);
         const user = await prisma.user.findUnique({
-            where: { id: req.user?.id }
+            where: { id: req.user?.id },
+            include: {
+                properties: {
+                    include: {
+                        property: true
+                    }
+                }
+            }
         });
         console.log('Found user:', user);
         res.json(user);
@@ -35,30 +42,26 @@ router.put('/me', authenticate, async (req: AuthRequest, res, next) => {
 
 router.post('/link-property', authenticate, async (req: AuthRequest, res, next) => {
     try {
-        const { stand_number, address, suburb } = req.body;
+        const { account_number, stand_number, suburb } = req.body;
 
-        if (!stand_number || !address || !suburb) {
-            return res.status(400).json({ message: 'Stand number, address, and suburb are required' });
+        if (!account_number || !stand_number || !suburb) {
+            return res.status(400).json({ message: 'Account number, stand number, and suburb are required' });
         }
 
-        // Find or create the property
-        let property = await prisma.property.findUnique({
-            where: { stand_number }
+        // Find the property with matching account number, stand number, and suburb
+        const property = await prisma.property.findFirst({
+            where: { 
+                account_number: account_number.trim(), 
+                stand_number: stand_number.trim(),
+                suburb: {
+                    equals: suburb.trim(),
+                    mode: 'insensitive'
+                }
+            }
         });
 
         if (!property) {
-            // Create new property with a generated account number and UUID
-            const count = await prisma.property.count();
-            property = await prisma.property.create({
-                data: {
-                    id: uuidv4(),
-                    stand_number,
-                    address,
-                    suburb,
-                    owner_name: '',
-                    account_number: `ACC-${String(count + 1).padStart(4, '0')}`
-                }
-            });
+            return res.status(404).json({ message: 'Property not found with the provided details' });
         }
 
         // Check if already linked
@@ -84,7 +87,7 @@ router.post('/link-property', authenticate, async (req: AuthRequest, res, next) 
             } as any
         });
 
-        res.json({ message: 'Property linked successfully', property });
+        res.json({ message: 'Property linked successfully and awaiting admin approval', property });
     } catch (err) {
         next(err);
     }

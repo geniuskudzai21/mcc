@@ -2,7 +2,7 @@ import React from 'react';
 import Layout from '../components/Layout';
 import {
     TrendingUp, AlertCircle, Calendar, CheckCircle2,
-    ArrowRight, Home as HomeIcon, Bell, FileText,
+    Home as HomeIcon, Bell, FileText,
     ChevronRight, Wrench, Megaphone, CreditCard, Clock
 } from 'lucide-react';
 import {

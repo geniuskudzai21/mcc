@@ -68,7 +68,8 @@ async function main() {
     const properties = [
         { stand_number: 'ST-1001', address: '12 Main Street', suburb: 'Mutare CBD', owner_name: 'City Management', account_number: 'ACC-0001' },
         { stand_number: 'ST-2002', address: '45 Second Avenue', suburb: 'Chikanga', owner_name: 'Resident Alpha', account_number: 'ACC-0002' },
-        { stand_number: 'ST-3003', address: '78 Third Road', suburb: 'Sakubva', owner_name: 'Resident Beta', account_number: 'ACC-0003' }
+        { stand_number: 'ST-3003', address: '78 Third Road', suburb: 'Sakubva', owner_name: 'Resident Beta', account_number: 'ACC-0003' },
+        { stand_number: 'ST-3050', address: '123 Hobhouse Street', suburb: 'Hobhouse', owner_name: 'City Management', account_number: 'ACC-3050' }
     ];
 
     for (const p of properties) {

@@ -462,4 +462,74 @@ router.post('/announcements', authenticate, authorizeAdmin, async (req, res, nex
     }
 });
 
+// Get pending user accounts for approval
+router.get('/users/pending', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
+    try {
+        const users = await prisma.user.findMany({
+            where: {
+                properties: {
+                    some: {
+                        status: 'PENDING'
+                    }
+                }
+            },
+            include: {
+                properties: {
+                    include: {
+                        property: true
+                    }
+                }
+            },
+            orderBy: { created_at: 'desc' }
+        });
+        res.json(users);
+    } catch (err) {
+        next(err);
+    }
+});
+
+// Approve user account
+router.put('/users/:id/approve', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
+    try {
+        const userId = req.params.id as string;
+        
+        // Update all user properties to VERIFIED
+        await prisma.userProperty.updateMany({
+            where: {
+                user_id: userId,
+                status: 'PENDING'
+            },
+            data: {
+                status: 'VERIFIED'
+            }
+        });
+
+        res.json({ message: 'User account approved successfully' });
+    } catch (err) {
+        next(err);
+    }
+});
+
+// Reject user account
+router.put('/users/:id/reject', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
+    try {
+        const userId = req.params.id as string;
+        
+        // Update all user properties to REJECTED
+        await prisma.userProperty.updateMany({
+            where: {
+                user_id: userId,
+                status: 'PENDING'
+            },
+            data: {
+                status: 'REJECTED'
+            }
+        });
+
+        res.json({ message: 'User account rejected successfully' });
+    } catch (err) {
+        next(err);
+    }
+});
+
 export default router;

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Layout from '../components/Layout';
-import { User, Mail, Phone, Shield, Building2, Plus, X, Clock, CheckCircle, AlertCircle, Lock } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { User, Mail, Phone, Shield, Building2, Clock, CheckCircle, AlertCircle, Lock } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,9 +11,6 @@ const ACCENT = '#09d6f1';
 const ProfilePage: React.FC = () => {
     const { user: authUser } = useAuth();
     const isAdmin = authUser?.role !== 'USER';
-    const queryClient = useQueryClient();
-    const [showPropertyModal, setShowPropertyModal] = useState(false);
-    const [propertyForm, setPropertyForm] = useState({ stand_number: '', address: '', suburb: '' });
 
     const { data: user, isLoading } = useQuery({
         queryKey: ['user-me'],
@@ -25,17 +22,6 @@ const ProfilePage: React.FC = () => {
             console.log('User profile response:', res.data);
             return res.data; 
         }
-    });
-
-    const linkPropertyMutation = useMutation({
-        mutationFn: async () => api.post('/users/link-property', propertyForm),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user-me'] });
-            setShowPropertyModal(false);
-            setPropertyForm({ stand_number: '', address: '', suburb: '' });
-            alert('Property link request submitted! Awaiting admin verification.');
-        },
-        onError: (err: any) => alert(err.response?.data?.message || 'Failed to link property')
     });
 
     if (isLoading) {
@@ -91,23 +77,7 @@ const ProfilePage: React.FC = () => {
                             {isAdmin ? 'Your administrative account details' : 'Manage your personal information and property links'}
                         </p>
                     </div>
-                    {!isAdmin && (
-                        <button
-                            className="link-btn"
-                            onClick={() => setShowPropertyModal(true)}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '7px',
-                                padding: '0.55rem 1rem', background: NAVY,
-                                color: 'white', borderRadius: '8px', fontSize: '0.78rem',
-                                fontWeight: 700, border: 'none', cursor: 'pointer',
-                                transition: 'all 0.2s ease', letterSpacing: '0.02em',
-                            }}
-                        >
-                            <Plus style={{ width: '13px' }} />
-                            Link Property
-                        </button>
-                    )}
-                </div>
+            </div>
 
                 <div className="profile-grid" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '1.25rem' }}>
 
@@ -255,67 +225,7 @@ const ProfilePage: React.FC = () => {
                 </div>
             </div>
 
-            {/* ── Link Property Modal ── */}
-            {showPropertyModal && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)', animation: 'fadeUp 0.2s ease both' }}>
-                    <div style={{ background: 'white', borderRadius: '14px', width: '440px', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.2)' }}>
-                        {/* Modal header */}
-                        <div style={{ background: NAVY, padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Building2 style={{ width: '15px', color: ACCENT }} />
-                                <h3 style={{ color: 'white', fontSize: '0.9rem', fontWeight: 800 }}>Link Municipal Property</h3>
-                            </div>
-                            <button onClick={() => setShowPropertyModal(false)} style={{ color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: '2px' }}>
-                                <X style={{ width: '16px' }} />
-                            </button>
-                        </div>
-
-                        <div style={{ padding: '1.5rem' }}>
-                            {/* Warning */}
-                            <div style={{ display: 'flex', gap: '10px', padding: '0.75rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', marginBottom: '1.25rem' }}>
-                                <Shield style={{ width: '14px', color: '#d97706', flexShrink: 0, marginTop: '1px' }} />
-                                <p style={{ fontSize: '0.72rem', color: '#92400e', lineHeight: 1.5 }}>
-                                    Property links are subject to verification by the Billing Department. Providing false information may lead to account suspension.
-                                </p>
-                            </div>
-
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                                {[
-                                    { label: 'Stand / Account Number', key: 'stand_number', placeholder: 'e.g. ST-101 or ACC-0001' },
-                                    { label: 'Street Address', key: 'address', placeholder: 'e.g. 123 First Avenue' },
-                                    { label: 'Suburb', key: 'suburb', placeholder: 'e.g. Chikanga' },
-                                ].map(({ label, key, placeholder }) => (
-                                    <div key={key}>
-                                        <label style={{ display: 'block', fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '0.35rem' }}>{label}</label>
-                                        <input
-                                            type="text"
-                                            placeholder={placeholder}
-                                            className="modal-input"
-                                            value={(propertyForm as any)[key]}
-                                            onChange={(e) => setPropertyForm({ ...propertyForm, [key]: e.target.value })}
-                                            style={{ width: '100%', padding: '0.65rem 0.875rem', border: '1.5px solid #e5e7eb', borderRadius: '8px', fontSize: '0.85rem', outline: 'none', color: '#111827', fontFamily: 'inherit', background: '#f9fafb', transition: 'border-color 0.15s, background 0.15s' }}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-                                <button onClick={() => setShowPropertyModal(false)} style={{ flex: 1, padding: '0.7rem', border: '1.5px solid #e5e7eb', borderRadius: '8px', fontWeight: 700, color: '#6b7280', fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit', background: 'white' }}>
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => linkPropertyMutation.mutate()}
-                                    disabled={!propertyForm.stand_number || !propertyForm.address || linkPropertyMutation.isPending}
-                                    style={{ flex: 1, padding: '0.7rem', background: (!propertyForm.stand_number || !propertyForm.address) ? '#9ca3af' : NAVY, color: 'white', borderRadius: '8px', fontWeight: 700, fontSize: '0.82rem', border: 'none', cursor: (!propertyForm.stand_number || !propertyForm.address) ? 'not-allowed' : 'pointer', fontFamily: 'inherit', transition: 'background 0.2s' }}
-                                >
-                                    {linkPropertyMutation.isPending ? 'Submitting...' : 'Submit for Review'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </Layout>
+            </Layout>
     );
 };
 

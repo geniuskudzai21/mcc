@@ -7,7 +7,7 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { name, email, password, phone, account_number, stand_number } = req.body;
+        const { name, email, password, phone, account_number, stand_number, suburb } = req.body;
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) {
@@ -21,9 +21,16 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
         });
 
         // Handle Property Link if provided
-        if (account_number && stand_number) {
+        if (account_number && stand_number && suburb) {
             const property = await prisma.property.findFirst({
-                where: { account_number, stand_number }
+                where: { 
+                    account_number: account_number.trim(),
+                    stand_number: stand_number.trim(),
+                    suburb: {
+                        equals: suburb.trim(),
+                        mode: 'insensitive'
+                    }
+                }
             });
 
             if (property) {

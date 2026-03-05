@@ -7,7 +7,10 @@ const router = Router();
 router.get('/', authenticate, async (req: AuthRequest, res, next) => {
     try {
         const userProperties = await prisma.userProperty.findMany({
-            where: { user_id: req.user?.id },
+            where: { 
+                user_id: req.user?.id,
+                status: 'VERIFIED'
+            },
             select: { property_id: true }
         });
         const propertyIds = userProperties.map(up => up.property_id);
@@ -37,13 +40,14 @@ router.get('/:id', authenticate, async (req: AuthRequest, res, next) => {
 
         if (!bill) return res.status(404).json({ message: 'Bill not found' });
 
-        // Ensure user owns this bill
+        // Ensure user owns this bill and property is verified
         const userProperty = await prisma.userProperty.findUnique({
             where: {
                 user_id_property_id: {
                     user_id: req.user?.id as string,
                     property_id: bill.property_id
-                }
+                },
+                status: 'VERIFIED'
             }
         });
 

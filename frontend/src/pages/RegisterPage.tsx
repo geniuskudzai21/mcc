@@ -29,6 +29,7 @@ const RegisterPage: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [account_number, setAccountNumber] = useState('');
     const [stand_number, setStandNumber] = useState('');
+    const [suburb, setSuburb] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [btnHover, setBtnHover] = useState(false);
@@ -42,7 +43,7 @@ const RegisterPage: React.FC = () => {
         if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
         setLoading(true);
         try {
-            const res = await api.post('/auth/register', { name, email, phone, password, account_number, stand_number });
+            const res = await api.post('/auth/register', { name, email, phone, password, account_number, stand_number, suburb });
             login(res.data.token, res.data.user);
             navigate('/dashboard');
         } catch (err: any) {
@@ -207,6 +208,13 @@ const RegisterPage: React.FC = () => {
                                         <div style={{ position: 'relative' }}>
                                             <Hash style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '12px', color: '#9ca3af' }} />
                                             <input type="text" placeholder="ACC-0001" value={account_number} onChange={e => setAccountNumber(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
+                                        </div>
+                                    </div>
+                                    <div style={{ gridColumn: '1 / -1' }}>
+                                        <Label text="Suburb" />
+                                        <div style={{ position: 'relative' }}>
+                                            <Building2 style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '12px', color: '#9ca3af' }} />
+                                            <input type="text" placeholder="e.g., Hobhouse" value={suburb} onChange={e => setSuburb(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
                                         </div>
                                     </div>
                                 </div>

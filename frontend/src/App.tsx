@@ -9,10 +9,9 @@ import PaymentsPage from './pages/PaymentsPage.tsx';
 import RequestsPage from './pages/RequestsPage.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
 import AdminDashboard from './admin/AdminDashboard.tsx';
-import AdminUsers from './admin/AdminUsers.tsx';
+import AdminAccountApprovals from './admin/AdminAccountApprovals.tsx';
 import AdminBills from './admin/AdminBills.tsx';
 import AdminRequests from './admin/AdminRequests.tsx';
-import AdminProperties from './admin/AdminProperties.tsx';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -65,8 +64,7 @@ function App() {
 
             {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
-            <Route path="/admin/properties" element={<ProtectedRoute adminOnly><AdminProperties /></ProtectedRoute>} />
+            <Route path="/admin/account-approvals" element={<ProtectedRoute adminOnly><AdminAccountApprovals /></ProtectedRoute>} />
             <Route path="/admin/bills" element={<ProtectedRoute adminOnly><AdminBills /></ProtectedRoute>} />
             <Route path="/admin/requests" element={<ProtectedRoute adminOnly><AdminRequests /></ProtectedRoute>} />
 
