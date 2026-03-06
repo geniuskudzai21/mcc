@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-
     await prisma.payment.deleteMany({});
     await prisma.serviceRequest.deleteMany({});
     await prisma.billItem.deleteMany({});
