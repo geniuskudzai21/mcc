@@ -49,7 +49,8 @@ const DashboardPage: React.FC = () => {
         return (
             <Layout>
                 <div className="flex items-center justify-center h-[60vh] flex-col gap-4">
-                    <div className="w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                     <p className="text-slate-500 text-sm">Loading your portal...</p>
                 </div>
             </Layout>
@@ -116,12 +117,12 @@ const DashboardPage: React.FC = () => {
 
                 <div className="grid grid-cols-4 gap-4 mb-6">
                     {[
-                        { icon: <CreditCard className="w-4.5 h-4.5 text-cyan-400" />, label: 'Outstanding', value: `$${outstanding.toFixed(2)}`, sub: unpaidBills.length > 0 ? `${unpaidBills.length} unpaid bill${unpaidBills.length > 1 ? 's' : ''}` : 'No pending bills', bg: outstanding > 0 ? 'bg-red-50' : 'bg-green-50' },
+                        { icon: <CreditCard className="w-4.5 h-4.5 text-blue-600" />, label: 'Outstanding', value: `$${outstanding.toFixed(2)}`, sub: unpaidBills.length > 0 ? `${unpaidBills.length} unpaid bill${unpaidBills.length > 1 ? 's' : ''}` : 'No pending bills', bg: outstanding > 0 ? 'bg-red-50' : 'bg-green-50' },
                         { icon: <CheckCircle2 className="w-4.5 h-4.5 text-green-600" />, label: 'Total Paid', value: `$${paidTotal.toFixed(2)}`, sub: `${bills?.filter((b: any) => b.status === 'PAID').length || 0} bills settled`, bg: 'bg-green-50' },
                         { icon: <HomeIcon className="w-4.5 h-4.5 text-purple-600" />, label: 'Properties', value: `${properties.length}`, sub: 'Linked to account'},
                         { icon: <Wrench className="w-4.5 h-4.5 text-amber-600" />, label: 'Active Requests', value: `${activeRequests.length}`, sub: 'Pending resolution', bg: 'bg-amber-50' },
                     ].map((m, i) => (
-                        <div key={i} className="bg-white rounded-xl p-5 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both] transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-600/30 cursor-pointer" style={{ animationDelay: `${i * 0.05}s` }}>
+                        <div key={i} className="bg-white rounded-xl p-5 border border-slate-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1 animate-[fadeIn_0.4s_ease_both] cursor-pointer" style={{ animationDelay: `${i * 0.05}s` }}>
                             <div className="flex items-center justify-between mb-3.5">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-slate-500">{m.label}</span>
                                 {m.icon}
@@ -134,13 +135,15 @@ const DashboardPage: React.FC = () => {
 
                 <div className="grid grid-cols-[1fr_1fr_320px] gap-4 mb-6">
                     <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.2s' }}>
-                        <div className="flex items-center justify-between mb-5">
-                            <div>
-                                <h3 className="font-extrabold text-sm text-gray-900 mb-0.5">Billing History</h3>
-                                <p className="text-xs text-slate-400">Last 6 billing periods</p>
+                            <div className="flex items-center gap-3.5 mb-3.5">
+                                <div className="w-12 h-12 bg-white rounded-xl border-2 border-slate-200 flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <TrendingUp className="w-5 text-blue-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-extrabold text-sm text-gray-900 mb-0.5">Billing History</h3>
+                                    <p className="text-xs text-slate-400">Last 6 billing periods</p>
+                                </div>
                             </div>
-                            <TrendingUp className="w-4 text-cyan-400" />
-                        </div>
                         {chartData.length > 0 ? (
                             <ResponsiveContainer width="100%" height={180}>
                                 <AreaChart data={chartData}>
@@ -163,20 +166,20 @@ const DashboardPage: React.FC = () => {
                     </div>
 
                     <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.25s' }}>
-                        <div className="flex items-center justify-between mb-5">
-                            <div>
-                                <h3 className="font-extrabold text-sm text-gray-900 mb-0.5">Outstanding Bills</h3>
-                                <p className="text-xs text-slate-400">Action required</p>
+                            <div className="flex items-center gap-3.5 mb-3.5">
+                                <div>
+                                    <h3 className="font-extrabold text-sm text-gray-900 mb-0.5">Outstanding Bills</h3>
+                                    <p className="text-xs text-slate-400">Action required</p>
+                                </div>
+                                <button onClick={() => navigate('/bills')} className="text-xs font-extrabold text-slate-800 bg-none border-none cursor-pointer flex items-center gap-0.5 hover:text-blue-600 transition-all duration-300 transform hover:scale-110">
+                                    View All <ChevronRight className="w-3" />
+                                </button>
                             </div>
-                            <button onClick={() => navigate('/bills')} className="text-xs font-extrabold text-slate-800 bg-none border-none cursor-pointer flex items-center gap-0.5 hover:text-cyan-600">
-                                View All <ChevronRight className="w-3" />
-                            </button>
-                        </div>
                         <div className="flex flex-col gap-2">
                             {unpaidBills.length > 0 ? unpaidBills.slice(0, 4).map((bill: any) => (
-                                <div key={bill.id} onClick={() => navigate(`/bills/${bill.id}`)} className="flex items-center justify-between p-3 rounded-lg cursor-pointer border border-slate-100 hover:bg-slate-50 transition-colors">
+                                <div key={bill.id} onClick={() => navigate(`/bills/${bill.id}`)} className="flex items-center justify-between p-3 rounded-lg cursor-pointer border border-slate-100 hover:bg-slate-50 transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20">
                                     <div className="flex items-center gap-2.5">
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${bill.status === 'OVERDUE' ? 'bg-red-50' : 'bg-amber-50'}`}>
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110 ${bill.status === 'OVERDUE' ? 'bg-red-50' : 'bg-amber-50'}`}>
                                             <FileText className={`w-3.5 ${bill.status === 'OVERDUE' ? 'text-red-600' : 'text-amber-600'}`} />
                                         </div>
                                         <div>
@@ -186,7 +189,7 @@ const DashboardPage: React.FC = () => {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-sm font-extrabold text-gray-900">${parseFloat(bill.total_amount).toFixed(2)}</p>
-                                        <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full ${bill.status === 'OVERDUE' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
+                                        <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full transition-transform duration-300 transform hover:scale-105 ${bill.status === 'OVERDUE' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
                                             {bill.status}
                                         </span>
                                     </div>
@@ -204,18 +207,24 @@ const DashboardPage: React.FC = () => {
                     <div className="bg-white rounded-xl p-6 border border-slate-200 flex flex-col gap-3 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.3s' }}>
                         <h3 className="font-extrabold text-sm text-gray-900 mb-1">Quick Actions</h3>
 
-                        <button onClick={() => navigate('/bills')} className="w-full py-2 px-3.5 bg-green-200 text-green-900 border-1 border-green-400 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                            <div className="rounded p-1"><Calendar className="w-3.5" /></div>
+                        <button onClick={() => navigate('/bills')} className="w-full py-2 px-3.5 bg-green-200 text-green-900 border-1 border-green-400 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30">
+                            <div className="rounded-lg p-1 transition-transform duration-300 transform hover:scale-110">
+                                <Calendar className="w-3.5" />
+                            </div>
                             Pay My Bills
                         </button>
 
-                        <button onClick={() => navigate('/requests')} className="w-full py-2 px-3.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                            <div className="rounded p-1"><AlertCircle className="w-3.5" /></div>
+                        <button onClick={() => navigate('/requests')} className="w-full py-2 px-3.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30">
+                            <div className="rounded-lg p-1 transition-transform duration-300 transform hover:scale-110">
+                                <AlertCircle className="w-3.5" />
+                            </div>
                             Report an Issue
                         </button>
 
-                        <button onClick={() => navigate('/profile')} className="w-full py-2 px-3.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                            <div className="rounded p-1"><HomeIcon className="w-3.5" /></div>
+                        <button onClick={() => navigate('/profile')} className="w-full py-2 px-3.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30">
+                            <div className="rounded-lg p-1 transition-transform duration-300 transform hover:scale-110">
+                                <HomeIcon className="w-3.5" />
+                            </div>
                             My Profile
                         </button>
                     </div>
@@ -223,20 +232,20 @@ const DashboardPage: React.FC = () => {
 
                 <div className="grid grid-cols-[1fr_380px] gap-4">
                     <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.35s' }}>
-                        <div className="flex items-center justify-between mb-5">
-                            <div className="flex items-center gap-2">
-                                <Megaphone className="w-4 text-cyan-400" />
-                                <h3 className="font-extrabold text-sm text-gray-900">City Announcements</h3>
+                        <div className="flex items-center gap-2 mb-3.5">
+                            <div className="w-12 h-12 bg-white rounded-xl border-2 border-slate-200 flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                <Megaphone className="w-4 text-blue-600" />
                             </div>
-                            <span className="text-[10px] font-extrabold bg-sky-50 text-sky-700 px-2.5 py-1 rounded-full">
+                            <h3 className="font-extrabold text-sm text-gray-900">City Announcements</h3>
+                            <span className="text-[10px] font-extrabold bg-sky-50 text-sky-700 px-2.5 py-1 rounded-full transition-transform duration-300 transform hover:scale-105">
                                 {announcements?.length || 0} notices
                             </span>
                         </div>
                         <div className="flex flex-col gap-2.5">
                             {announcements?.length > 0 ? announcements.slice(0, 4).map((ann: any) => (
-                                <div key={ann.id} className="flex gap-4 p-3.5 border border-slate-100 rounded-xl hover:border-cyan-200 hover:shadow-sm transition-all cursor-default">
-                                    <div className="text-center min-w-[40px] bg-slate-800 rounded-lg py-2 px-1 flex-shrink-0">
-                                        <p className="text-cyan-400 text-[10px] font-extrabold uppercase">
+                                <div key={ann.id} className="flex gap-4 p-3.5 border border-slate-100 rounded-xl hover:border-blue-200 hover:shadow-md transition-all duration-300 transform hover:scale-105 cursor-default">
+                                    <div className="text-center min-w-[40px] bg-slate-800 rounded-lg py-2 px-1 flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
+                                        <p className="text-blue-600 text-[10px] font-extrabold uppercase">
                                             {new Date(ann.created_at).toLocaleString('default', { month: 'short' })}
                                         </p>
                                         <p className="text-white text-base font-extrabold leading-tight">
@@ -266,16 +275,16 @@ const DashboardPage: React.FC = () => {
                         </div>
                         <div className="flex flex-col gap-2.5">
                             {properties.length > 0 ? properties.map((p: any) => (
-                                <div key={p.id} className="flex items-center gap-3.5 p-3.5 rounded-xl border border-slate-100 hover:bg-sky-50 cursor-pointer transition-colors">
-                                    <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0">
-                                        <HomeIcon className="w-4.5 text-cyan-400" />
+                                <div key={p.id} className="flex items-center gap-3.5 p-3.5 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-all duration-300 transform hover:scale-105">
+                                    <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
+                                        <HomeIcon className="w-4.5 text-blue-600" />
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-sm font-bold text-gray-900 mb-0.5">{p.property.address}</p>
                                         <p className="text-xs text-slate-400">{p.property.suburb} · Stand {p.property.stand_number}</p>
                                     </div>
                                     <div className="text-right">
-                                        <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${p.status === 'VERIFIED' ? 'bg-green-50 text-green-600' : p.status === 'REJECTED' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
+                                        <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-transform duration-300 transform hover:scale-105 ${p.status === 'VERIFIED' ? 'bg-green-50 text-green-600' : p.status === 'REJECTED' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
                                             {p.status}
                                         </span>
                                     </div>

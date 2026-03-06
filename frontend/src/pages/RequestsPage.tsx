@@ -5,24 +5,33 @@ import {
     MapPin,
     Calendar,
     X,
-    ArrowRight,
     AlertTriangle,
     Droplets,
     Trash2,
     Zap,
     DollarSign,
     Edit2,
-    CheckCircle2
+    CheckCircle2,
+    Clock,
+    MessageSquare
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 
 const categoryIcons: Record<string, React.ReactNode> = {
-    'Water Leak': <Droplets style={{ width: '20px' }} />,
-    'Sewer Blockage': <Trash2 style={{ width: '20px' }} />,
-    'Missed Refuse': <Trash2 style={{ width: '20px' }} />,
-    'Streetlight Fault': <Zap style={{ width: '20px' }} />,
-    'Billing Query': <DollarSign style={{ width: '20px' }} />
+    'Water Leak': <Droplets className="w-5 h-5" />,
+    'Sewer Blockage': <Trash2 className="w-5 h-5" />,
+    'Missed Refuse': <Trash2 className="w-5 h-5" />,
+    'Streetlight Fault': <Zap className="w-5 h-5" />,
+    'Billing Query': <DollarSign className="w-5 h-5" />
+};
+
+const categoryColors: Record<string, string> = {
+    'Water Leak': 'bg-blue-100 text-blue-700 border-blue-200',
+    'Sewer Blockage': 'bg-orange-100 text-orange-700 border-orange-200',
+    'Missed Refuse': 'bg-green-100 text-green-700 border-green-200',
+    'Streetlight Fault': 'bg-yellow-100 text-yellow-700 border-yellow-200',
+    'Billing Query': 'bg-purple-100 text-purple-700 border-purple-200'
 };
 
 const RequestsPage: React.FC = () => {
@@ -104,6 +113,32 @@ const RequestsPage: React.FC = () => {
         }
     };
 
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'RESOLVED':
+                return 'bg-green-100 text-green-800 border-green-200';
+            case 'IN_PROGRESS':
+                return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'PENDING':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'RESOLVED':
+                return <CheckCircle2 className="w-5 h-5 text-green-600" />;
+            case 'IN_PROGRESS':
+                return <Clock className="w-5 h-5 text-blue-600" />;
+            case 'PENDING':
+                return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
+            default:
+                return <MessageSquare className="w-5 h-5 text-gray-600" />;
+        }
+    };
+
     const closeModal = () => {
         setShowModal(false);
         setEditRequest(null);
@@ -138,138 +173,209 @@ const RequestsPage: React.FC = () => {
     };
 
     if (requestsLoading) {
-        return <Layout><div className="flex-center" style={{ height: '60vh' }}>Accessing municipal records...</div></Layout>;
+        return (
+            <Layout>
+                <div className="flex items-center justify-center" style={{ height: '60vh' }}>
+                    <div className="text-center">
+                        <div className="processing-pulse mb-6">
+                            <div className="processing-pulse-dot">
+                                <MessageSquare className="w-6 h-6" />
+                            </div>
+                        </div>
+                        <p className="text-gray-600 font-medium">Loading service requests...</p>
+                    </div>
+                </div>
+            </Layout>
+        );
     }
 
     return (
         <Layout>
-            <div className="page-header">
-                <div>
-                    <h1 className="page-title">Service Requests</h1>
-                    <p className="page-subtitle">Track and report municipal service issues.</p>
+            <div className="max-w-6xl mx-auto">
+                <div className="mb-8">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Requests</h1>
+                            <p className="text-gray-600">Report and track municipal service issues</p>
+                        </div>
+                        <button
+                            onClick={() => setShowModal(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30"
+                        >
+                            <Plus className="w-5 h-5" />
+                            New Request
+                        </button>
+                    </div>
                 </div>
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="btn-primary"
-                    style={{ width: 'auto' }}
-                >
-                    <Plus className="nav-icon" />
-                    New Request
-                </button>
-            </div>
 
-            <div className="grid grid-cols-3 gap-6">
-                {requests?.map((request: any) => (
-                    <div key={request.id} className="stat-card" style={{ borderTop: `4px solid ${request.status === 'RESOLVED' ? '#16a34a' : 'var(--primary)'}`, padding: '1.5rem', position: 'relative' }}>
-                        <div className="flex-between mb-4">
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <div className="stat-icon-wrapper" style={{ width: '32px', height: '32px', background: 'var(--bg-main)', color: 'var(--primary)', borderRadius: '6px' }}>
-                                    {categoryIcons[request.category] || <AlertTriangle style={{ width: '16px' }} />}
-                                </div>
-                                <h3 className="card-title" style={{ margin: 0, fontSize: '14px' }}>{request.category}</h3>
+                {/* Request Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600 mb-1">Total Requests</p>
+                                <p className="text-2xl font-bold text-gray-900">{requests?.length || 0}</p>
                             </div>
-                            <span className={`badge ${request.status === 'RESOLVED' ? "badge-success" :
-                                request.status === 'PENDING' ? "badge-warning" :
-                                    "badge-info"
-                                }`} style={{ fontSize: '9px', padding: '0.25rem 0.5rem' }}>
-                                {request.status}
-                            </span>
-                        </div>
-
-                        <div className="mb-4">
-                            <p className="page-subtitle" style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '13px', marginBottom: '0.5rem' }}>"{request.description}"</p>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '11px', color: 'var(--text-muted)' }}>
-                                    <MapPin style={{ width: '12px' }} />
-                                    {request.property.address}
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '11px', color: 'var(--text-muted)' }}>
-                                    <Calendar style={{ width: '12px' }} />
-                                    {new Date(request.created_at).toLocaleDateString()}
-                                </div>
+                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <MessageSquare className="w-6 h-6 text-blue-600" />
                             </div>
                         </div>
+                    </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
-                            {request.status === 'PENDING' && (
-                                <>
-                                    <button
-                                        onClick={() => handleEdit(request)}
-                                        className="forgot-link"
-                                        style={{ fontSize: '11px', color: '#2563eb', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}
-                                    >
-                                        <Edit2 style={{ width: '12px' }} /> EDIT
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(request.id)}
-                                        className="forgot-link"
-                                        style={{ fontSize: '11px', color: '#dc2626', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}
-                                    >
-                                        <Trash2 style={{ width: '12px' }} /> DELETE
-                                    </button>
-                                </>
-                            )}
-                            <button className="forgot-link" style={{ fontSize: '11px', marginLeft: 'auto', fontWeight: 700 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <span>DETAILS</span>
-                                    <ArrowRight style={{ width: '12px' }} />
-                                </div>
+                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600 mb-1">Pending</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {requests?.filter((r: any) => r.status === 'PENDING').length || 0}
+                                </p>
+                            </div>
+                            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <Clock className="w-6 h-6 text-yellow-600" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600 mb-1">Resolved</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {requests?.filter((r: any) => r.status === 'RESOLVED').length || 0}
+                                </p>
+                            </div>
+                            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <CheckCircle2 className="w-6 h-6 text-green-600" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Request List */}
+                <div className="space-y-4">
+                    {requests?.length === 0 ? (
+                        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">No service requests</h3>
+                            <p className="text-gray-600 mb-6">You haven't submitted any service requests yet</p>
+                            <button
+                                onClick={() => setShowModal(true)}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Create Your First Request
                             </button>
                         </div>
-                    </div>
-                ))}
-                {requests?.length === 0 && (
-                    <div className="col-span-3 flex-center" style={{ height: '200px', flexDirection: 'column', gap: '1rem', color: 'var(--text-muted)' }}>
-                        <CheckCircle2 style={{ width: '48px', height: '48px', opacity: 0.2 }} />
-                        <p>No active service requests for your account.</p>
-                    </div>
-                )}
+                    ) : (
+                        requests.map((request: any) => (
+                            <div key={request.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="p-6">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex items-start gap-4">
+                                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${categoryColors[request.category] || 'bg-gray-100 text-gray-700'} shadow-md transition-transform duration-300 transform hover:scale-110`}>
+                                                {categoryIcons[request.category] || <AlertTriangle className="w-5 h-5" />}
+                                            </div>
+                                            
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <h3 className="text-lg font-semibold text-gray-900">
+                                                        {request.category}
+                                                    </h3>
+                                                    <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(request.status)} transition-transform duration-300 transform hover:scale-105`}>
+                                                        {request.status}
+                                                    </span>
+                                                </div>
+                                                
+                                                <p className="text-gray-600 mb-3">
+                                                    {request.description}
+                                                </p>
+                                                
+                                                <div className="flex items-center gap-4 text-sm text-gray-500">
+                                                    <div className="flex items-center gap-1">
+                                                        <MapPin className="w-4 h-4" />
+                                                        {request.property.address}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Calendar className="w-4 h-4" />
+                                                        {new Date(request.created_at).toLocaleDateString()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            {request.status === 'PENDING' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleEdit(request)}
+                                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-110 hover:rotate-12"
+                                                        title="Edit Request"
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(request.id)}
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-110 hover:rotate-12"
+                                                        title="Delete Request"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
 
             {/* New/Edit Request Modal */}
             {showModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,51,102,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
-                    <div className="stat-card" style={{ width: '450px', padding: '2rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <div>
-                                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#003366', textTransform: 'uppercase' }}>
-                                    {editRequest ? 'Edit Request' : 'Report an Issue'}
-                                </h3>
-                                <p style={{ fontSize: '12px', color: '#64748b' }}>Municipal Service Desk</p>
+                <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-lg font-bold text-gray-900">
+                                        {editRequest ? 'Edit Request' : 'Report an Issue'}
+                                    </h3>
+                                    <p className="text-xs text-gray-600">Municipal Service Desk</p>
+                                </div>
+                                <button 
+                                    onClick={closeModal} 
+                                    className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-300 transform hover:scale-110 hover:rotate-90"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
                             </div>
-                            <button onClick={closeModal} style={{ background: '#f1f5f9', border: 'none', padding: '0.5rem', borderRadius: '50%', cursor: 'pointer' }}>
-                                <X style={{ width: '18px', color: '#003366' }} />
-                            </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={handleSubmit} className="p-4 space-y-4">
                             {!editRequest && (
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, marginBottom: '0.5rem', color: '#003366', textTransform: 'uppercase' }}>ISSUE CATEGORY</label>
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <label className="block text-xs font-medium text-gray-700 mb-2">Issue Category</label>
+                                    <div className="grid grid-cols-2 gap-2">
                                         {['Water Leak', 'Sewer Blockage', 'Missed Refuse', 'Streetlight Fault', 'Billing Query'].map((cat) => (
                                             <button
                                                 key={cat}
                                                 type="button"
                                                 onClick={() => setCategory(cat)}
-                                                style={{
-                                                    padding: '0.75rem 0.5rem',
-                                                    border: `2px solid ${category === cat ? '#003366' : 'transparent'}`,
-                                                    borderRadius: '8px',
-                                                    background: category === cat ? '#eff6ff' : '#f8fafc',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    alignItems: 'center',
-                                                    gap: '0.5rem',
-                                                    transition: 'all 0.2s ease'
-                                                }}
+                                                className={`p-2 rounded-lg border-2 transition-all duration-300 transform hover:scale-105 ${
+                                                    category === cat 
+                                                        ? 'border-blue-500 bg-blue-50 shadow-md shadow-blue-600/30' 
+                                                        : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+                                                }`}
                                             >
-                                                <div style={{ color: category === cat ? '#003366' : '#64748b' }}>{categoryIcons[cat]}</div>
-                                                <span style={{ fontSize: '10px', fontWeight: 700, color: category === cat ? '#003366' : '#64748b', textAlign: 'center' }}>{cat}</span>
+                                                <div className={`flex flex-col items-center gap-1 transition-transform duration-300 transform hover:scale-110 ${
+                                                    category === cat ? 'text-blue-700' : 'text-gray-600'
+                                                }`}>
+                                                    <div className="w-4 h-4">
+                                                        {categoryIcons[cat]}
+                                                    </div>
+                                                    <span className="text-xs font-medium text-center">{cat}</span>
+                                                </div>
                                             </button>
                                         ))}
                                     </div>
@@ -277,13 +383,13 @@ const RequestsPage: React.FC = () => {
                             )}
 
                             {!editRequest && (
-                                <div style={{ marginTop: '1.5rem' }}>
-                                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, marginBottom: '0.5rem', color: '#003366', textTransform: 'uppercase' }}>AFFECTED PROPERTY</label>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Affected Property</label>
                                     <select
                                         value={propertyId}
                                         onChange={(e) => setPropertyId(e.target.value)}
                                         required
-                                        style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '13px', fontWeight: 600, color: '#1e293b', background: '#f8fafc' }}
+                                        className="w-full px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     >
                                         <option value="">Choose property...</option>
                                         {properties.map((p: any) => (
@@ -295,33 +401,32 @@ const RequestsPage: React.FC = () => {
                                 </div>
                             )}
 
-                            <div style={{ marginTop: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '11px', fontWeight: 800, marginBottom: '0.5rem', color: '#003366', textTransform: 'uppercase' }}>ISSUE DESCRIPTION</label>
+                            <div>
+                                <label className="block text-xs font-medium text-gray-700 mb-1">Issue Description</label>
                                 <textarea
                                     rows={3}
                                     placeholder="Provide details to help our teams resolve this quickly..."
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     required
-                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '13px', resize: 'none', background: '#f8fafc' }}
+                                    className="w-full px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                 />
                             </div>
 
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                            <div className="flex gap-2 pt-2">
                                 <button
                                     type="button"
                                     onClick={closeModal}
-                                    style={{ flex: 1, padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '8px', background: 'white', fontWeight: 700, fontSize: '13px', color: '#64748b', cursor: 'pointer' }}
+                                    className="flex-1 px-3 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105"
                                 >
-                                    DISCARD
+                                    Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={!category || !propertyId || !description || submitting}
-                                    className="btn-primary"
-                                    style={{ flex: 2, padding: '0.75rem', background: '#003366', color: 'white', borderRadius: '8px', fontWeight: 700, fontSize: '13px', border: 'none', cursor: 'pointer', opacity: (!category || !propertyId || !description || submitting) ? 0.7 : 1 }}
+                                    className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
                                 >
-                                    {submitting ? 'PROCESSING...' : (editRequest ? 'UPDATE REPORT' : 'SUBMIT REPORT')}
+                                    {submitting ? 'Processing...' : (editRequest ? 'Update' : 'Submit')}
                                 </button>
                             </div>
                         </form>

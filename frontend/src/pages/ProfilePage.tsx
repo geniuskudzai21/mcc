@@ -6,7 +6,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const NAVY = '#001e3c';
-const ACCENT = '#09d6f1';
+const ACCENT = '#2563eb';
 
 const ProfilePage: React.FC = () => {
     const { user: authUser } = useAuth();
@@ -28,7 +28,7 @@ const ProfilePage: React.FC = () => {
         return (
             <Layout isAdmin={isAdmin}>
                 <div className="flex items-center justify-center h-[60vh] gap-4 flex-col">
-                    <div className="w-9 h-9 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-9 h-9 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
                     <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                     <p className="text-slate-500 text-sm">Loading profile...</p>
                 </div>
@@ -51,9 +51,11 @@ const ProfilePage: React.FC = () => {
             <style>{`
                 @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .profile-card { animation: fadeUp 0.35s ease both; }
-                .prop-item:hover { background: #f0f9ff; }
+                .prop-item:hover { background: #f0f9ff; transform: translateY(-1px); }
                 .link-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,30,60,0.2); }
                 .modal-input:focus { border-color: ${NAVY} !important; background: #fff !important; }
+                .card-shadow { box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.2); }
+                .card-shadow:hover { box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.3); }
             `}</style>
 
             <div className="max-w-4xl mx-auto">
@@ -62,7 +64,7 @@ const ProfilePage: React.FC = () => {
                 <div className="flex items-center justify-between mb-6 animate-[fadeUp_0.3s_ease_both]">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <div className="w-1 h-4.5 bg-cyan-400 rounded-sm" />
+                            <div className="w-1 h-4.5 bg-blue-600 rounded-sm" />
                             <h1 className="text-lg font-black text-gray-900 tracking-tight">
                                 {isAdmin ? 'Administrative Identity' : 'Citizen Profile'}
                             </h1>
@@ -77,11 +79,11 @@ const ProfilePage: React.FC = () => {
 
                     {/* ── LEFT: Identity Card ── */}
                     <div className="profile-card" style={{ animationDelay: '0.05s' }}>
-                        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             {/* Navy top band */}
                             <div className="bg-blue-900 pt-8 px-6 pb-14 relative text-center">
                                 <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
-                                <div className="absolute bottom-[-32px] left-1/2 -translate-x-1/2 w-16 h-16 bg-cyan-400 rounded-full border-4 border-white flex items-center justify-center text-2xl font-black text-blue-900 z-10 shadow-lg">
+                                <div className="absolute bottom-[-32px] left-1/2 -translate-x-1/2 w-16 h-16 bg-blue-600 rounded-full border-4 border-white flex items-center justify-center text-2xl font-black text-blue-900 z-10 shadow-lg shadow-blue-600/30 transition-transform duration-300 transform hover:scale-110">
                                     {user?.name?.[0]?.toUpperCase()}
                                 </div>
                                 <p className="text-white/40 text-xs uppercase tracking-wider relative z-10">
@@ -97,18 +99,24 @@ const ProfilePage: React.FC = () => {
                                 </p>
 
                                 <div className="flex flex-col gap-2.5 text-left border-t border-slate-100 pt-5">
-                                    <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md">
-                                        <Mail className="w-3 text-slate-400 flex-shrink-0" />
+                                    <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md transition-all duration-300 transform hover:scale-105">
+                                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <Mail className="w-3 text-blue-600" />
+                                        </div>
                                         <span className="text-xs text-slate-700 font-medium truncate">{user?.email}</span>
                                     </div>
                                     {!isAdmin && (
-                                        <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md">
-                                            <Phone className="w-3 text-slate-400 flex-shrink-0" />
+                                        <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md transition-all duration-300 transform hover:scale-105">
+                                            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                                <Phone className="w-3 text-green-600" />
+                                            </div>
                                             <span className="text-xs text-slate-700 font-medium">{user?.phone || 'Not provided'}</span>
                                         </div>
                                     )}
-                                    <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md">
-                                        <Shield className="w-3 text-slate-400 flex-shrink-0" />
+                                    <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-md transition-all duration-300 transform hover:scale-105">
+                                        <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <Shield className="w-3 text-purple-600" />
+                                        </div>
                                         <span className="text-xs text-slate-700 font-medium">{user?.role || 'USER'}</span>
                                     </div>
                                 </div>
@@ -120,34 +128,40 @@ const ProfilePage: React.FC = () => {
                     <div className="flex flex-col gap-5">
 
                         {/* Security Credentials */}
-                        <div className="profile-card bg-white rounded-xl border border-slate-200 p-6" style={{ animationDelay: '0.1s' }}>
+                        <div className="profile-card bg-white rounded-xl border border-slate-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1" style={{ animationDelay: '0.1s' }}>
                             <div className="flex items-center gap-2 mb-5">
-                                <div className="bg-blue-50 p-1.5 rounded-md">
+                                <div className="bg-blue-50 p-1.5 rounded-md transition-transform duration-300 transform hover:scale-110">
                                     <Lock className="w-3 text-sky-700" />
                                 </div>
                                 <h4 className="font-extrabold text-sm text-gray-900">Security Credentials</h4>
-                                <span className="ml-auto text-xs font-bold px-2 py-0.5 bg-green-50 text-green-600 rounded-full">Read-only</span>
+                                <span className="ml-auto text-xs font-bold px-2 py-0.5 bg-green-50 text-green-600 rounded-full transition-transform duration-300 transform hover:scale-105">Read-only</span>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3.5 mb-4">
                                 <div>
                                     <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Full Name</label>
                                     <div className="relative">
-                                        <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 text-slate-300" />
+                                        <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 text-slate-300 transition-transform duration-300 transform hover:scale-110">
+                                            <User />
+                                        </div>
                                         <input type="text" defaultValue={user?.name} className={inputClass} readOnly />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Email Address</label>
                                     <div className="relative">
-                                        <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 text-slate-300" />
+                                        <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 text-slate-300 transition-transform duration-300 transform hover:scale-110">
+                                            <Mail />
+                                        </div>
                                         <input type="text" defaultValue={user?.email} className={inputClass} readOnly />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-start gap-2">
-                                <Shield className="w-3 text-slate-400 flex-shrink-0 mt-0.5" />
+                            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-start gap-2 transition-all duration-300 transform hover:scale-105">
+                                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 transition-transform duration-300 transform hover:scale-110">
+                                    <Shield className="w-3 text-green-600" />
+                                </div>
                                 <div>
                                     <p className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-0.5">Immutable Identity</p>
                                     <p className="text-xs text-slate-600 leading-relaxed">Identity records can only be modified by the IT Department through official channels.</p>
@@ -157,13 +171,13 @@ const ProfilePage: React.FC = () => {
 
                         {/* Linked Properties (user only) */}
                         {!isAdmin && (
-                            <div className="profile-card bg-white rounded-xl border border-slate-200 p-6" style={{ animationDelay: '0.15s' }}>
+                            <div className="profile-card bg-white rounded-xl border border-slate-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1" style={{ animationDelay: '0.15s' }}>
                                 <div className="flex items-center gap-2 mb-5">
-                                    <div className="bg-purple-50 p-1.5 rounded-md">
+                                    <div className="bg-purple-50 p-1.5 rounded-md transition-transform duration-300 transform hover:scale-110">
                                         <Building2 className="w-3 text-purple-600" />
                                     </div>
                                     <h4 className="font-extrabold text-sm text-gray-900">Linked Properties</h4>
-                                    <span className="ml-auto text-xs font-bold px-2 py-0.5 bg-slate-50 text-slate-600 rounded-full border border-slate-200">
+                                    <span className="ml-auto text-xs font-bold px-2 py-0.5 bg-slate-50 text-slate-600 rounded-full border border-slate-200 transition-transform duration-300 transform hover:scale-105">
                                         {user?.properties?.length || 0} linked
                                     </span>
                                 </div>
@@ -174,15 +188,15 @@ const ProfilePage: React.FC = () => {
                                             const s = getStatusConfig(up.status);
                                             const Icon = s.icon;
                                             return (
-                                                <div key={up.property.id} className="prop-item flex items-center gap-3.5 p-3.5 bg-slate-50 rounded-lg border border-slate-100 transition-colors">
-                                                    <div className="w-9.5 h-9.5 bg-blue-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                        <Building2 className="w-4 text-cyan-400" />
+                                                <div key={up.property.id} className="prop-item flex items-center gap-3.5 p-3.5 bg-slate-50 rounded-lg border border-slate-100 transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20">
+                                                    <div className="w-9.5 h-9.5 bg-blue-900 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
+                                                        <Building2 className="w-4 text-blue-600" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="font-bold text-sm text-gray-900 mb-0.5 truncate">{up.property.address}</p>
                                                         <p className="text-xs text-slate-400">{up.property.suburb} · Stand {up.property.stand_number}</p>
                                                     </div>
-                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-600 border border-green-200 rounded-full text-xs font-bold flex-shrink-0">
+                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-600 border border-green-200 rounded-full text-xs font-bold flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
                                                         <Icon className="w-2.5" />
                                                         {s.label}
                                                     </span>
@@ -191,8 +205,10 @@ const ProfilePage: React.FC = () => {
                                         })}
                                     </div>
                                 ) : (
-                                    <div className="text-center p-8 border-2 border-dashed border-slate-200 rounded-xl">
-                                        <Building2 className="w-8 mx-auto mb-3 text-slate-300 block" />
+                                    <div className="text-center p-8 border-2 border-dashed border-slate-200 rounded-xl shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
+                                            <Building2 className="w-8 text-gray-400" />
+                                        </div>
                                         <p className="font-bold text-sm text-slate-700 mb-1">No Properties Linked</p>
                                         <p className="text-xs text-slate-400">Link a property to access billing and payment history.</p>
                                     </div>
@@ -202,9 +218,9 @@ const ProfilePage: React.FC = () => {
 
                         {/* Admin block */}
                         {isAdmin && (
-                            <div className="profile-card bg-white rounded-xl border-2 border-blue-900 p-6" style={{ animationDelay: '0.15s' }}>
+                            <div className="profile-card bg-white rounded-xl border-2 border-blue-900 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1" style={{ animationDelay: '0.15s' }}>
                                 <div className="flex items-center gap-2 mb-3.5">
-                                    <div className="bg-blue-900 p-1.5 rounded-md">
+                                    <div className="bg-blue-900 p-1.5 rounded-md transition-transform duration-300 transform hover:scale-110">
                                         <Shield className="w-3 text-cyan-400" />
                                     </div>
                                     <h4 className="font-extrabold text-sm text-blue-900">Administrative Access</h4>

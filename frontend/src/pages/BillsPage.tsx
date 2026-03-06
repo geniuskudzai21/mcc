@@ -33,12 +33,20 @@ const BillsPage: React.FC = () => {
     const [lastPayment, setLastPayment] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { data: bills, isLoading } = useQuery({
+    const { data: bills, isLoading, error } = useQuery({
         queryKey: ['bills-list'],
         queryFn: async () => {
-            const res = await api.get('/bills');
-            return res.data;
-        }
+            try {
+                const res = await api.get('/bills');
+                return res.data;
+            } catch (err) {
+                console.error('API Error:', err);
+                throw err;
+            }
+        },
+        retry: 1,
+        retryDelay: 1000,
+        staleTime: 30000,
     });
 
     const payMutation = useMutation({
@@ -106,27 +114,48 @@ const BillsPage: React.FC = () => {
         }
     };
 
-    if (isLoading) {
-        return <Layout><div className="flex items-center justify-center py-8 text-slate-600">Synchronizing with billing server...</div></Layout>;
-    }
+    // Calculate derived values (must be before early returns)
+    const unPaidBills = bills?.filter((b: any) => b && (b.status === 'UNPAID' || b.status === 'OVERDUE')) || [];
+    const totalOutstanding = unPaidBills.reduce((sum: number, b: any) => sum + (parseFloat(b.total_amount) || 0), 0);
+    const safeBills = Array.isArray(bills) ? bills : [];
 
-    const unPaidBills = bills?.filter((b: any) => b.status === 'UNPAID' || b.status === 'OVERDUE') || [];
-    const totalOutstanding = unPaidBills.reduce((sum: number, b: any) => sum + parseFloat(b.total_amount), 0);
-
-    // Filter bills based on search query
+    // Filter bills based on search query (must be before early returns)
     const filteredBills = useMemo(() => {
-        if (!searchQuery.trim()) return bills;
+        if (!searchQuery.trim()) return safeBills;
         
         const query = searchQuery.toLowerCase();
-        return bills?.filter((bill: any) => {
+        return safeBills.filter((bill: any) => {
+            if (!bill) return false;
             return (
                 bill.property?.address?.toLowerCase().includes(query) ||
                 `${bill.billing_month}/${bill.billing_year}`.includes(query) ||
                 bill.total_amount?.toString().includes(query) ||
                 bill.status?.toLowerCase().includes(query)
             );
-        }) || [];
-    }, [bills, searchQuery]);
+        });
+    }, [safeBills, searchQuery]);
+
+    if (isLoading) {
+        return <Layout><div className="flex items-center justify-center py-8 text-slate-600">Synchronizing with billing server...</div></Layout>;
+    }
+
+    if (error) {
+        return (
+            <Layout>
+                <div className="flex flex-col items-center justify-center py-16 text-slate-600">
+                    <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Unable to load bills</h3>
+                    <p className="text-sm text-slate-500 mb-4">There was a problem connecting to the billing server.</p>
+                    <button 
+                        onClick={() => window.location.reload()}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </Layout>
+        );
+    }
 
     return (
         <Layout>
@@ -163,9 +192,9 @@ const BillsPage: React.FC = () => {
                         )}
                     </div>
                     <div className="flex gap-3 w-full lg:w-auto">
-                        <div className="flex-1 lg:flex-initial bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100 min-w-[160px]">
+                        <div className="flex-1 lg:flex-initial bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100 min-w-[160px] shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                     <TrendingUp className="w-5 h-5 text-blue-600" />
                                 </div>
                                 <div>
@@ -174,14 +203,14 @@ const BillsPage: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex-1 lg:flex-initial bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100 min-w-[140px]">
+                        <div className="flex-1 lg:flex-initial bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100 min-w-[140px] shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                     <AlertCircle className="w-5 h-5 text-amber-600" />
                                 </div>
                                 <div>
                                     <p className="text-xs font-medium text-amber-600">Overdue</p>
-                                    <p className="text-lg font-bold text-slate-900">{bills?.filter((b: any) => b.status === 'OVERDUE').length || 0}</p>
+                                    <p className="text-lg font-bold text-slate-900">{safeBills.filter((b: any) => b && b.status === 'OVERDUE').length}</p>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +219,7 @@ const BillsPage: React.FC = () => {
             </div>
 
             {/* Bills Table */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-8">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-8 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-slate-50 border-b border-slate-200">
@@ -204,14 +233,18 @@ const BillsPage: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {filteredBills?.map((bill: any) => (
-                                <tr key={bill.id} className="hover:bg-slate-50 transition-colors">
+                            {filteredBills?.map((bill: any) => {
+                                if (!bill || !bill.id) return null;
+                                return (
+                                <tr key={bill.id} className="hover:bg-slate-50 transition-colors duration-300">
                                     <td className="py-4 px-6">
                                         <div className="flex items-start gap-3">
-                                            <Home className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                            <div className="w-5 h-5 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 transition-transform duration-300 transform hover:scale-110">
+                                                <Home className="w-3 h-3 text-blue-600" />
+                                            </div>
                                             <div>
-                                                <p className="font-semibold text-slate-900 text-sm">{bill.property.address}</p>
-                                                <p className="text-xs text-slate-500 mt-1">Acct: {bill.property.account_number}</p>
+                                                <p className="font-semibold text-slate-900 text-sm">{bill.property?.address || 'N/A'}</p>
+                                                <p className="text-xs text-slate-500 mt-1">Acct: {bill.property?.account_number || 'N/A'}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -222,16 +255,16 @@ const BillsPage: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
-                                        <p className="font-bold text-lg text-slate-900">${parseFloat(bill.total_amount).toFixed(2)}</p>
+                                        <p className="font-bold text-lg text-slate-900">${(parseFloat(bill.total_amount) || 0).toFixed(2)}</p>
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-slate-400" />
-                                            <span className="text-sm text-slate-600">{new Date(bill.due_date).toLocaleDateString()}</span>
+                                            <span className="text-sm text-slate-600">{bill.due_date ? new Date(bill.due_date).toLocaleDateString() : 'N/A'}</span>
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-transform duration-300 transform hover:scale-105 ${
                                             bill.status === 'PAID' 
                                                 ? 'bg-green-100 text-green-800 border border-green-200' 
                                                 : bill.status === 'OVERDUE' 
@@ -241,21 +274,21 @@ const BillsPage: React.FC = () => {
                                             {bill.status === 'PAID' && <CheckCircle2 className="w-3 h-3 mr-1" />}
                                             {bill.status === 'OVERDUE' && <AlertCircle className="w-3 h-3 mr-1" />}
                                             {bill.status === 'UNPAID' && <Clock className="w-3 h-3 mr-1" />}
-                                            {bill.status}
+                                            {bill.status || 'UNKNOWN'}
                                         </span>
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => navigate(`/bills/${bill.id}`)}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
                                             >
                                                 <FileText className="w-4 h-4" />
                                                 Details
                                             </button>
                                             {bill.status !== 'PAID' && (
                                                 <button
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                                                     onClick={() => handlePayBill(bill)}
                                                     disabled={payMutation.isPending}
                                                 >
@@ -266,8 +299,9 @@ const BillsPage: React.FC = () => {
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
-                            {filteredBills?.length === 0 && (
+                                );
+                            })}
+                            {(filteredBills || []).length === 0 && (
                                 <tr>
                                     <td colSpan={6} className="text-center py-12">
                                         <div className="flex flex-col items-center">
@@ -290,13 +324,13 @@ const BillsPage: React.FC = () => {
             {/* Quick Actions and Info Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Outstanding Summary Card */}
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 text-white">
+                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 text-white shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h3 className="text-lg font-bold mb-1">Outstanding Balance</h3>
                             <p className="text-slate-300 text-sm">Total amount due across all properties</p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                             <TrendingUp className="w-6 h-6 text-white" />
                         </div>
                     </div>
@@ -305,7 +339,7 @@ const BillsPage: React.FC = () => {
                         <p className="text-slate-400 text-sm">{unPaidBills.length} unpaid {unPaidBills.length === 1 ? 'bill' : 'bills'}</p>
                     </div>
                     <button
-                        className="w-full bg-white text-slate-900 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-white text-slate-900 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30"
                         disabled={totalOutstanding <= 0 || payMutation.isPending}
                         onClick={handlePayBalance}
                     >
@@ -314,22 +348,28 @@ const BillsPage: React.FC = () => {
                 </div>
 
                 {/* Security Features Card */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-bold text-slate-900">Payment Security</h3>
-                        <ShieldCheck className="w-5 h-5 text-green-600" />
+                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                            <ShieldCheck className="w-4 h-4 text-green-600" />
+                        </div>
                     </div>
                     <p className="text-sm text-slate-600 mb-6">All transactions are protected with industry-standard encryption and security measures.</p>
                     <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                            <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                        <div className="flex items-center gap-3 transition-transform duration-300 transform hover:scale-105">
+                            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <CheckCircle2 className="w-3 h-3 text-green-600" />
+                            </div>
                             <div>
                                 <p className="text-sm font-semibold text-slate-900">256-bit SSL Encryption</p>
                                 <p className="text-xs text-slate-500">Bank-level security</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                        <div className="flex items-center gap-3 transition-transform duration-300 transform hover:scale-105">
+                            <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <FileText className="w-3 h-3 text-blue-600" />
+                            </div>
                             <div>
                                 <p className="text-sm font-semibold text-slate-900">Instant Receipts</p>
                                 <p className="text-xs text-slate-500">Digital proof of payment</p>
@@ -339,22 +379,28 @@ const BillsPage: React.FC = () => {
                 </div>
 
                 {/* Payment Methods Card */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-bold text-slate-900">Payment Methods</h3>
-                        <CreditCard className="w-5 h-5 text-blue-600" />
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                            <CreditCard className="w-4 h-4 text-blue-600" />
+                        </div>
                     </div>
                     <p className="text-sm text-slate-600 mb-6">Choose from multiple convenient payment options.</p>
                     <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                            <CreditCard className="w-5 h-5 text-green-600" />
+                        <div className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <CreditCard className="w-4 h-4 text-green-600" />
+                            </div>
                             <div className="flex-1">
                                 <p className="text-sm font-semibold text-slate-900">Credit/Debit Card</p>
                                 <p className="text-xs text-slate-500">Visa, Mastercard, etc.</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
-                            <Smartphone className="w-5 h-5 text-red-600" />
+                        <div className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                            <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                                <Smartphone className="w-4 h-4 text-red-600" />
+                            </div>
                             <div className="flex-1">
                                 <p className="text-sm font-semibold text-slate-900">EcoCash</p>
                                 <p className="text-xs text-slate-500">Mobile money transfer</p>
@@ -367,7 +413,7 @@ const BillsPage: React.FC = () => {
             {/* Payment Modal */}
             {showPaymentModal && selectedBill && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl" style={{ animation: 'modalIn 0.3s ease-out' }}>
+                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300" style={{ animation: 'modalIn 0.3s ease-out' }}>
                         {processingStep > 0 ? (
                             <div className="text-center py-8 px-6">
                                 <div className="processing-pulse mb-6">

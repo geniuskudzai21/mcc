@@ -15,13 +15,20 @@ const BillDetailsPage: React.FC = () => {
     const [processingStep, setProcessingStep] = useState<number>(0); // 0: Idle, 1: Initializing, 2: Authorizing, 3: Verifying, 4: Done
     const [lastPayment, setLastPayment] = useState<any>(null);
 
-    const { data: bill, isLoading } = useQuery({
+    const { data: bill, isLoading, error } = useQuery({
         queryKey: ['bill', id],
         queryFn: async () => {
-            const res = await api.get(`/bills/${id}`);
-            return res.data;
+            try {
+                const res = await api.get(`/bills/${id}`);
+                return res.data;
+            } catch (err) {
+                console.error('Bill API Error:', err);
+                throw err;
+            }
         },
-        enabled: !!id
+        enabled: !!id,
+        retry: 1,
+        retryDelay: 1000,
     });
 
     const payMutation = useMutation({
@@ -55,11 +62,56 @@ const BillDetailsPage: React.FC = () => {
         }
     });
 
+    // Calculate derived values (must be before early returns)
+    const monthNames = [
+        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+        "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+    ];
+    const formattedDate = bill?.billing_month && bill?.billing_year 
+        ? `${monthNames[bill.billing_month - 1]} ${bill.billing_year}` 
+        : 'N/A';
+
+    // Create mock payment data for already paid bills (must be before early returns)
+    React.useEffect(() => {
+        if (bill?.status === 'PAID' && !lastPayment) {
+            setLastPayment({
+                transaction_reference: `RCPT${Date.now()}`,
+                amount: bill.total_amount,
+                payment_method: 'CARD',
+                paid_at: new Date().toISOString()
+            });
+        }
+    }, [bill, lastPayment]);
+
     if (isLoading) {
-        return <Layout><div className="flex items-center justify-center py-8 text-slate-600">Synchronizing with billing server...</div></Layout>;
+        return <Layout><div className="flex items-center justify-center py-8 text-slate-600">Loading bill details...</div></Layout>;
     }
 
-    if (!bill) {
+    if (error) {
+        return (
+            <Layout>
+                <div className="flex flex-col items-center justify-center py-16 text-slate-600">
+                    <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Unable to load bill</h3>
+                    <p className="text-sm text-slate-500 mb-4">There was a problem loading this bill.</p>
+                    <button 
+                        onClick={() => navigate(-1)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mr-2"
+                    >
+                        Go Back
+                    </button>
+                    <button 
+                        onClick={() => window.location.reload()}
+                        className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </Layout>
+        );
+    }
+
+    if (!bill || !id) {
         return (
             <Layout>
                 <div className="flex flex-col items-center justify-center py-16">
@@ -75,24 +127,6 @@ const BillDetailsPage: React.FC = () => {
             </Layout>
         );
     }
-
-    const monthNames = [
-        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
-        "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
-    ];
-    const formattedDate = `${monthNames[bill.billing_month - 1]} ${bill.billing_year}`;
-
-    // Create mock payment data for already paid bills
-    React.useEffect(() => {
-        if (bill?.status === 'PAID' && !lastPayment) {
-            setLastPayment({
-                transaction_reference: `RCPT${Date.now()}`,
-                amount: bill.total_amount,
-                payment_method: 'CARD',
-                paid_at: new Date().toISOString()
-            });
-        }
-    }, [bill, lastPayment]);
 
     return (
         <Layout>
@@ -138,16 +172,16 @@ const BillDetailsPage: React.FC = () => {
                                             <div className="space-y-2">
                                                 <div>
                                                     <p className="text-xs text-slate-500">Account Number</p>
-                                                    <p className="font-semibold text-sm text-slate-900">{bill.property?.account_number}</p>
+                                                    <p className="font-semibold text-sm text-slate-900">{bill.property?.account_number || 'N/A'}</p>
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-slate-500">Account Name</p>
-                                                    <p className="font-semibold text-sm text-slate-900">{bill.property?.owner_name}</p>
+                                                    <p className="font-semibold text-sm text-slate-900">{bill.property?.owner_name || 'N/A'}</p>
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-slate-500">Property Address</p>
-                                                    <p className="font-semibold text-sm text-slate-900">{bill.property?.address}</p>
-                                                    <p className="text-xs text-slate-600">{bill.property?.suburb}, Mutare</p>
+                                                    <p className="font-semibold text-sm text-slate-900">{bill.property?.address || 'N/A'}</p>
+                                                    <p className="text-xs text-slate-600">{bill.property?.suburb || 'N/A'}, Mutare</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -165,7 +199,7 @@ const BillDetailsPage: React.FC = () => {
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-slate-500">Due Date</p>
-                                                    <p className="font-semibold text-sm text-slate-900">{new Date(bill.due_date).toLocaleDateString()}</p>
+                                                    <p className="font-semibold text-sm text-slate-900">{bill.due_date ? new Date(bill.due_date).toLocaleDateString() : 'N/A'}</p>
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-slate-500">Status</p>
@@ -179,7 +213,7 @@ const BillDetailsPage: React.FC = () => {
                                                         {bill.status === 'PAID' && <CheckCircle className="w-3 h-3 mr-1" />}
                                                         {bill.status === 'OVERDUE' && <AlertCircle className="w-3 h-3 mr-1" />}
                                                         {bill.status === 'UNPAID' && <Clock className="w-3 h-3 mr-1" />}
-                                                        {bill.status}
+                                                        {bill.status || 'UNKNOWN'}
                                                     </span>
                                                 </div>
                                             </div>
@@ -209,15 +243,15 @@ const BillDetailsPage: React.FC = () => {
                                                 <td className="py-2 px-4 text-xs text-slate-600">Outstanding Balance B/F</td>
                                                 <td className="py-2 px-4 text-right text-xs font-medium">$0.00</td>
                                             </tr>
-                                            {bill.items?.map((item: any) => (
-                                                <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                                                    <td className="py-2 px-4 text-xs text-slate-900">{item.description}</td>
-                                                    <td className="py-2 px-4 text-right text-xs font-medium">${parseFloat(item.amount).toFixed(2)}</td>
+                                            {(bill.items || []).map((item: any) => (
+                                                <tr key={item?.id || Math.random()} className="hover:bg-slate-50 transition-colors">
+                                                    <td className="py-2 px-4 text-xs text-slate-900">{item?.description || 'N/A'}</td>
+                                                    <td className="py-2 px-4 text-right text-xs font-medium">${(parseFloat(item?.amount) || 0).toFixed(2)}</td>
                                                 </tr>
                                             ))}
                                             <tr className="bg-gradient-to-r from-slate-100 to-slate-50">
                                                 <td className="py-2 px-4 text-xs font-semibold text-slate-900">Total Payable for Period</td>
-                                                <td className="py-2 px-4 text-right text-xs font-bold text-slate-900">${parseFloat(bill.total_amount).toFixed(2)}</td>
+                                                <td className="py-2 px-4 text-right text-xs font-bold text-slate-900">${(parseFloat(bill?.total_amount) || 0).toFixed(2)}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -270,7 +304,7 @@ const BillDetailsPage: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="mb-4">
-                                    <p className="text-2xl font-bold mb-1">${parseFloat(bill.total_amount).toFixed(2)}</p>
+                                    <p className="text-2xl font-bold mb-1">${(parseFloat(bill?.total_amount) || 0).toFixed(2)}</p>
                                     <p className="text-slate-300 text-xs">USD</p>
                                 </div>
                                 {bill.status !== 'PAID' ? (
@@ -363,7 +397,11 @@ const BillDetailsPage: React.FC = () => {
                                 <div className="p-6">
                                     <div className="text-center mb-6">
                                         <div className="bg-green-50 text-green-700 px-3 py-2 rounded-lg inline-block font-semibold text-sm">
-                                            Amount: ${parseFloat(bill.total_amount).toFixed(2)}
+                                            {bill?.total_amount !== null && bill?.total_amount !== undefined ? 
+                                                `Amount: $${parseFloat(bill?.total_amount).toFixed(2)}` 
+                                                : 
+                                                'Amount: N/A'
+                                            }
                                         </div>
                                     </div>
 
@@ -456,15 +494,15 @@ const BillDetailsPage: React.FC = () => {
                                         </div>
                                         <div className="flex justify-between pb-3 border-b border-dashed border-slate-300">
                                             <span className="text-slate-600 text-sm font-medium">Account No:</span>
-                                            <span className="font-semibold text-sm text-slate-900">{bill.property?.account_number}</span>
+                                            <span className="font-semibold text-sm text-slate-900">{bill.property?.account_number || 'N/A'}</span>
                                         </div>
                                         <div className="flex justify-between pb-3 border-b border-dashed border-slate-300">
                                             <span className="text-slate-600 text-sm font-medium">Account Name:</span>
-                                            <span className="font-semibold text-sm text-slate-900">{bill.property?.owner_name}</span>
+                                            <span className="font-semibold text-sm text-slate-900">{bill.property?.owner_name || 'N/A'}</span>
                                         </div>
                                         <div className="flex justify-between pb-3 border-b border-dashed border-slate-300">
                                             <span className="text-slate-600 text-sm font-medium">Property Address:</span>
-                                            <span className="font-semibold text-sm text-slate-900">{bill.property?.address}, {bill.property?.suburb}</span>
+                                            <span className="font-semibold text-sm text-slate-900">{bill.property?.address || 'N/A'}, {bill.property?.suburb || 'N/A'}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-slate-600 text-sm font-medium">Payment Method:</span>
