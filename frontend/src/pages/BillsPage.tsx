@@ -169,52 +169,67 @@ const BillsPage: React.FC = () => {
         
                 </div>
                 
-                {/* Search and Stats Bar */}
-                <div className="flex flex-col lg:flex-row gap-4 items-center">
-                    <div className="flex-1 relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <Search className="w-5 h-5 text-slate-400" />
+                {/* Enhanced Search and Filter Bar */}
+                <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                        {/* Search Section */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Search Bills</label>
+                            <div className="relative group">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
+                                    <Search className="w-5 h-5 text-gray-400" />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search by property, period, amount, or status..."
+                                    className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => setSearchQuery('')}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
+                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 transition-transform duration-200 group-focus-within:scale-x-100"></div>
+                            </div>
                         </div>
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search bills by property, period, amount, or status..."
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-50 transition-all shadow-sm hover:shadow-md"
-                        />
-                        {searchQuery && (
-                            <button
-                                onClick={() => setSearchQuery('')}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                        
+                        {/* Filter Section */}
+                        <div className="lg:w-48">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Status Filter</label>
+                            <select
+                                value={searchQuery === 'UNPAID' ? 'UNPAID' : searchQuery === 'OVERDUE' ? 'OVERDUE' : searchQuery === 'PAID' ? 'PAID' : 'all'}
+                                onChange={(e) => setSearchQuery(e.target.value === 'all' ? '' : e.target.value)}
+                                className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 appearance-none cursor-pointer hover:bg-gray-100"
                             >
-                                <X className="w-4 h-4" />
-                            </button>
-                        )}
-                    </div>
-                    <div className="flex gap-3 w-full lg:w-auto">
-                        <div className="flex-1 lg:flex-initial bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100 min-w-[160px] shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <TrendingUp className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <div>
-                                    <p className="text-xs font-medium text-blue-600">Total Outstanding</p>
-                                    <p className="text-lg font-bold text-slate-900">${totalOutstanding.toFixed(2)}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex-1 lg:flex-initial bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100 min-w-[140px] shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <AlertCircle className="w-5 h-5 text-amber-600" />
-                                </div>
-                                <div>
-                                    <p className="text-xs font-medium text-amber-600">Overdue</p>
-                                    <p className="text-lg font-bold text-slate-900">{safeBills.filter((b: any) => b && b.status === 'OVERDUE').length}</p>
-                                </div>
-                            </div>
+                                <option value="all">All Status</option>
+                                <option value="UNPAID">Unpaid Bills</option>
+                                <option value="OVERDUE">Overdue Bills</option>
+                                <option value="PAID">Paid Bills</option>
+                            </select>
                         </div>
                     </div>
+                    
+                    {/* Search Results Info */}
+                    {searchQuery && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm text-gray-600">
+                                    Found <span className="font-semibold text-gray-900">{filteredBills.length}</span> bill{filteredBills.length !== 1 ? 's' : ''} matching "<span className="font-medium text-blue-600">{searchQuery}</span>"
+                                </p>
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
+                                >
+                                    Clear Search
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
