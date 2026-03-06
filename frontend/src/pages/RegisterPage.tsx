@@ -71,7 +71,7 @@ const RegisterPage: React.FC = () => {
         backgroundImage: "url('/mutarebg.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        filter: 'blur(5px)'
+        filter: 'blur(5px) brightness(0.4)'
     };
 
     return (
@@ -79,7 +79,7 @@ const RegisterPage: React.FC = () => {
             <div className="absolute inset-0" style={backgroundStyle}></div>
             <div className="relative z-10 min-h-screen flex items-center justify-center p-2">
                 <div className="w-full max-w-2xl">
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-4">
+                    <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-8">
                         <div className="text-center mb-4">
                             <img 
                                 src="/mutarelogo.png" 
@@ -89,7 +89,7 @@ const RegisterPage: React.FC = () => {
                             <h1 className="text-lg font-bold text-blue-900 mb-1 tracking-tight">
                                 City of Mutare
                             </h1>
-                            <p className="text-xs text-slate-500 font-medium">
+                            <p className="text-xs text-slate-600 font-medium">
                                 Create Account
                             </p>
                         </div>
@@ -104,12 +104,11 @@ const RegisterPage: React.FC = () => {
                         <form onSubmit={handleRegister} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             {/* Personal Information Column */}
                             <div className="space-y-2">
-                                <div className="bg-blue-50 rounded-lg p-2 mb-2">
-                                    <div className="flex items-center gap-2 text-blue-600 text-xs font-semibold">
+                                <div className="bg-blue-900 rounded-lg p-4 mb-2 border border-slate-200">
+                                    <div className="flex items-center gap-2 text-white text-xs">
                                         <User size={12} />
                                         <span>Personal Information</span>
                                     </div>
-                                    <p className="text-slate-500 text-xs m-0">Enter your personal details</p>
                                 </div>
 
                                 <div>
@@ -124,7 +123,7 @@ const RegisterPage: React.FC = () => {
                                             value={formData.name}
                                             onChange={e => updateField('name', e.target.value)}
                                             required
-                                            className="w-full px-7 py-2 border border-slate-200 rounded-lg text-xs outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                            className="w-full px-7 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] placeholder-slate-400"
                                         />
                                     </div>
                                 </div>
@@ -141,7 +140,7 @@ const RegisterPage: React.FC = () => {
                                             value={formData.email}
                                             onChange={e => updateField('email', e.target.value)}
                                             required
-                                            className="w-full px-7 py-2 border border-slate-200 rounded-lg text-xs outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                            className="w-full px-7 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] placeholder-slate-400"
                                         />
                                     </div>
                                 </div>
@@ -158,7 +157,7 @@ const RegisterPage: React.FC = () => {
                                             value={formData.phone}
                                             onChange={e => updateField('phone', e.target.value)}
                                             required
-                                            className="w-full px-7 py-2 border border-slate-200 rounded-lg text-xs outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                            className="w-full px-7 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] placeholder-slate-400"
                                         />
                                     </div>
                                 </div>
@@ -170,17 +169,17 @@ const RegisterPage: React.FC = () => {
                                     <div className="relative">
                                         <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 text-slate-400 z-10" />
                                         <input
-                                            type={showPassword ? 'text' : 'password'}
+                                            type={showPassword ? 'text' : 'text'}
                                             placeholder="Create password"
                                             value={formData.password}
                                             onChange={e => updateField('password', e.target.value)}
                                             required
-                                            className="w-full px-7 py-2 border border-slate-200 rounded-lg text-xs outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                            className="w-full px-7 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] placeholder-slate-400"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-slate-400 p-0.5 rounded transition-all duration-200 hover:text-blue-900"
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-slate-400 p-0.5 rounded transition-all duration-200 hover:text-blue-600"
                                         >
                                             {showPassword ? <EyeOff size={12} /> : <Eye size={12} />}
                                         </button>
@@ -194,13 +193,20 @@ const RegisterPage: React.FC = () => {
                                     <div className="relative">
                                         <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 text-slate-400 z-10" />
                                         <input
-                                            type="password"
+                                            type="text"
                                             placeholder="Confirm password"
                                             value={formData.confirmPassword}
                                             onChange={e => updateField('confirmPassword', e.target.value)}
                                             required
-                                            className="w-full px-7 py-2 border border-slate-200 rounded-lg text-xs outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                            className="w-full px-7 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] placeholder-slate-400"
                                         />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-slate-400 p-0.5 rounded transition-all duration-200 hover:text-blue-600"
+                                        >
+                                            {showPassword ? <EyeOff size={12} /> : <Eye size={12} />}
+                                        </button>
                                     </div>
                                     {formData.confirmPassword && formData.password === formData.confirmPassword && (
                                         <div className="flex items-center gap-1 mt-0.5 text-emerald-500 text-xs">
@@ -212,12 +218,11 @@ const RegisterPage: React.FC = () => {
 
                             {/* Property Information Column */}
                             <div className="space-y-2">
-                                <div className="bg-sky-50 rounded-lg p-2 mb-2">
-                                    <div className="flex items-center gap-2 text-cyan-600 text-xs font-semibold">
+                                <div className="bg-blue-900 rounded-lg p-4 mb-2 border border-slate-200">
+                                    <div className="flex items-center gap-2 text-white text-xs">
                                         <Building2 size={12} />
                                         <span>Property Information</span>
                                     </div>
-                                    <p className="text-slate-500 text-xs m-0">Enter your municipal account details</p>
                                 </div>
 
                                 <div>
@@ -232,7 +237,7 @@ const RegisterPage: React.FC = () => {
                                             value={formData.stand_number}
                                             onChange={e => updateField('stand_number', e.target.value)}
                                             required
-                                            className="w-full px-7 py-2 border border-slate-200 rounded-lg text-xs outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                            className="w-full px-7 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] placeholder-slate-400"
                                         />
                                     </div>
                                 </div>
@@ -249,7 +254,7 @@ const RegisterPage: React.FC = () => {
                                             value={formData.account_number}
                                             onChange={e => updateField('account_number', e.target.value)}
                                             required
-                                            className="w-full px-7 py-2 border border-slate-200 rounded-lg text-xs outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                            className="w-full px-7 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] placeholder-slate-400"
                                         />
                                     </div>
                                 </div>
@@ -266,7 +271,7 @@ const RegisterPage: React.FC = () => {
                                             value={formData.suburb}
                                             onChange={e => updateField('suburb', e.target.value)}
                                             required
-                                            className="w-full px-7 py-2 border border-slate-200 rounded-lg text-xs outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                            className="w-full px-7 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] placeholder-slate-400"
                                         />
                                     </div>
                                 </div>
@@ -275,7 +280,7 @@ const RegisterPage: React.FC = () => {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full py-2 bg-blue-900 text-white border-none rounded-lg text-xs font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_4px_6px_-1px_rgba(30,58,138,0.3)] hover:bg-blue-800 hover:-translate-y-0.5 hover:shadow-[0_10px_15px_-3px_rgba(30,58,138,0.4)] disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0"
+                                        className="w-full py-2.5 bg-blue-900 text-white border-2 border-blue-600 rounded-lg text-xs font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_4px_6px_-1px_rgba(30,58,138,0.3)] hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-[0_10px_15px_-3px_rgba(30,58,138,0.4)] disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0"
                                     >
                                         {loading ? (
                                             <>
@@ -294,11 +299,11 @@ const RegisterPage: React.FC = () => {
                         </form>
 
                         <div className="text-center mt-4 pt-3 border-t border-slate-200">
-                            <p className="text-slate-500 text-xs">
+                            <p className="text-slate-600 text-xs">
                                 Already have an account?{' '}
                                 <NavLink
                                     to="/login"
-                                    className="text-teal-500 no-underline font-semibold transition-colors duration-200 hover:text-teal-600"
+                                    className="text-blue-600 no-underline font-semibold transition-colors duration-200 hover:text-blue-700"
                                 >
                                     Sign in
                                 </NavLink>

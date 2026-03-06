@@ -77,7 +77,7 @@ const LoginPage: React.FC = () => {
                                         value={email}
                                         onChange={e => setEmail(e.target.value)}
                                         required
-                                        className="w-full px-10 py-3 border border-slate-200 rounded-xl text-sm outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                        className="w-full px-9 py-2 border border-slate-300 rounded-xl text-sm outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
                                     />
                                 </div>
                             </div>
@@ -89,19 +89,19 @@ const LoginPage: React.FC = () => {
                                 <div className="relative">
                                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 text-slate-400 z-10" />
                                     <input
-                                        type={showPassword ? 'text' : 'password'}
+                                        type={showPassword ? 'text' : 'text'}
                                         placeholder="Enter your password"
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
                                         required
-                                        className="w-full px-10 py-3 border border-slate-200 rounded-xl text-sm outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
+                                        className="w-full px-9 py-2 border border-slate-300 rounded-xl text-sm outline-none transition-all duration-200 focus:border-teal-500 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.1)]"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
                                         className="absolute right-3.5 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-slate-400 p-1 rounded transition-all duration-200 hover:text-blue-900"
                                     >
-                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                                     </button>
                                 </div>
                             </div>
@@ -118,7 +118,7 @@ const LoginPage: React.FC = () => {
                                 </label>
                                 <NavLink
                                     to="/forgot-password"
-                                    className="text-teal-500 no-underline font-medium transition-colors duration-200 hover:text-teal-600"
+                                    className="text-blue-600 no-underline font-medium transition-colors duration-200 hover:text-teal-600"
                                 >
                                     Forgot password?
                                 </NavLink>
@@ -127,7 +127,7 @@ const LoginPage: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3.5 bg-blue-900 text-white border-none rounded-[10px] text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_4px_6px_-1px_rgba(30,58,138,0.3)] hover:bg-blue-800 hover:-translate-y-0.5 hover:shadow-[0_10px_15px_-3px_rgba(30,58,138,0.4)] disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0"
+                                className="w-full py-2.5 bg-blue-900 text-white border-none rounded-[10px] text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 shadow-[0_4px_6px_-1px_rgba(30,58,138,0.3)] hover:bg-blue-800 hover:-translate-y-0.5 hover:shadow-[0_10px_15px_-3px_rgba(30,58,138,0.4)] disabled:bg-slate-400 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0"
                             >
                                 {loading ? (
                                     <>
@@ -148,7 +148,7 @@ const LoginPage: React.FC = () => {
                                 Don't have an account?{' '}
                                 <NavLink
                                     to="/register"
-                                    className="text-teal-500 no-underline font-semibold transition-colors duration-200 hover:text-teal-600"
+                                    className="text-blue-600 no-underline font-semibold transition-colors duration-200 hover:text-teal-600"
                                 >
                                     Register here
                                 </NavLink>
