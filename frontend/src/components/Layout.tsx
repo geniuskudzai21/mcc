@@ -119,7 +119,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
 
             <div className="flex-1 overflow-y-auto flex flex-col">
                 {!hideHeader && (
-                    <header className="border-b border-slate-300 border-t-4 border-t-[#2563eb] px-7 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+                    <header className="bg-white border-b border-slate-300 border-t-4 border-t-[#2563eb] px-7 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
                         <div className="flex items-center gap-2">
                             <div className="w-[3px] h-[18px] bg-[#2563eb] rounded-sm" />
                             <h2 className="text-[0.925rem] font-extrabold text-gray-900 tracking-tight">{currentTitle}</h2>

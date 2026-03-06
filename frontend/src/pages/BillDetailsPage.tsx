@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Layout from '../components/Layout';
-import { ArrowLeft, CheckCircle, CreditCard, Smartphone, X, Loader2, ShieldCheck, Printer } from 'lucide-react';
+import { ArrowLeft, CheckCircle, CreditCard, Smartphone, X, Loader2, ShieldCheck, Printer, Home, Calendar, FileText, AlertCircle, TrendingUp, Clock } from 'lucide-react';
 import api from '../services/api';
 
 const BillDetailsPage: React.FC = () => {
@@ -56,15 +56,21 @@ const BillDetailsPage: React.FC = () => {
     });
 
     if (isLoading) {
-        return <Layout><div className="flex-center" style={{ height: '60vh' }}>Synchronizing with Billing Server...</div></Layout>;
+        return <Layout><div className="flex items-center justify-center py-8 text-slate-600">Synchronizing with billing server...</div></Layout>;
     }
 
     if (!bill) {
         return (
             <Layout>
-                <div style={{ textAlign: 'center', padding: '4rem' }}>
-                    <p>Bill not found</p>
-                    <button onClick={() => navigate(-1)} className="forgot-link">Go Back</button>
+                <div className="flex flex-col items-center justify-center py-16">
+                    <FileText className="w-16 h-16 text-slate-300 mb-4" />
+                    <p className="text-slate-500 font-medium mb-4">Bill not found</p>
+                    <button 
+                        onClick={() => navigate(-1)} 
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Go Back
+                    </button>
                 </div>
             </Layout>
         );
@@ -76,344 +82,415 @@ const BillDetailsPage: React.FC = () => {
     ];
     const formattedDate = `${monthNames[bill.billing_month - 1]} ${bill.billing_year}`;
 
+    // Create mock payment data for already paid bills
+    React.useEffect(() => {
+        if (bill?.status === 'PAID' && !lastPayment) {
+            setLastPayment({
+                transaction_reference: `RCPT${Date.now()}`,
+                amount: bill.total_amount,
+                payment_method: 'CARD',
+                paid_at: new Date().toISOString()
+            });
+        }
+    }, [bill, lastPayment]);
+
     return (
         <Layout>
-            <div style={{ maxWidth: '64rem', margin: '0 auto', padding: '2rem 0' }}>
-                <button
-                    onClick={() => navigate(-1)}
-                    className="forgot-link"
-                    style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}
-                >
-                    <ArrowLeft className="nav-icon" style={{ width: '1rem' }} />
-                    Back to My Bills
-                </button>
+            <div className="min-h-screen">
+                
+                    {/* Back Button */}
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium mb-4 transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to My Bills
+                    </button>
 
-                <div className="municipal-bill-container no-print-visible" style={{ position: 'relative' }}>
-                    {bill.status === 'PAID' && (
-                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-30deg)', border: '10px solid #16a34a', color: '#16a34a', padding: '1rem 3rem', fontSize: '64px', fontWeight: 900, borderRadius: '20px', opacity: 0.15, pointerEvents: 'none', textTransform: 'uppercase', zIndex: 10 }}>
-                            PAID
-                        </div>
-                    )}
-
-                    {/* Header */}
-                    <header className="bill-header-main">
-                        <div className="bill-header-left">
-                            <p>Providing Service with Pride</p>
-                            <p>BOX 910, MUTARE</p>
-                        </div>
-                        <div className="bill-header-right">
-                            <h1>CITY OF MUTARE</h1>
-                            <h2>MUNICIPAL BILLING STATEMENT</h2>
-                        </div>
-                    </header>
-
-                    {/* Info Grid */}
-                    <div className="bill-info-grid">
-                        <div>
-                            <div className="account-info-box">
-                                <p>
-                                    <span className="account-info-label">Account No:</span>
-                                    <span className="account-number-highlight">{bill.property?.account_number}</span>
-                                </p>
-                                <p>
-                                    <span className="account-info-label">Account Name:</span>
-                                    <span className="account-number-highlight">{bill.property?.owner_name}</span>
-                                </p>
-                                <p>
-                                    <span className="account-info-label">Stand/Property:</span>
-                                    <span className="account-info-value" style={{ display: 'block', marginTop: '5px' }}>
-                                        {bill.property?.address}<br />
-                                        {bill.property?.suburb}, Mutare
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div style={{ textAlign: 'right', marginBottom: '1.5rem', fontWeight: 700 }}>
-                                <div style={{ textTransform: 'uppercase', fontSize: '10px', color: '#64748b', marginBottom: '4px' }}>STATEMENT OF ACCOUNT</div>
-                                <span style={{ marginRight: '1rem', textTransform: 'uppercase', fontSize: '11px' }}>Date:</span>
-                                <span style={{ color: '#003366', fontSize: '18px' }}>{formattedDate}</span>
-                            </div>
-
-                            <div className="summary-card">
-                                <div className="summary-card-header">FINANCIAL SUMMARY</div>
-                                <div className="summary-row">
-                                    <span>Last Statement Balance:</span>
-                                    <span className="font-bold">$0.00</span>
-                                </div>
-                                <div className="summary-row">
-                                    <span>New Charges:</span>
-                                    <span className="font-bold">${parseFloat(bill.total_amount).toFixed(2)}</span>
-                                </div>
-                                <div className="summary-row total">
-                                    <span>TOTAL DUE (USD):</span>
-                                    <span className="amount">${parseFloat(bill.total_amount).toFixed(2)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '2rem' }}>
-                        <div style={{ flex: 1 }}>
-                            <div className="billing-details-title">
-                                <span>DESCRIPTION OF SERVICES</span>
-                                <span>TARIFF AMOUNT</span>
-                            </div>
-                            <table className="billing-table">
-                                <thead>
-                                    <tr>
-                                        <th>Municipal Service Detail</th>
-                                        <th style={{ textAlign: 'right' }}>Total ($)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr style={{ background: '#f8fafc' }}>
-                                        <td>OUTSTANDING BALANCE B/F</td>
-                                        <td className="amount">$0.00</td>
-                                    </tr>
-                                    {bill.items?.map((item: any) => (
-                                        <tr key={item.id}>
-                                            <td>{item.description.toUpperCase()}</td>
-                                            <td className="amount">${parseFloat(item.amount).toFixed(2)}</td>
-                                        </tr>
-                                    ))}
-                                    <tr className="total-row">
-                                        <td>TOTAL PAYABLE FOR PERIOD:</td>
-                                        <td className="amount">${parseFloat(bill.total_amount).toFixed(2)}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <div className="payment-methods-section">
-                                <div className="payment-methods-header">AUTHORIZED CHANNELS</div>
-                                <div className="payment-logos">
-                                    <div className="payment-method-item">
-                                        <span className="payment-method-name ecocash">EcoCash</span>
-                                    </div>
-                                    <div className="payment-method-item">
-                                        <span className="payment-method-name onemoney">OneMoney</span>
-                                    </div>
-                                    <div className="payment-method-item">
-                                        <span className="payment-method-name paynow">Paynow Gateway</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style={{ width: '300px', textAlign: 'center' }}>
-                            <img
-                                src="/mutarelogo.png"
-                                alt="Coat of Arms"
-                                style={{ width: '180px', marginBottom: '2rem', opacity: 0.8 }}
-                            />
-
-                            <div className="due-today-card no-print">
-                                <div className="due-today-label" style={{ background: '#003366', color: 'white', padding: '0.5rem', borderRadius: '4px 4px 0 0' }}>CURRENT BALANCE</div>
-                                <div style={{ padding: '1.5rem', border: '1px solid #e2e8f0', borderTop: 'none', borderRadius: '0 0 8px 8px' }}>
-                                    <span className="due-today-value" style={{ fontSize: '32px' }}>${parseFloat(bill.total_amount).toFixed(2)}</span>
-                                    <div className="bill-action-buttons" style={{ marginTop: '1.5rem' }}>
-                                        {bill.status !== 'PAID' ? (
-                                            <button
-                                                className="btn-pay-now"
-                                                onClick={() => setShowPaymentModal(true)}
-                                            >
-                                                PAY ONLINE NOW
-                                            </button>
-                                        ) : (
-                                            <button
-                                                className="btn-pay-now"
-                                                style={{ background: '#003366' }}
-                                                onClick={() => setShowReceipt(true)}
-                                            >
-                                                VIEW OFFICIAL RECEIPT
-                                            </button>
+                    <div className="max-w-4xl mx-auto p-4 bg-white rounded-lg">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {/* Main Bill Content */}
+                        <div className="lg:col-span-2 space-y-4">
+                            {/* Header Card */}
+                            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-md">
+                                <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h1 className="text-xl font-bold text-white mb-1">Municipal Bill</h1>
+                                            <p className="text-blue-100 text-sm">City of Mutare</p>
+                                        </div>
+                                        {bill.status === 'PAID' && (
+                                            <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                                PAID
+                                            </div>
                                         )}
                                     </div>
                                 </div>
+                                
+                                <div className="p-4 bg-gradient-to-b from-white to-slate-50">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Account Information */}
+                                        <div>
+                                            <h3 className="text-xs font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                                <Home className="w-3 h-3" />
+                                                Account Information
+                                            </h3>
+                                            <div className="space-y-2">
+                                                <div>
+                                                    <p className="text-xs text-slate-500">Account Number</p>
+                                                    <p className="font-semibold text-sm text-slate-900">{bill.property?.account_number}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-slate-500">Account Name</p>
+                                                    <p className="font-semibold text-sm text-slate-900">{bill.property?.owner_name}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-slate-500">Property Address</p>
+                                                    <p className="font-semibold text-sm text-slate-900">{bill.property?.address}</p>
+                                                    <p className="text-xs text-slate-600">{bill.property?.suburb}, Mutare</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Billing Period */}
+                                        <div>
+                                            <h3 className="text-xs font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                                <Calendar className="w-3 h-3" />
+                                                Billing Period
+                                            </h3>
+                                            <div className="space-y-2">
+                                                <div>
+                                                    <p className="text-xs text-slate-500">Statement Date</p>
+                                                    <p className="font-semibold text-sm text-slate-900">{formattedDate}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-slate-500">Due Date</p>
+                                                    <p className="font-semibold text-sm text-slate-900">{new Date(bill.due_date).toLocaleDateString()}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-slate-500">Status</p>
+                                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                                        bill.status === 'PAID' 
+                                                            ? 'bg-green-100 text-green-800' 
+                                                            : bill.status === 'OVERDUE' 
+                                                            ? 'bg-red-100 text-red-800'
+                                                            : 'bg-blue-100 text-blue-800'
+                                                    }`}>
+                                                        {bill.status === 'PAID' && <CheckCircle className="w-3 h-3 mr-1" />}
+                                                        {bill.status === 'OVERDUE' && <AlertCircle className="w-3 h-3 mr-1" />}
+                                                        {bill.status === 'UNPAID' && <Clock className="w-3 h-3 mr-1" />}
+                                                        {bill.status}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bill Details Table */}
+                            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-md">
+                                <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+                                    <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                                        <FileText className="w-4 h-4" />
+                                        Bill Details
+                                    </h3>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead className="bg-gradient-to-r from-slate-50 to-slate-100">
+                                            <tr>
+                                                <th className="text-left py-2 px-4 text-xs font-semibold text-slate-700">Description</th>
+                                                <th className="text-right py-2 px-4 text-xs font-semibold text-slate-700">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            <tr className="hover:bg-slate-50 transition-colors">
+                                                <td className="py-2 px-4 text-xs text-slate-600">Outstanding Balance B/F</td>
+                                                <td className="py-2 px-4 text-right text-xs font-medium">$0.00</td>
+                                            </tr>
+                                            {bill.items?.map((item: any) => (
+                                                <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                                                    <td className="py-2 px-4 text-xs text-slate-900">{item.description}</td>
+                                                    <td className="py-2 px-4 text-right text-xs font-medium">${parseFloat(item.amount).toFixed(2)}</td>
+                                                </tr>
+                                            ))}
+                                            <tr className="bg-gradient-to-r from-slate-100 to-slate-50">
+                                                <td className="py-2 px-4 text-xs font-semibold text-slate-900">Total Payable for Period</td>
+                                                <td className="py-2 px-4 text-right text-xs font-bold text-slate-900">${parseFloat(bill.total_amount).toFixed(2)}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {/* Payment Methods */}
+                            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-md">
+                                <h3 className="text-base font-semibold text-slate-900 mb-3">Payment Methods</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div className="flex items-center gap-2 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                                        <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                                            <Smartphone className="w-4 h-4 text-red-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-xs">EcoCash</p>
+                                            <p className="text-xs text-slate-500">Mobile Money</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                            <CreditCard className="w-4 h-4 text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-xs">Bank Card</p>
+                                            <p className="text-xs text-slate-500">Visa, Mastercard</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                            <TrendingUp className="w-4 h-4 text-green-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-xs">PayNow</p>
+                                            <p className="text-xs text-slate-500">Online Gateway</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Sidebar */}
+                        <div className="space-y-4">
+                            {/* Amount Due Card */}
+                            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg p-4 text-white shadow-lg">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="text-sm font-semibold">Current Balance</h3>
+                                    <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                                        <TrendingUp className="w-5 h-5 text-white" />
+                                    </div>
+                                </div>
+                                <div className="mb-4">
+                                    <p className="text-2xl font-bold mb-1">${parseFloat(bill.total_amount).toFixed(2)}</p>
+                                    <p className="text-slate-300 text-xs">USD</p>
+                                </div>
+                                {bill.status !== 'PAID' ? (
+                                    <button
+                                        onClick={() => setShowPaymentModal(true)}
+                                        className="w-full bg-white text-slate-900 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors text-sm"
+                                    >
+                                        Pay Online Now
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => setShowReceipt(true)}
+                                        className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors text-sm"
+                                    >
+                                        View Receipt
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Contact Information */}
+                            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-md">
+                                <h3 className="text-base font-semibold text-slate-900 mb-3">Contact Information</h3>
+                                <div className="space-y-2">
+                                    <div>
+                                        <p className="text-xs text-slate-500">Payable to</p>
+                                        <p className="font-semibold text-sm">The City Treasurer</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-slate-500">Inquiries</p>
+                                        <p className="font-semibold text-sm">Mutare City Council</p>
+                                        <p className="text-xs text-slate-600">(020) 62345 / 61045</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-slate-500">Address</p>
+                                        <p className="font-semibold text-sm">Box 910, Mutare</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Logo */}
+                            <div className="bg-white rounded-lg border border-slate-200 p-4 flex items-center justify-center shadow-md">
+                                <img
+                                    src="/mutarelogo.png"
+                                    alt="City of Mutare"
+                                    className="w-24 h-24 object-contain opacity-80"
+                                />
                             </div>
                         </div>
                     </div>
-
-                    <footer className="bill-redesign-footer">
-                        <div className="bill-footer-row">
-                            <span className="footer-label">Payable to: </span>
-                            <span className="footer-content">The City Treasurer</span>
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '10px', marginTop: '1rem' }}>
-                            <span className="footer-label">Inquiries:</span>
-                            <div className="footer-content">
-                                MUTARE CITY COUNCIL | PHONES: (020) 62345 / 61045
-                            </div>
-                        </div>
-                    </footer>
                 </div>
             </div>
 
-            {/* Compact Payment Modal */}
+            {/* Modern Payment Modal */}
             {showPaymentModal && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,10,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, backdropFilter: 'blur(8px)' }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '1rem', width: '100%', maxWidth: '24rem', boxShadow: 'var(--shadow-2xl)', position: 'relative' }}>
-                        {processingStep === 0 && (
-                            <button
-                                onClick={() => setShowPaymentModal(false)}
-                                style={{ position: 'absolute', top: '1rem', right: '1rem', color: '#64748b' }}
-                            >
-                                <X style={{ width: '1.25rem' }} />
-                            </button>
-                        )}
-
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl" style={{ animation: 'modalIn 0.3s ease-out' }}>
                         {processingStep > 0 ? (
-                            <div className="text-center py-8">
-                                <div className="processing-pulse">
+                            <div className="text-center py-8 px-6">
+                                <div className="processing-pulse mb-6">
                                     <div className="processing-pulse-dot">
-                                        {processingStep === 4 ? <CheckCircle style={{ width: '2.5rem' }} /> : <ShieldCheck style={{ width: '2.5rem' }} />}
+                                        {processingStep === 4 ? (
+                                            <CheckCircle className="w-8 h-8 text-green-600" />
+                                        ) : (
+                                            <ShieldCheck className="w-8 h-8 text-blue-600" />
+                                        )}
                                     </div>
                                 </div>
-                                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: '0.5rem', color: '#003366' }}>
+                                <h3 className="text-xl font-bold mb-2 text-slate-900">
                                     {processingStep === 1 ? 'Initializing...' :
-                                        processingStep === 2 ? 'Authorizing...' :
-                                            processingStep === 3 ? 'Verifying...' : 'Payment Confirmed!'}
+                                     processingStep === 2 ? 'Authorizing...' :
+                                     processingStep === 3 ? 'Verifying...' : 'Payment Confirmed!'}
                                 </h3>
-                                <p style={{ color: '#64748b', fontSize: '14px' }}>
+                                <p className="text-slate-600 text-sm">
                                     {processingStep < 4 ? 'Please do not close this window.' : 'Your receipt is ready.'}
                                 </p>
-                                {processingStep < 4 && <Loader2 className="animate-spin" style={{ margin: '1.5rem auto 0', color: 'var(--primary)' }} />}
+                                {processingStep < 4 && <Loader2 className="animate-spin w-6 h-6 mx-auto mt-4 text-blue-600" />}
                             </div>
                         ) : (
                             <>
-                                <div className="text-center mb-6">
-                                    <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#003366' }}>Secure Payment</h2>
-                                    <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '0.5rem', borderRadius: '0.5rem', display: 'inline-block', fontSize: '12px', fontWeight: 700, marginTop: '0.5rem' }}>
-                                        Amount: ${parseFloat(bill.total_amount).toFixed(2)}
+                                <div className="flex justify-between items-center p-6 border-b border-slate-200">
+                                    <h3 className="text-xl font-bold text-slate-900">Secure Payment</h3>
+                                    <button
+                                        onClick={() => setShowPaymentModal(false)}
+                                        className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors"
+                                    >
+                                        <X className="w-5 h-5 text-slate-600" />
+                                    </button>
+                                </div>
+
+                                <div className="p-6">
+                                    <div className="text-center mb-6">
+                                        <div className="bg-green-50 text-green-700 px-3 py-2 rounded-lg inline-block font-semibold text-sm">
+                                            Amount: ${parseFloat(bill.total_amount).toFixed(2)}
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    <div className="space-y-3 mb-6">
+                                        <button
+                                            onClick={() => setPaymentMethod('ECOCASH')}
+                                            className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                                                paymentMethod === 'ECOCASH' 
+                                                    ? 'border-blue-600 bg-blue-50' 
+                                                    : 'border-slate-200 bg-white hover:bg-slate-50'
+                                            }`}
+                                        >
+                                            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                                <Smartphone className="w-5 h-5 text-red-600" />
+                                            </div>
+                                            <div className="flex-1 text-left">
+                                                <p className="font-semibold text-sm">EcoCash</p>
+                                                <p className="text-xs text-slate-500">Mobile Money Transfer</p>
+                                            </div>
+                                        </button>
+
+                                        <button
+                                            onClick={() => setPaymentMethod('CARD')}
+                                            className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                                                paymentMethod === 'CARD' 
+                                                    ? 'border-blue-600 bg-blue-50' 
+                                                    : 'border-slate-200 bg-white hover:bg-slate-50'
+                                            }`}
+                                        >
+                                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                                <CreditCard className="w-5 h-5 text-green-600" />
+                                            </div>
+                                            <div className="flex-1 text-left">
+                                                <p className="font-semibold text-sm">Bank Card</p>
+                                                <p className="text-xs text-slate-500">Visa, Mastercard, etc.</p>
+                                            </div>
+                                        </button>
+                                    </div>
+
                                     <button
-                                        onClick={() => setPaymentMethod('ECOCASH')}
-                                        style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.875rem', borderRadius: '0.75rem', border: `2px solid ${paymentMethod === 'ECOCASH' ? 'var(--primary)' : 'var(--border)'}`, background: paymentMethod === 'ECOCASH' ? '#eff6ff' : 'white', width: '100%', transition: 'all 0.2s' }}
+                                        onClick={() => payMutation.mutate(paymentMethod)}
+                                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg"
                                     >
-                                        <Smartphone style={{ width: '1.5rem', color: '#dc2626' }} />
-                                        <span style={{ fontWeight: 700, fontSize: '14px' }}>EcoCash</span>
+                                        Confirm Payment
                                     </button>
-
-                                    <button
-                                        onClick={() => setPaymentMethod('CARD')}
-                                        style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.875rem', borderRadius: '0.75rem', border: `2px solid ${paymentMethod === 'CARD' ? 'var(--primary)' : 'var(--border)'}`, background: paymentMethod === 'CARD' ? '#eff6ff' : 'white', width: '100%', transition: 'all 0.2s' }}
-                                    >
-                                        <CreditCard style={{ width: '1.5rem', color: '#16a34a' }} />
-                                        <span style={{ fontWeight: 700, fontSize: '14px' }}>Bank Card</span>
-                                    </button>
+                                    <p className="text-xs text-slate-500 text-center mt-4">
+                                        Secure 256-bit SSL Encrypted Transaction
+                                    </p>
                                 </div>
-
-                                <button
-                                    className="btn-primary"
-                                    style={{ marginTop: '1.5rem' }}
-                                    onClick={() => payMutation.mutate(paymentMethod)}
-                                >
-                                    CONFIRM PAYMENT
-                                </button>
-                                <p style={{ fontSize: '10px', color: '#94a3b8', textAlign: 'center', marginTop: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                    Secure 256-bit SSL Encrypted Transaction
-                                </p>
                             </>
                         )}
                     </div>
                 </div>
             )}
 
-            {/* Instant Receipt Modal */}
+            {/* Modern Receipt Modal */}
             {showReceipt && lastPayment && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,10,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 110, backdropFilter: 'blur(10px)', padding: '1rem' }}>
-                    <div style={{ width: '100%', maxWidth: '30rem' }}>
-                        <div className="municipal-receipt-container" style={{ padding: '1.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[1100] backdrop-blur-lg p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-auto shadow-2xl" style={{ animation: 'modalIn 0.3s ease-out' }}>
+                        <div className="relative">
                             <button
                                 onClick={() => setShowReceipt(false)}
-                                style={{ position: 'absolute', top: '1rem', right: '1rem', color: '#003366' }}
-                                className="no-print"
+                                className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors z-10"
                             >
-                                <X style={{ width: '1.25rem' }} />
+                                <X className="w-5 h-5 text-slate-600" />
                             </button>
 
-                            <div className="receipt-watermark" style={{ fontSize: '60px', opacity: 0.1 }}>PAID</div>
+                            <div className="p-8">
+                                <div className="text-center mb-8">
+                                    <div className="flex justify-center mb-4">
+                                        <img
+                                            src="/mutarelogo.png"
+                                            alt="City of Mutare"
+                                            className="w-16 h-16 object-contain opacity-80"
+                                        />
+                                    </div>
+                                    <h2 className="text-2xl font-black text-slate-900 mb-2">PAYMENT RECEIPT</h2>
+                                    <p className="text-green-600 font-semibold text-lg">Transaction Successful</p>
+                                </div>
 
-                            <div className="receipt-header" style={{ marginBottom: '1.25rem', paddingBottom: '1rem' }}>
-                                <img src="/mutarelogo.png" alt="Logo" className="receipt-logo" style={{ width: '60px', marginBottom: '0.5rem' }} />
-                                <h2 className="receipt-title" style={{ fontSize: '18px' }}>CITY OF MUTARE</h2>
-                                <p className="receipt-subtitle" style={{ fontSize: '10px' }}>Official Payment Receipt</p>
+                                <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 mb-6 border border-slate-200">
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between pb-3 border-b border-dashed border-slate-300">
+                                            <span className="text-slate-600 text-sm font-medium">Receipt No:</span>
+                                            <span className="font-semibold text-sm font-mono text-slate-900">{lastPayment.transaction_reference}</span>
+                                        </div>
+                                        <div className="flex justify-between pb-3 border-b border-dashed border-slate-300">
+                                            <span className="text-slate-600 text-sm font-medium">Date & Time:</span>
+                                            <span className="font-semibold text-sm text-slate-900">{new Date(lastPayment.paid_at).toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between pb-3 border-b border-dashed border-slate-300">
+                                            <span className="text-slate-600 text-sm font-medium">Account No:</span>
+                                            <span className="font-semibold text-sm text-slate-900">{bill.property?.account_number}</span>
+                                        </div>
+                                        <div className="flex justify-between pb-3 border-b border-dashed border-slate-300">
+                                            <span className="text-slate-600 text-sm font-medium">Account Name:</span>
+                                            <span className="font-semibold text-sm text-slate-900">{bill.property?.owner_name}</span>
+                                        </div>
+                                        <div className="flex justify-between pb-3 border-b border-dashed border-slate-300">
+                                            <span className="text-slate-600 text-sm font-medium">Property Address:</span>
+                                            <span className="font-semibold text-sm text-slate-900">{bill.property?.address}, {bill.property?.suburb}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-600 text-sm font-medium">Payment Method:</span>
+                                            <span className="font-semibold text-sm text-green-600">{lastPayment.payment_method}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="text-center p-6 bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl mb-6">
+                                    <span className="text-white/70 text-xs uppercase tracking-wider font-semibold">Total Amount Settled</span>
+                                    <p className="text-white text-4xl font-black my-2">${parseFloat(lastPayment.amount).toFixed(2)}</p>
+                                    <span className="text-white/60 text-sm">Payment completed successfully</span>
+                                </div>
+
+                                <div className="text-center mb-6">
+                                    <p className="text-sm text-slate-600">This is a computer-generated receipt. No signature is required.</p>
+                                </div>
+
+                                <button
+                                    onClick={() => window.print()}
+                                    className="w-full p-4 bg-gradient-to-r from-slate-100 to-slate-200 border border-slate-300 rounded-xl font-semibold flex items-center justify-center gap-3 hover:from-slate-200 hover:to-slate-300 transition-all"
+                                >
+                                    <Printer className="w-5 h-5" />
+                                    Print Official Receipt
+                                </button>
                             </div>
-
-                            <div className="receipt-body">
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem 1.5rem' }}>
-                                    <div className="receipt-row" style={{ flexDirection: 'column', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                        <span className="receipt-label">Receipt No:</span>
-                                        <span className="receipt-value" style={{ textAlign: 'left', fontSize: '12px' }}>{lastPayment.transaction_reference}</span>
-                                    </div>
-                                    <div className="receipt-row" style={{ flexDirection: 'column', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                        <span className="receipt-label">Date:</span>
-                                        <span className="receipt-value" style={{ textAlign: 'left', fontSize: '12px' }}>{new Date(lastPayment.paid_at).toLocaleString()}</span>
-                                    </div>
-                                    <div className="receipt-row" style={{ flexDirection: 'column', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                        <span className="receipt-label">Account No:</span>
-                                        <span className="receipt-value" style={{ textAlign: 'left', fontSize: '12px' }}>{bill.property?.account_number}</span>
-                                    </div>
-                                    <div className="receipt-row" style={{ flexDirection: 'column', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                        <span className="receipt-label">Paid By (Account Name):</span>
-                                        <span className="receipt-value" style={{ textAlign: 'left', fontSize: '11px' }}>{bill.property?.owner_name}</span>
-                                    </div>
-                                    <div className="receipt-row" style={{ flexDirection: 'column', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                        <span className="receipt-label">Property Address:</span>
-                                        <span className="receipt-value" style={{ textAlign: 'left', fontSize: '11px' }}>{bill.property?.address}, {bill.property?.suburb}</span>
-                                    </div>
-                                </div>
-
-                                <div className="receipt-divider" style={{ margin: '1rem 0' }}></div>
-
-                                <div className="receipt-row" style={{ marginBottom: '0.5rem' }}>
-                                    <span className="receipt-label">Service Period:</span>
-                                    <span className="receipt-value" style={{ fontSize: '12px' }}>{formattedDate}</span>
-                                </div>
-                                <div className="receipt-row" style={{ marginBottom: '0.5rem' }}>
-                                    <span className="receipt-label">Payment Mode:</span>
-                                    <span className="receipt-value" style={{ color: '#16a34a', fontSize: '12px' }}>{lastPayment.payment_method}</span>
-                                </div>
-
-                                <div className="receipt-total-box" style={{ padding: '0.75rem', marginTop: '1rem', background: '#f8fafc', border: '1.5px solid #003366', borderRadius: '4px' }}>
-                                    <span className="receipt-total-label" style={{ color: '#003366', fontSize: '10px' }}>TOTAL AMOUNT SETTLED</span>
-                                    <span className="receipt-total-value" style={{ fontSize: '24px' }}>${parseFloat(lastPayment.amount).toFixed(2)}</span>
-                                </div>
-
-                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem', opacity: 0.5 }}>
-                                    <div style={{ border: '1.5px double #003366', padding: '4px 12px', borderRadius: '50%', transform: 'rotate(-5deg)', fontSize: '8px', fontWeight: 900, textAlign: 'center' }}>
-                                        MUNICIPAL CASHIER<br />OFFICIAL SEAL
-                                    </div>
-                                </div>
-
-                                <p className="receipt-footer-msg" style={{ borderTop: '1px solid #e2e8f0', paddingTop: '0.5rem', marginTop: '1rem', fontSize: '9px' }}>
-                                    This is a computer-generated receipt. No signature is required.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }} className="no-print">
-                            <button
-                                className="btn-primary"
-                                style={{
-                                    width: 'auto',
-                                    padding: '0.5rem 1.5rem',
-                                    background: '#003366',
-                                    color: 'white',
-                                    fontSize: '11px',
-                                    borderRadius: '4px',
-                                    fontWeight: 800,
-                                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
-                                }}
-                                onClick={() => window.print()}
-                            >
-                                <Printer style={{ width: '1rem' }} />
-                                PRINT OFFICIAL RECEIPT
-                            </button>
                         </div>
                     </div>
                 </div>
