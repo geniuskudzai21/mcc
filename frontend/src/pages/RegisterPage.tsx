@@ -1,273 +1,805 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, Lock, ArrowRight, Building2, ShieldCheck, Hash } from 'lucide-react';
+import { User, Mail, Phone, Lock, ArrowRight, Building2, Hash, Eye, EyeOff, Check, Shield } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-const ACCENT = '#09d6f1';
-const NAVY = '#001e3c';
-
-const inputBase: React.CSSProperties = {
-    width: '100%', padding: '0.7rem 0.875rem 0.7rem 2.25rem',
-    border: '1.5px solid #e5e7eb', borderRadius: '10px',
-    fontSize: '0.82rem', background: '#fafafa',
-    outline: 'none', color: '#111827',
-    transition: 'border-color 0.2s, background 0.2s',
-};
-
-const Label: React.FC<{ text: string }> = ({ text }) => (
-    <label style={{ display: 'block', fontSize: '0.62rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#374151', marginBottom: '0.35rem' }}>{text}</label>
-);
+const DEEP_BLUE = '#1e3a8a';
+const TEAL = '#14b8a6';
+const DARK_BG = '#0f172a';
+const PURPLE = '#8b5cf6';
+const CYAN = '#06b6d4';
+const WHITE = '#ffffff';
 
 const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [account_number, setAccountNumber] = useState('');
-    const [stand_number, setStandNumber] = useState('');
-    const [suburb, setSuburb] = useState('');
+    const [step, setStep] = useState(1);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
+        account_number: '',
+        stand_number: '',
+        suburb: ''
+    });
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [btnHover, setBtnHover] = useState(false);
 
-    const focus = (e: React.FocusEvent<HTMLInputElement>) => { e.currentTarget.style.borderColor = NAVY; e.currentTarget.style.background = '#fff'; };
-    const blur = (e: React.FocusEvent<HTMLInputElement>) => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.background = '#fafafa'; };
+    const updateField = (field: string, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const validateStep1 = () => {
+        if (!formData.name || !formData.email || !formData.phone || !formData.password) {
+            setError('Please fill in all fields');
+            return false;
+        }
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            return false;
+        }
+        if (formData.password.length < 6) {
+            setError('Password must be at least 6 characters');
+            return false;
+        }
+        setError('');
+        setStep(2);
+        return true;
+    };
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!formData.account_number || !formData.stand_number || !formData.suburb) {
+            setError('Please fill in all property details');
+            return;
+        }
         setError('');
-        if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
         setLoading(true);
         try {
-            const res = await api.post('/auth/register', { name, email, phone, password, account_number, stand_number, suburb });
+            const res = await api.post('/auth/register', {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password,
+                account_number: formData.account_number,
+                stand_number: formData.stand_number,
+                suburb: formData.suburb
+            });
             login(res.data.token, res.data.user);
             navigate('/dashboard');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Registration failed.');
-        } finally { setLoading(false); }
+            setError(err.response?.data?.message || 'Registration failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const inputStyle = {
+        width: '100%',
+        padding: '0.75rem 1rem',
+        border: '1px solid #e2e8f0',
+        borderRadius: '10px',
+        fontSize: '0.875rem',
+        outline: 'none',
+        transition: 'all 0.2s',
+        background: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(10px)'
     };
 
     return (
-        <>
-            <style>{`
-                @keyframes fadeSlideUp {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to   { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes logoPop {
-                    0%   { opacity: 0; transform: scale(0.85); }
-                    60%  { transform: scale(1.05); }
-                    100% { opacity: 1; transform: scale(1); }
-                }
-                @keyframes pulseDot {
-                    0%, 100% { box-shadow: 0 0 0 0 rgba(9,214,241,0.6); }
-                    50%      { box-shadow: 0 0 0 6px rgba(9,214,241,0); }
-                }
-            `}</style>
+        <div style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: DARK_BG,
+            fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            position: 'relative',
+            overflow: 'hidden'
+        }}>
+            {/* Futuristic AI Background */}
+            <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: `
+                    radial-gradient(ellipse at 20% 30%, ${PURPLE}60 0%, transparent 40%),
+                    radial-gradient(ellipse at 80% 70%, ${CYAN}60 0%, transparent 40%),
+                    radial-gradient(ellipse at 50% 50%, ${DEEP_BLUE}40 0%, transparent 50%),
+                    linear-gradient(135deg, ${PURPLE}20 0%, ${CYAN}20 50%, ${DEEP_BLUE}20 100%)
+                `,
+                backgroundSize: '800px 800px, 800px 800px, 600px 600px, 100% 100%',
+                backgroundPosition: '0 0, 0 0, 0 0, 0 0',
+                animation: 'gradient-shift 15s ease-in-out infinite'
+            }} />
+            
+            {/* Animated Neural Network */}
+            <svg style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                opacity: 0.3
+            }}>
+                <defs>
+                    <pattern id="neural-grid" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+                        <circle cx="30" cy="30" r="2" fill={CYAN} opacity="0.6">
+                            <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite" />
+                        </circle>
+                        <line x1="30" y1="30" x2="90" y2="30" stroke={PURPLE} strokeWidth="0.5" opacity="0.4">
+                            <animate attributeName="opacity" values="0.1;0.6;0.1" dur="4s" repeatCount="indefinite" />
+                        </line>
+                        <line x1="30" y1="30" x2="30" y2="90" stroke={CYAN} strokeWidth="0.5" opacity="0.4">
+                            <animate attributeName="opacity" values="0.1;0.6;0.1" dur="3.5s" repeatCount="indefinite" />
+                        </line>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#neural-grid)" />
+            </svg>
 
-            <div className="auth-container" style={{ minHeight: '100vh', display: 'flex', fontFamily: "'Inter', system-ui, sans-serif" }}>
+            {/* Floating Orbs */}
+            <div style={{
+                position: 'absolute',
+                inset: 0,
+                overflow: 'hidden'
+            }}>
+                {[...Array(6)].map((_, i) => (
+                    <div
+                        key={i}
+                        style={{
+                            position: 'absolute',
+                            width: `${Math.random() * 200 + 50}px`,
+                            height: `${Math.random() * 200 + 50}px`,
+                            borderRadius: '50%',
+                            background: `radial-gradient(circle, ${i % 2 === 0 ? PURPLE : CYAN}40 0%, transparent 70%)`,
+                            filter: 'blur(40px)',
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animation: `float-orb ${10 + Math.random() * 10}s ease-in-out infinite`,
+                            animationDelay: `${Math.random() * 5}s`
+                        }}
+                    />
+                ))}
+            </div>
 
-                {/* ━━━━━━━━━━━━━━━ LEFT PANEL ━━━━━━━━━━━━━━━ */}
-                <div className="auth-left-panel" style={{
-                    width: '420px', flexShrink: 0, background: NAVY,
-                    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                    padding: '3rem', position: 'relative', overflow: 'hidden'
+            {/* Digital Rain Effect */}
+            <div style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundImage: `
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(6, 182, 166, 0.03) 2px,
+                        rgba(6, 182, 166, 0.03) 4px
+                    ),
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(139, 92, 246, 0.03) 2px,
+                        rgba(139, 92, 246, 0.03) 4px
+                    )
+                `,
+                animation: 'digital-rain 20s linear infinite'
+            }} />
+
+            {/* Register Card */}
+            <div style={{
+                width: '100%',
+                maxWidth: '420px',
+                padding: '1.5rem',
+                position: 'relative',
+                zIndex: 1
+            }}>
+                <div style={{
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '16px',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+                    padding: '2rem',
+                    border: '1px solid rgba(255, 255, 255, 0.2)'
                 }}>
-                    {/* Top accent bar */}
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: ACCENT }} />
-                    {/* Dot grid */}
-                    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: 'radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-                    {/* Vertical accent line */}
-                    <div style={{ position: 'absolute', top: 0, right: '70px', width: '1px', height: '100%', background: `rgba(9,214,241,0.08)` }} />
-                    {/* Ghost text */}
-                    <div style={{ position: 'absolute', bottom: '-20px', left: '-10px', fontSize: '150px', fontWeight: 900, color: 'rgba(255,255,255,0.025)', lineHeight: 1, letterSpacing: '-0.04em', userSelect: 'none', pointerEvents: 'none' }}>MCC</div>
-
-                    {/* TOP: location tag */}
-                    <div style={{ position: 'relative', zIndex: 10 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: '8px', height: '8px', background: ACCENT, borderRadius: '50%', animation: 'pulseDot 2.5s ease-in-out infinite' }} />
-                            <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Zimbabwe · Manicaland</span>
-                        </div>
-                    </div>
-
-                    {/* MIDDLE: hero */}
-                    <div style={{ position: 'relative', zIndex: 10 }}>
-                        <img
-                            src="/mutarelogo.png" alt="Mutare Crest"
-                            style={{ width: '90px', height: '90px', display: 'block', marginBottom: '1.75rem', filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.5))', animation: 'logoPop 0.7s cubic-bezier(0.34,1.56,0.64,1) both' }}
+                    {/* Logo Section */}
+                    <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                        <img 
+                            src="/mutarelogo.png" 
+                            alt="City of Mutare" 
+                            style={{ 
+                                width: '60px', 
+                                height: '60px',
+                                marginBottom: '1rem',
+                                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
+                            }} 
                         />
-                        <div style={{ width: '36px', height: '3px', background: ACCENT, marginBottom: '1.25rem', borderRadius: '2px' }} />
-                        <h1 className="auth-hero-title" style={{ color: 'white', fontSize: '2.5rem', fontWeight: 900, lineHeight: 1, letterSpacing: '-0.03em', marginBottom: '0.5rem' }}>
-                            CITY OF<br />MUTARE
+                        
+                        <h1 style={{
+                            fontSize: '1.5rem',
+                            fontWeight: 700,
+                            color: DEEP_BLUE,
+                            margin: '0 0 0.25rem 0',
+                            letterSpacing: '-0.025em'
+                        }}>
+                            City of Mutare
                         </h1>
-                        <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', lineHeight: 1.7, marginBottom: '2rem' }}>
-                            Register your municipal account to access digital billing, service requests, and property management.
+                        
+                        <p style={{
+                            fontSize: '0.875rem',
+                            color: '#64748b',
+                            margin: '0',
+                            fontWeight: 500
+                        }}>
+                            Municipal Registration
                         </p>
+                    </div>
 
-                        {/* Steps */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            {[
-                                ['01', 'Enter your personal details'],
-                                ['02', 'Link your municipal property'],
-                                ['03', 'Await admin verification'],
-                                ['04', 'Access your full account'],
-                            ].map(([num, text]) => (
-                                <div key={num} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <div style={{ width: '26px', height: '26px', border: `1px solid rgba(9,214,241,0.3)`, borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(9,214,241,0.06)' }}>
-                                        <span style={{ color: ACCENT, fontSize: '0.6rem', fontWeight: 900 }}>{num}</span>
-                                    </div>
-                                    <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem' }}>{text}</span>
+                    {/* Progress Steps */}
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                        {[1, 2].map((s) => (
+                            <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <div style={{ 
+                                    width: '24px', 
+                                    height: '24px', 
+                                    borderRadius: '50%', 
+                                    background: step >= s ? TEAL : '#e5e7eb',
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center',
+                                    color: step >= s ? 'white' : '#6b7280',
+                                    fontWeight: 600,
+                                    fontSize: '0.75rem'
+                                }}>
+                                    {step > s ? <Check size={12} /> : s}
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* BOTTOM */}
-                    <div style={{ position: 'relative', zIndex: 10, color: 'rgba(255,255,255,0.2)', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                        © 2026 City of Mutare · All Rights Reserved
-                    </div>
-                </div>
-
-                {/* ━━━━━━━━━━━━━━━ RIGHT FORM PANEL ━━━━━━━━━━━━━━━ */}
-                <div className="auth-right-panel" style={{ flex: 1, background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 3rem', overflowY: 'auto', position: 'relative' }}>
-                    {/* Top accent bar */}
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: ACCENT }} />
-
-                    <div style={{ width: '100%', maxWidth: '520px', animation: 'fadeSlideUp 0.5s ease both' }}>
-
-                        {/* Heading */}
-                        <div style={{ marginBottom: '2rem' }}>
-                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', borderLeft: `3px solid ${ACCENT}`, paddingLeft: '10px', marginBottom: '0.875rem' }}>
-                                <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#374151' }}>New Citizen Registration</span>
+                                {s < 2 && <div style={{ width: '32px', height: '2px', background: step > s ? TEAL : '#e5e7eb' }} />}
                             </div>
-                            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0a0a0a', letterSpacing: '-0.03em', marginBottom: '0.3rem' }}>Create your account</h2>
-                            <p style={{ color: '#6b7280', fontSize: '0.85rem' }}>All fields are required. Property links require admin approval.</p>
-                        </div>
+                        ))}
+                    </div>
 
-                        {error && (
-                            <div style={{ background: '#fff1f2', borderLeft: '3px solid #dc2626', padding: '0.7rem 0.875rem', borderRadius: '8px', fontSize: '0.8rem', color: '#dc2626', marginBottom: '1.5rem' }}>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: DEEP_BLUE, marginBottom: '0.5rem' }}>
+                        {step === 1 ? 'Create Account' : 'Property Details'}
+                    </h2>
+                    <p style={{ color: '#64748b', fontSize: '0.8rem', marginBottom: '1.5rem' }}>
+                        {step === 1 ? 'Enter your personal information' : 'Link your municipal property'}
+                    </p>
+
+                    {/* Error Message */}
+                    {error && (
+                        <div style={{
+                            background: '#fef2f2',
+                            border: '1px solid #fecaca',
+                            borderRadius: '12px',
+                            padding: '0.75rem',
+                            marginBottom: '1.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            animation: 'slideDown 0.3s ease'
+                        }}>
+                            <Shield size={16} style={{ color: '#dc2626', flexShrink: 0 }} />
+                            <span style={{ color: '#dc2626', fontSize: '0.8rem', fontWeight: 500 }}>
                                 {error}
-                            </div>
-                        )}
+                            </span>
+                        </div>
+                    )}
 
-                        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-                            {/* Name + Phone */}
-                            <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
-                                <div>
-                                    <Label text="Full Legal Name" />
-                                    <div style={{ position: 'relative' }}>
-                                        <User style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '13px', color: '#9ca3af' }} />
-                                        <input type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
-                                    </div>
-                                </div>
-                                <div>
-                                    <Label text="Contact Number" />
-                                    <div style={{ position: 'relative' }}>
-                                        <Phone style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '13px', color: '#9ca3af' }} />
-                                        <input type="tel" placeholder="+263 7..." value={phone} onChange={e => setPhone(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
-                                    </div>
+                    {step === 1 ? (
+                        <form onSubmit={(e) => { e.preventDefault(); validateStep1(); }} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {/* Name */}
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    color: '#374151',
+                                    marginBottom: '0.4rem'
+                                }}>
+                                    Full Name
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                    <User style={{
+                                        position: 'absolute',
+                                        left: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        color: '#9ca3af',
+                                        zIndex: 1
+                                    }} />
+                                    <input
+                                        type="text"
+                                        placeholder="John Doe"
+                                        value={formData.name}
+                                        onChange={e => updateField('name', e.target.value)}
+                                        required
+                                        style={{ ...inputStyle, paddingLeft: '2.5rem' }}
+                                        onFocus={e => {
+                                            e.currentTarget.style.borderColor = TEAL;
+                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)';
+                                        }}
+                                        onBlur={e => {
+                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    />
                                 </div>
                             </div>
 
                             {/* Email */}
                             <div>
-                                <Label text="Email Address" />
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    color: '#374151',
+                                    marginBottom: '0.4rem'
+                                }}>
+                                    Email
+                                </label>
                                 <div style={{ position: 'relative' }}>
-                                    <Mail style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '13px', color: '#9ca3af' }} />
-                                    <input type="email" placeholder="name@example.com" value={email} onChange={e => setEmail(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
+                                    <Mail style={{
+                                        position: 'absolute',
+                                        left: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        color: '#9ca3af',
+                                        zIndex: 1
+                                    }} />
+                                    <input
+                                        type="email"
+                                        placeholder="you@example.com"
+                                        value={formData.email}
+                                        onChange={e => updateField('email', e.target.value)}
+                                        required
+                                        style={{ ...inputStyle, paddingLeft: '2.5rem' }}
+                                        onFocus={e => {
+                                            e.currentTarget.style.borderColor = TEAL;
+                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)';
+                                        }}
+                                        onBlur={e => {
+                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    />
                                 </div>
                             </div>
 
-                            {/* Property Section */}
-                            <div style={{ border: '1.5px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden' }}>
-                                <div style={{ background: NAVY, padding: '0.625rem 0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-                                        <Building2 style={{ width: '13px', color: ACCENT }} />
-                                        <span style={{ fontSize: '0.62rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: ACCENT }}>Municipal Property Link</span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.06)', padding: '0.2rem 0.5rem', borderRadius: '999px' }}>
-                                        <ShieldCheck style={{ width: '11px', color: 'rgba(255,255,255,0.5)' }} />
-                                        <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Admin Approval</span>
-                                    </div>
-                                </div>
-                                <div className="form-row" style={{ padding: '0.875rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', background: '#fafafa' }}>
-                                    <div>
-                                        <Label text="Stand Number" />
-                                        <div style={{ position: 'relative' }}>
-                                            <Hash style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '12px', color: '#9ca3af' }} />
-                                            <input type="text" placeholder="ST-1001" value={stand_number} onChange={e => setStandNumber(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <Label text="Account Number" />
-                                        <div style={{ position: 'relative' }}>
-                                            <Hash style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '12px', color: '#9ca3af' }} />
-                                            <input type="text" placeholder="ACC-0001" value={account_number} onChange={e => setAccountNumber(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
-                                        </div>
-                                    </div>
-                                    <div style={{ gridColumn: '1 / -1' }}>
-                                        <Label text="Suburb" />
-                                        <div style={{ position: 'relative' }}>
-                                            <Building2 style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '12px', color: '#9ca3af' }} />
-                                            <input type="text" placeholder="e.g., Hobhouse" value={suburb} onChange={e => setSuburb(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Password row */}
-                            <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
-                                <div>
-                                    <Label text="Password" />
-                                    <div style={{ position: 'relative' }}>
-                                        <Lock style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '13px', color: '#9ca3af' }} />
-                                        <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
-                                    </div>
-                                </div>
-                                <div>
-                                    <Label text="Confirm Password" />
-                                    <div style={{ position: 'relative' }}>
-                                        <Lock style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '13px', color: '#9ca3af' }} />
-                                        <input type="password" placeholder="••••••••" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={inputBase} onFocus={focus} onBlur={blur} required />
-                                    </div>
+                            {/* Phone */}
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    color: '#374151',
+                                    marginBottom: '0.4rem'
+                                }}>
+                                    Phone
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                    <Phone style={{
+                                        position: 'absolute',
+                                        left: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        color: '#9ca3af',
+                                        zIndex: 1
+                                    }} />
+                                    <input
+                                        type="tel"
+                                        placeholder="+263 77..."
+                                        value={formData.phone}
+                                        onChange={e => updateField('phone', e.target.value)}
+                                        required
+                                        style={{ ...inputStyle, paddingLeft: '2.5rem' }}
+                                        onFocus={e => {
+                                            e.currentTarget.style.borderColor = TEAL;
+                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)';
+                                        }}
+                                        onBlur={e => {
+                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    />
                                 </div>
                             </div>
 
-                            {/* Submit */}
+                            {/* Password */}
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    color: '#374151',
+                                    marginBottom: '0.4rem'
+                                }}>
+                                    Password
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                    <Lock style={{
+                                        position: 'absolute',
+                                        left: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        color: '#9ca3af',
+                                        zIndex: 1
+                                    }} />
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        placeholder="Create password"
+                                        value={formData.password}
+                                        onChange={e => updateField('password', e.target.value)}
+                                        required
+                                        style={{ ...inputStyle, paddingLeft: '2.5rem', paddingRight: '2.5rem' }}
+                                        onFocus={e => {
+                                            e.currentTarget.style.borderColor = TEAL;
+                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)';
+                                        }}
+                                        onBlur={e => {
+                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '0.875rem',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            color: '#9ca3af',
+                                            padding: '0.25rem',
+                                            borderRadius: '4px',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        onMouseOver={e => { e.currentTarget.style.color = DEEP_BLUE; }}
+                                        onMouseOut={e => { e.currentTarget.style.color = '#9ca3af'; }}
+                                    >
+                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Confirm Password */}
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    color: '#374151',
+                                    marginBottom: '0.4rem'
+                                }}>
+                                    Confirm Password
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                    <Lock style={{
+                                        position: 'absolute',
+                                        left: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        color: '#9ca3af',
+                                        zIndex: 1
+                                    }} />
+                                    <input
+                                        type="password"
+                                        placeholder="Confirm password"
+                                        value={formData.confirmPassword}
+                                        onChange={e => updateField('confirmPassword', e.target.value)}
+                                        required
+                                        style={{ ...inputStyle, paddingLeft: '2.5rem' }}
+                                        onFocus={e => {
+                                            e.currentTarget.style.borderColor = TEAL;
+                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)';
+                                        }}
+                                        onBlur={e => {
+                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    />
+                                </div>
+                                {formData.confirmPassword && formData.password === formData.confirmPassword && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '0.25rem', color: '#10b981', fontSize: '0.75rem' }}>
+                                        <Check size={12} /> Passwords match
+                                    </div>
+                                )}
+                            </div>
+
                             <button
-                                id="register-submit" type="submit" disabled={loading}
-                                onMouseEnter={() => setBtnHover(true)}
-                                onMouseLeave={() => setBtnHover(false)}
+                                type="submit"
                                 style={{
-                                    width: '100%', padding: '0.875rem', marginTop: '0.25rem',
-                                    background: loading ? '#6b7280' : (btnHover ? '#002f5a' : NAVY),
-                                    color: 'white', border: 'none', borderRadius: '12px',
-                                    fontWeight: 800, fontSize: '0.875rem', letterSpacing: '0.05em',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                                    cursor: loading ? 'not-allowed' : 'pointer',
-                                    transform: btnHover && !loading ? 'translateY(-1px)' : 'translateY(0)',
-                                    boxShadow: btnHover && !loading ? '0 8px 20px rgba(0,30,60,0.25)' : 'none',
-                                    transition: 'all 0.2s ease',
+                                    width: '100%',
+                                    padding: '0.875rem',
+                                    background: DEEP_BLUE,
+                                    color: WHITE,
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    fontWeight: 600,
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    transition: 'all 0.2s'
                                 }}
+                                onMouseOver={e => { e.currentTarget.style.background = '#1e40af'; }}
+                                onMouseOut={e => { e.currentTarget.style.background = DEEP_BLUE; }}
                             >
-                                {loading ? 'Creating Account...' : 'Register as Citizen'}
-                                {!loading && <ArrowRight style={{ width: '15px' }} />}
+                                Continue
+                                <ArrowRight size={16} />
                             </button>
                         </form>
+                    ) : (
+                        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {/* Property Info */}
+                            <div style={{ background: '#f0f9ff', borderRadius: '8px', padding: '1rem', marginBottom: '0.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: CYAN, fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                                    <Building2 size={16} />
+                                    <span>Property Information</span>
+                                </div>
+                                <p style={{ color: '#64748b', fontSize: '0.75rem', margin: 0 }}>
+                                    Enter your municipal account details to link your property
+                                </p>
+                            </div>
 
-                        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.8rem', color: '#6b7280' }}>
-                            Already registered?{' '}
-                            <NavLink to="/login" style={{ color: NAVY, fontWeight: 800, textDecoration: 'underline' }}>Sign In to Portal</NavLink>
-                        </div>
+                            {/* Stand Number */}
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    color: '#374151',
+                                    marginBottom: '0.4rem'
+                                }}>
+                                    Stand Number
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                    <Hash style={{
+                                        position: 'absolute',
+                                        left: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        color: '#9ca3af',
+                                        zIndex: 1
+                                    }} />
+                                    <input
+                                        type="text"
+                                        placeholder="ST-1001"
+                                        value={formData.stand_number}
+                                        onChange={e => updateField('stand_number', e.target.value)}
+                                        required
+                                        style={{ ...inputStyle, paddingLeft: '2.5rem' }}
+                                        onFocus={e => {
+                                            e.currentTarget.style.borderColor = TEAL;
+                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)';
+                                        }}
+                                        onBlur={e => {
+                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Account Number */}
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    color: '#374151',
+                                    marginBottom: '0.4rem'
+                                }}>
+                                    Account Number
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                    <Hash style={{
+                                        position: 'absolute',
+                                        left: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        color: '#9ca3af',
+                                        zIndex: 1
+                                    }} />
+                                    <input
+                                        type="text"
+                                        placeholder="ACC-0001"
+                                        value={formData.account_number}
+                                        onChange={e => updateField('account_number', e.target.value)}
+                                        required
+                                        style={{ ...inputStyle, paddingLeft: '2.5rem' }}
+                                        onFocus={e => {
+                                            e.currentTarget.style.borderColor = TEAL;
+                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)';
+                                        }}
+                                        onBlur={e => {
+                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Suburb */}
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    color: '#374151',
+                                    marginBottom: '0.4rem'
+                                }}>
+                                    Suburb
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                    <Building2 style={{
+                                        position: 'absolute',
+                                        left: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '16px',
+                                        color: '#9ca3af',
+                                        zIndex: 1
+                                    }} />
+                                    <input
+                                        type="text"
+                                        placeholder="e.g., Hobhouse"
+                                        value={formData.suburb}
+                                        onChange={e => updateField('suburb', e.target.value)}
+                                        required
+                                        style={{ ...inputStyle, paddingLeft: '2.5rem' }}
+                                        onFocus={e => {
+                                            e.currentTarget.style.borderColor = TEAL;
+                                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)';
+                                        }}
+                                        onBlur={e => {
+                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setStep(1)}
+                                    style={{
+                                        flex: 1,
+                                        padding: '0.875rem',
+                                        background: 'white',
+                                        color: '#374151',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '10px',
+                                        fontWeight: 600,
+                                        fontSize: '0.9rem',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    style={{
+                                        flex: 2,
+                                        padding: '0.875rem',
+                                        background: loading ? '#94a3b8' : DEEP_BLUE,
+                                        color: WHITE,
+                                        border: 'none',
+                                        borderRadius: '10px',
+                                        fontWeight: 600,
+                                        fontSize: '0.9rem',
+                                        cursor: loading ? 'not-allowed' : 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    {loading ? 'Creating...' : 'Create Account'}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {/* Login Link */}
+                    <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
+                        <p style={{ color: '#64748b', fontSize: '0.8rem', margin: 0 }}>
+                            Already have an account?{' '}
+                            <NavLink
+                                to="/login"
+                                style={{
+                                    color: TEAL,
+                                    textDecoration: 'none',
+                                    fontWeight: 600,
+                                    transition: 'color 0.2s'
+                                }}
+                                onMouseOver={e => { e.currentTarget.style.color = '#0d9488'; }}
+                                onMouseOut={e => { e.currentTarget.style.color = TEAL; }}
+                            >
+                                Sign in
+                            </NavLink>
+                        </p>
                     </div>
                 </div>
+
+                {/* Footer */}
+                <div style={{
+                    textAlign: 'center',
+                    marginTop: '1.5rem',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    fontSize: '0.75rem'
+                }}>
+                    <p style={{ margin: 0 }}>City of Mutare © 2026</p>
+                    <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+                        Secure Municipal Portal
+                    </p>
+                </div>
             </div>
-        </>
+
+            {/* Animations */}
+            <style>{`
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+                @keyframes slideDown {
+                    from { opacity: 0; transform: translateY(-10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes gradient-shift {
+                    0%, 100% { 
+                        background-position: 0% 0%, 100% 100%, 50% 50%, 0% 0%;
+                    }
+                    25% { 
+                        background-position: 100% 0%, 0% 100%, 0% 50%, 100% 0%;
+                    }
+                    50% { 
+                        background-position: 100% 100%, 0% 0%, 100% 50%, 0% 100%;
+                    }
+                    75% { 
+                        background-position: 0% 100%, 100% 0%, 50% 0%, 100% 100%;
+                    }
+                }
+                @keyframes float-orb {
+                    0%, 100% { 
+                        transform: translate(0, 0) scale(1);
+                        opacity: 0.3;
+                    }
+                    25% { 
+                        transform: translate(30px, -20px) scale(1.1);
+                        opacity: 0.6;
+                    }
+                    50% { 
+                        transform: translate(-20px, 30px) scale(0.9);
+                        opacity: 0.4;
+                    }
+                    75% { 
+                        transform: translate(-30px, -10px) scale(1.05);
+                        opacity: 0.5;
+                    }
+                }
+                @keyframes digital-rain {
+                    0% { transform: translateY(0); }
+                    100% { transform: translateY(20px); }
+                }
+            `}</style>
+        </div>
     );
 };
 
