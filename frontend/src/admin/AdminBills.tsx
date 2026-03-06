@@ -9,7 +9,13 @@ import {
     Trash2,
     Edit2,
     X,
-    CreditCard
+    CreditCard,
+    Calendar,
+    Home,
+    TrendingUp,
+    Users,
+    FileText,
+    Clock
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -126,322 +132,363 @@ const AdminBills: React.FC = () => {
     };
 
     if (isLoading) {
-        return <Layout isAdmin><div>Loading bills...</div></Layout>;
+        return (
+            <Layout isAdmin>
+                <div className="flex items-center justify-center h-[60vh] flex-col gap-4">
+                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                    <p className="text-slate-500 text-sm">Loading billing data...</p>
+                </div>
+            </Layout>
+        );
     }
 
-    const totalBillings = bills?.reduce((sum: number, b: any) => sum + parseFloat(b.total_amount), 0) || 0;
-    const pendingBillings = bills?.filter((b: any) => b.status !== 'PAID').reduce((sum: number, b: any) => sum + parseFloat(b.total_amount), 0) || 0;
-    const collectedBillings = totalBillings - pendingBillings;
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'PAID': return 'bg-green-100 text-green-800 border-green-200';
+            case 'OVERDUE': return 'bg-red-100 text-red-800 border-red-200';
+            case 'UNPAID': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            default: return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'PAID': return <CheckCircle2 className="w-4 h-4" />;
+            case 'OVERDUE': return <AlertCircle className="w-4 h-4" />;
+            case 'UNPAID': return <Clock className="w-4 h-4" />;
+            default: return <FileText className="w-4 h-4" />;
+        }
+    };
+
+    const stats = {
+        total: bills?.length || 0,
+        paid: bills?.filter((b: any) => b.status === 'PAID').length || 0,
+        unpaid: bills?.filter((b: any) => b.status !== 'PAID').length || 0,
+        overdue: bills?.filter((b: any) => b.status === 'OVERDUE').length || 0,
+        totalRevenue: bills?.reduce((sum: number, b: any) => sum + parseFloat(b.total_amount), 0) || 0,
+        collectedRevenue: bills?.filter((b: any) => b.status === 'PAID').reduce((sum: number, b: any) => sum + parseFloat(b.total_amount), 0) || 0,
+    };
 
     return (
         <Layout isAdmin>
-            <div className="page-header" style={{ marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div>
-                        <h1 className="page-title">Billing Management</h1>
-                        <p className="page-subtitle">Manage property bills, tariffs, and revenue collections.</p>
-                    </div>
-                    <span style={{
-                        background: '#dbeafe',
-                        color: '#1d4ed8',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '9999px',
-                        fontSize: '12px',
-                        fontWeight: 600
-                    }}>
-                        {bills?.length || 0} Bills
-                    </span>
-                </div>
-                <div style={{ display: 'flex', gap: '1rem', width: 'auto' }}>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-6 mb-8">
-                <div className="stat-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid #2563eb' }}>
-                    <div>
-                        <p className="stat-label">Total Billings (MTD)</p>
-                        <h3 className="stat-value" style={{ fontSize: '1.25rem' }}>${totalBillings.toFixed(2)}</h3>
-                    </div>
-                    <div className="stat-icon-wrapper bg-blue-light" style={{ width: '3rem', height: '3rem' }}>
-                        <DollarSign className="nav-icon" style={{ width: '1.25rem' }} />
-                    </div>
-                </div>
-
-                <div className="stat-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid #16a34a' }}>
-                    <div>
-                        <p className="stat-label">Collected (MTD)</p>
-                        <h3 className="stat-value" style={{ fontSize: '1.25rem' }}>${collectedBillings.toFixed(2)}</h3>
-                    </div>
-                    <div className="stat-icon-wrapper bg-green-light" style={{ width: '3rem', height: '3rem' }}>
-                        <CheckCircle2 className="nav-icon" style={{ width: '1.25rem' }} />
-                    </div>
-                </div>
-
-                <div className="stat-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid #f97316' }}>
-                    <div>
-                        <p className="stat-label">Outstanding (MTD)</p>
-                        <h3 className="stat-value" style={{ fontSize: '1.25rem' }}>${pendingBillings.toFixed(2)}</h3>
-                    </div>
-                    <div className="stat-icon-wrapper bg-orange-light" style={{ width: '3rem', height: '3rem' }}>
-                        <AlertCircle className="nav-icon" style={{ width: '1.25rem' }} />
-                    </div>
-                </div>
-            </div>
-
-            <div className="table-container">
-                <div className="card-title-row" style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 className="card-title" style={{ fontSize: '14px' }}>All Invoices</h3>
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        background: 'white',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        padding: '0.5rem 0.75rem',
-                        gap: '0.5rem',
-                        width: '300px'
-                    }}>
-                        <Search style={{ width: '16px', color: '#9ca3af' }} />
-                        <input
-                            type="text"
-                            placeholder="Search by account, address or status..."
-                            style={{
-                                border: 'none',
-                                outline: 'none',
-                                fontSize: '13px',
-                                width: '100%',
-                                background: 'transparent'
-                            }}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        {searchTerm && (
-                            <button
-                                onClick={() => setSearchTerm('')}
-                                style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
-                            >
-                                <X style={{ width: '14px', color: '#9ca3af' }} />
-                            </button>
-                        )}
-                    </div>
-                </div>
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>Account No.</th>
-                            <th>Resident / Property</th>
-                            <th>Period</th>
-                            <th>Amount</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                            <th style={{ textAlign: 'right' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredBills.length > 0 ? (
-                            filteredBills.map((bill: any) => (
-                                <tr key={bill.id}>
-                                    <td style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '12px' }}>{bill.property?.account_number}</td>
-                                    <td>
-                                        <div style={{ fontWeight: 600, fontSize: '13px' }}>{bill.property?.owner_name || 'Unassigned'}</div>
-                                        <div style={{ fontSize: '11px', color: '#94a3b8' }}>{bill.property?.address}</div>
-                                    </td>
-                                    <td>{bill.billing_month}/{bill.billing_year}</td>
-                                    <td style={{ fontWeight: 700 }}>${parseFloat(bill.total_amount).toFixed(2)}</td>
-                                    <td>{new Date(bill.due_date).toLocaleDateString()}</td>
-                                    <td>
-                                        <span style={{
-                                            padding: '0.25rem 0.75rem',
-                                            borderRadius: '9999px',
-                                            fontSize: '11px',
-                                            fontWeight: 600,
-                                            background: bill.status === 'PAID' ? '#dcfce7' : bill.status === 'OVERDUE' ? '#fef2f2' : '#fef3c7',
-                                            color: bill.status === 'PAID' ? '#16a34a' : bill.status === 'OVERDUE' ? '#dc2626' : '#d97706'
-                                        }}>
-                                            {bill.status}
-                                        </span>
-                                    </td>
-                                    <td style={{ textAlign: 'right' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                                            {bill.status !== 'PAID' && (
-                                                <button
-                                                    onClick={() => markPaidMutation.mutate(bill.id)}
-                                                    disabled={markPaidMutation.isPending}
-                                                    style={{
-                                                        padding: '0.5rem',
-                                                        background: '#16a34a',
-                                                        border: 'none',
-                                                        borderRadius: '6px',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        color: 'white'
-                                                    }}
-                                                    title="Mark as Paid"
-                                                >
-                                                    <CreditCard style={{ width: '14px' }} />
-                                                </button>
-                                            )}
-                                            <button
-                                                className="btn-secondary"
-                                                style={{ width: 'auto', padding: '0.5rem' }}
-                                                onClick={() => handleEdit(bill)}
-                                            >
-                                                <Edit2 style={{ width: '14px' }} />
-                                            </button>
-                                            <button
-                                                className="btn-secondary"
-                                                style={{ width: 'auto', padding: '0.5rem', color: '#dc2626' }}
-                                                onClick={() => handleDelete(bill)}
-                                            >
-                                                <Trash2 style={{ width: '14px' }} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
-                                    {searchTerm ? 'No bills found matching your search' : 'No bills found'}
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            <div className="grid grid-cols-1 mb-8">
-                <div className="stat-card" style={{ background: 'linear-gradient(135deg, #003366 0%, #001a33 100%)', color: 'white', border: 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <FilePlus style={{ width: '1.5rem', color: '#16a34a' }} />
-                                Municipal Billing Engine
-                            </h3>
-                            <p style={{ fontSize: '14px', color: '#94a3b8', maxWidth: '600px' }}>
-                                Run this process to generate monthly invoices for <strong>all municipal properties</strong>.
-                                The engine will automatically calculate charges based on current tariffs (Water, Sewer, Refuse, Rates)
-                                and skip properties that already have an invoice for the current period.
-                            </p>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Billing Management</h1>
+                            <p className="text-gray-600">Manage property bills, tariffs, and revenue collections</p>
                         </div>
-                        <button
-                            className="btn-primary"
-                            style={{
-                                width: 'auto',
-                                background: '#16a34a',
-                                padding: '1rem 2.5rem',
-                                height: 'fit-content',
-                                fontSize: '14px',
-                                boxShadow: '0 10px 15px -3px rgba(22, 163, 74, 0.4)'
-                            }}
-                            onClick={() => generateBillsMutation.mutate()}
-                            disabled={generateBillsMutation.isPending}
-                        >
-                            {generateBillsMutation.isPending ? 'PROCESSING BATCH...' : 'RUN MONTH-END BILLING'}
-                        </button>
                     </div>
+                    
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Total Bills</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <FileText className="w-6 h-6 text-blue-600" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Paid Bills</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.paid}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <CheckCircle2 className="w-6 h-6 text-green-600" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Unpaid Bills</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.unpaid}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Clock className="w-6 h-6 text-yellow-600" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Overdue Bills</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.overdue}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <AlertCircle className="w-6 h-6 text-red-600" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Enhanced Search Bar */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 my-8">
+                        <div className="relative group">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
+                                <Search className="w-5 h-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search by account, property address, or status..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 transition-transform duration-200 group-focus-within:scale-x-100"></div>
+                        </div>
+                    </div>
+
+                    {/* Bills Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+                        {filteredBills.length === 0 && (
+                            <div className="col-span-full bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
+                                    <FileText className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">No bills found</h3>
+                                <p className="text-gray-600">
+                                    {searchTerm ? 'Try adjusting your search terms' : 'No bills available'}
+                                </p>
+                            </div>
+                        )}
+                        
+                        {filteredBills.map((bill: any) => (
+                            <div key={bill.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="p-6">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
+                                            {getStatusIcon(bill.status)}
+                                        </div>
+                                        
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-105 ${getStatusColor(bill.status)}`}>
+                                            {getStatusIcon(bill.status)}
+                                            {bill.status.replace('_', ' ')}
+                                        </span>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                                {bill.billing_month}/{bill.billing_year}
+                                            </h3>
+                                            <p className="text-sm text-gray-600 mb-1">
+                                                {bill.property?.address}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                Account: {bill.property?.account_number}
+                                            </p>
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                                            <div className="flex items-center gap-1">
+                                                <Calendar className="w-4 h-4" />
+                                                <span className="text-xs">{new Date(bill.due_date).toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <DollarSign className="w-4 h-4" />
+                                                <span className="font-bold text-lg">${parseFloat(bill.total_amount).toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        {bill.status !== 'PAID' && (
+                                            <button
+                                                onClick={() => markPaidMutation.mutate(bill.id)}
+                                                disabled={markPaidMutation.isPending}
+                                                className="flex-1 px-3 py-2 text-sm font-medium text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                            >
+                                                <CreditCard className="w-4 h-4" />
+                                                Mark Paid
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => handleEdit(bill)}
+                                            className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-all duration-300 transform hover:scale-110 hover:rotate-12"
+                                            title="Edit Bill"
+                                        >
+                                            <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(bill)}
+                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-110 hover:rotate-12"
+                                            title="Delete Bill"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Billing Engine */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1 my-8">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <FilePlus className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-1">Municipal Billing Engine</h3>
+                                    <p className="text-sm text-gray-600">Generate monthly invoices for all properties</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => generateBillsMutation.mutate()}
+                                disabled={generateBillsMutation.isPending}
+                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {generateBillsMutation.isPending ? 'Processing...' : 'Generate Monthly Bills'}
+                            </button>
+                        </div>
+                        
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <p className="text-sm text-gray-600 mb-2">
+                                <strong>How it works:</strong> The billing engine automatically calculates charges based on current tariffs (Water, Sewer, Refuse, Rates) and skips properties that already have an invoice for the current period.
+                            </p>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                                <div className="flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3 text-green-600" />
+                                    <span>Smart calculations</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <TrendingUp className="w-3 h-3 text-blue-600" />
+                                    <span>Revenue tracking</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <Users className="w-3 h-3 text-purple-600" />
+                                    <span>Batch processing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Edit Modal */}
+                    {showEditModal && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                            <div className="bg-white rounded-xl border border-gray-200 w-full max-w-lg mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                                <div className="p-6 border-b border-gray-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-900">Edit Bill</h3>
+                                            <p className="text-sm text-gray-600">Update bill information</p>
+                                        </div>
+                                        <button 
+                                            onClick={() => setShowEditModal(false)} 
+                                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="p-6 space-y-4">
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <p className="text-sm font-semibold text-gray-700 mb-1">Property Information</p>
+                                        <p className="text-sm text-gray-600">{selectedBill?.property?.address}</p>
+                                        <p className="text-xs text-gray-500">Account: {selectedBill?.property?.account_number}</p>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                        <select
+                                            value={editForm.status}
+                                            onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="UNPAID">UNPAID</option>
+                                            <option value="PAID">PAID</option>
+                                            <option value="OVERDUE">OVERDUE</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Amount ($)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={editForm.total_amount}
+                                            onChange={(e) => setEditForm({ ...editForm, total_amount: e.target.value })}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div className="p-6 border-t border-gray-200">
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => setShowEditModal(false)}
+                                            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleUpdate}
+                                            disabled={updateBillMutation.isPending}
+                                            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                        >
+                                            {updateBillMutation.isPending ? 'Saving...' : 'Save Changes'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Delete Confirmation */}
+                    {showDeleteModal && selectedBill && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                            <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                                <div className="p-6 text-center">
+                                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Trash2 className="w-8 h-8 text-red-600" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Bill</h3>
+                                    <p className="text-gray-600 mb-6">
+                                        Are you sure you want to delete this bill for <strong>{selectedBill.property?.address}</strong>?
+                                    </p>
+                                    
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => setShowDeleteModal(false)}
+                                            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleDeleteConfirm}
+                                            disabled={deleteBillMutation.isPending}
+                                            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                        >
+                                            {deleteBillMutation.isPending ? 'Deleting...' : 'Delete Bill'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
-
-            {/* Edit Modal */}
-            {showEditModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
-                    <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', width: '450px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Edit Bill</h3>
-                            <button onClick={() => setShowEditModal(false)}><X style={{ width: '20px' }} /></button>
-                        </div>
-
-                        <div style={{ marginBottom: '1rem', padding: '0.75rem', background: '#f9fafb', borderRadius: '8px' }}>
-                            <p style={{ fontSize: '12px', color: '#64748b' }}>Property</p>
-                            <p style={{ fontWeight: 600 }}>{selectedBill?.property?.address}</p>
-                            <p style={{ fontSize: '12px', color: '#64748b' }}>Account: {selectedBill?.property?.account_number}</p>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Status</label>
-                                <select
-                                    value={editForm.status}
-                                    onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
-                                >
-                                    <option value="UNPAID">UNPAID</option>
-                                    <option value="PAID">PAID</option>
-                                    <option value="OVERDUE">OVERDUE</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Amount ($)</label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={editForm.total_amount}
-                                    onChange={(e) => setEditForm({ ...editForm, total_amount: e.target.value })}
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
-                                />
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-                            <button
-                                onClick={() => setShowEditModal(false)}
-                                style={{ flex: 1, padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontWeight: 600, background: '#f9fafb' }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleUpdate}
-                                disabled={updateBillMutation.isPending}
-                                style={{ flex: 1, padding: '0.625rem', background: '#2563eb', color: 'white', borderRadius: '8px', fontWeight: 600 }}
-                            >
-                                {updateBillMutation.isPending ? 'Saving...' : 'Save Changes'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete Modal */}
-            {showDeleteModal && selectedBill && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
-                    <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', width: '400px' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                            <div style={{ width: '48px', height: '48px', background: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                                <Trash2 style={{ width: '24px', color: '#dc2626' }} />
-                            </div>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Delete Bill</h3>
-                            <p style={{ fontSize: '14px', color: '#64748b', marginTop: '0.5rem' }}>
-                                Are you sure you want to delete this bill for <strong>{selectedBill.property?.address}</strong>?
-                            </p>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                            <button
-                                onClick={() => setShowDeleteModal(false)}
-                                style={{ flex: 1, padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontWeight: 600, background: '#f9fafb' }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleDeleteConfirm}
-                                disabled={deleteBillMutation.isPending}
-                                style={{ flex: 1, padding: '0.625rem', background: '#dc2626', color: 'white', borderRadius: '8px', fontWeight: 600 }}
-                            >
-                                {deleteBillMutation.isPending ? 'Deleting...' : 'Delete Bill'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </Layout>
     );
 };

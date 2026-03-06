@@ -8,7 +8,14 @@ import {
     X,
     Search,
     AlertCircle,
-    Calendar
+    Calendar,
+    Users,
+    Clock,
+    CheckCircle2,
+    TrendingUp,
+    Mail,
+    Phone,
+    Home
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -95,196 +102,291 @@ const AdminAccountApprovals: React.FC = () => {
     };
 
     if (isLoading) {
-        return <Layout isAdmin><div>Loading pending accounts...</div></Layout>;
+        return (
+            <Layout isAdmin>
+                <div className="flex items-center justify-center h-[60vh] flex-col gap-4">
+                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                    <p className="text-slate-500 text-sm">Loading pending accounts...</p>
+                </div>
+            </Layout>
+        );
     }
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'VERIFIED': return 'bg-green-100 text-green-800 border-green-200';
+            case 'REJECTED': return 'bg-red-100 text-red-800 border-red-200';
+            case 'PENDING': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            default: return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'VERIFIED': return <CheckCircle2 className="w-4 h-4" />;
+            case 'REJECTED': return <X className="w-4 h-4" />;
+            case 'PENDING': return <Clock className="w-4 h-4" />;
+            default: return <AlertCircle className="w-4 h-4" />;
+        }
+    };
+
+    const stats = {
+        total: pendingUsers?.length || 0,
+        withProperties: pendingUsers?.filter((u: any) => u.properties && u.properties.length > 0).length || 0,
+        withoutProperties: pendingUsers?.filter((u: any) => !u.properties || u.properties.length === 0).length || 0,
+        recent: pendingUsers?.filter((u: any) => new Date(u.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length || 0,
+    };
 
     return (
         <Layout isAdmin>
-            <div className="page-header" style={{ marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div>
-                        <h1 className="page-title">Account Approvals</h1>
-                        <p className="page-subtitle">Review and approve citizen account registrations.</p>
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Account Approvals</h1>
+                            <p className="text-gray-600">Review and approve citizen account registrations</p>
+                        </div>
                     </div>
-                    <span style={{
-                        background: '#fef3c7',
-                        color: '#d97706',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '9999px',
-                        fontSize: '12px',
-                        fontWeight: 600
-                    }}>
-                        {pendingUsers?.length || 0} Pending
-                    </span>
-                </div>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    padding: '0.5rem 0.75rem',
-                    gap: '0.5rem',
-                    width: '300px'
-                }}>
-                    <Search style={{ width: '16px', color: '#9ca3af' }} />
-                    <input
-                        type="text"
-                        placeholder="Search by name, email, phone, or property..."
-                        style={{ border: 'none', outline: 'none', fontSize: '13px', width: '100%', background: 'transparent' }}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {filteredUsers.length > 0 ? (
-                    filteredUsers.map((user: any) => (
-                        <div key={user.id} className="stat-card" style={{ display: 'flex', gap: '2rem', padding: '1.5rem' }}>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                                    <span style={{ fontSize: '10px', fontWeight: 600, padding: '0.25rem 0.5rem', borderRadius: '4px', background: '#fef3c7', color: '#d97706' }}>
-                                        PENDING APPROVAL
-                                    </span>
-                                    <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                        <Hash style={{ width: '12px' }} /> {user.id.slice(0, 8)}
-                                    </span>
-                                    <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                        <Calendar style={{ width: '12px' }} /> {new Date(user.created_at).toLocaleDateString()}
-                                    </span>
+                    
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Total Pending</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                                 </div>
+                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Users className="w-6 h-6 text-blue-600" />
+                                </div>
+                            </div>
+                        </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '1rem' }}>
-                                    <div>
-                                        <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <User style={{ width: '14px', color: '#2563eb' }} />
-                                            User Information
-                                        </h4>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                            <p style={{ fontSize: '13px', color: '#374151' }}>
-                                                <strong>Name:</strong> {user.name}
-                                            </p>
-                                            <p style={{ fontSize: '13px', color: '#374151' }}>
-                                                <strong>Email:</strong> {user.email}
-                                            </p>
-                                            <p style={{ fontSize: '13px', color: '#374151' }}>
-                                                <strong>Phone:</strong> {user.phone || 'N/A'}
-                                            </p>
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">With Properties</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.withProperties}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Home className="w-6 h-6 text-green-600" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">No Properties</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.withoutProperties}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <AlertCircle className="w-6 h-6 text-yellow-600" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Recent (7 days)</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.recent}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <TrendingUp className="w-6 h-6 text-purple-600" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Enhanced Search Bar */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 my-8">
+                        <div className="relative group">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
+                                <Search className="w-5 h-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search by name, email, phone, or property..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 transition-transform duration-200 group-focus-within:scale-x-100"></div>
+                        </div>
+                    </div>
+
+                    {/* User Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+                        {filteredUsers.length === 0 && (
+                            <div className="col-span-full bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
+                                    <Users className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">No pending accounts</h3>
+                                <p className="text-gray-600">
+                                    {searchTerm ? 'Try adjusting your search terms' : 'All user accounts have been processed'}
+                                </p>
+                            </div>
+                        )}
+                        
+                        {filteredUsers.map((user: any) => (
+                            <div key={user.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="p-6">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
+                                            <User className="w-6 h-6 text-gray-600" />
+                                        </div>
+                                        
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-105 bg-yellow-100 text-yellow-800 border-yellow-200">
+                                            <Clock className="w-4 h-4" />
+                                            PENDING
+                                        </span>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                                {user.name}
+                                            </h3>
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                    <Mail className="w-4 h-4" />
+                                                    <span className="text-xs">{user.email}</span>
+                                                </div>
+                                                {user.phone && (
+                                                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                        <Phone className="w-4 h-4" />
+                                                        <span className="text-xs">{user.phone}</span>
+                                                    </div>
+                                                )}
+                                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                    <Hash className="w-4 h-4" />
+                                                    <span className="text-xs">{user.id.slice(0, 8)}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                    <Calendar className="w-4 h-4" />
+                                                    <span className="text-xs">{new Date(user.created_at).toLocaleDateString()}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="border-t border-gray-100 pt-3">
+                                            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                                <Home className="w-4 h-4" />
+                                                Properties ({user.properties?.length || 0})
+                                            </h4>
+                                            {user.properties && user.properties.length > 0 ? (
+                                                <div className="space-y-2">
+                                                    {user.properties.map((up: any) => (
+                                                        <div key={up.id} className="bg-gray-50 rounded-lg p-2">
+                                                            <div className="flex items-center justify-between mb-1">
+                                                                <span className="text-xs font-medium text-gray-700">
+                                                            Account: {up.property.account_number}
+                                                        </span>
+                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-105 ${getStatusColor(up.status)}`}>
+                                                            {getStatusIcon(up.status)}
+                                                            {up.status}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-xs text-gray-600">
+                                                        <div>Stand: {up.property.stand_number}</div>
+                                                        <div>{up.property.suburb}</div>
+                                                        <div className="truncate">{up.property.address}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                                </div>
+                                            ) : (
+                                                <p className="text-xs text-gray-500 italic">No properties linked</p>
+                                            )}
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <Building2 style={{ width: '14px', color: '#2563eb' }} />
-                                            Property Information
-                                        </h4>
-                                        {user.properties && user.properties.length > 0 ? (
-                                            user.properties.map((up: any, index: number) => (
-                                                <div key={up.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginBottom: index < user.properties.length - 1 ? '0.5rem' : '0' }}>
-                                                    <p style={{ fontSize: '13px', color: '#374151' }}>
-                                                        <strong>Account:</strong> {up.property.account_number}
-                                                    </p>
-                                                    <p style={{ fontSize: '13px', color: '#374151' }}>
-                                                        <strong>Stand:</strong> {up.property.stand_number}
-                                                    </p>
-                                                    <p style={{ fontSize: '13px', color: '#374151' }}>
-                                                        <strong>Suburb:</strong> {up.property.suburb}
-                                                    </p>
-                                                    <p style={{ fontSize: '13px', color: '#374151' }}>
-                                                        <strong>Address:</strong> {up.property.address}
-                                                    </p>
-                                                    <p style={{ fontSize: '13px', color: '#374151' }}>
-                                                        <strong>Status:</strong> 
-                                                        <span style={{
-                                                            fontSize: '11px',
-                                                            fontWeight: 700,
-                                                            padding: '2px 8px',
-                                                            borderRadius: '999px',
-                                                            background: up.status === 'VERIFIED' ? '#f0fdf4' : up.status === 'REJECTED' ? '#fef2f2' : '#fffbeb',
-                                                            color: up.status === 'VERIFIED' ? '#16a34a' : up.status === 'REJECTED' ? '#dc2626' : '#d97706',
-                                                            marginLeft: '0.5rem'
-                                                        }}>
-                                                            {up.status}
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <p style={{ fontSize: '13px', color: '#9ca3af' }}>No property linked</p>
-                                        )}
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => handleApprove(user)}
+                                            disabled={approveUserMutation.isPending}
+                                            className="flex-1 px-3 py-2 text-sm font-medium text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                        >
+                                            <Check className="w-4 h-4" />
+                                            Approve
+                                        </button>
+                                        <button
+                                            onClick={() => handleReject(user)}
+                                            disabled={rejectUserMutation.isPending}
+                                            className="flex-1 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                        >
+                                            <X className="w-4 h-4" />
+                                            Reject
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', justifyContent: 'center' }}>
-                                <button
-                                    onClick={() => handleApprove(user)}
-                                    disabled={approveUserMutation.isPending}
-                                    className="btn-primary"
-                                    style={{ width: 'auto', fontSize: '13px', padding: '0.625rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                                >
-                                    <Check style={{ width: '14px' }} />
-                                    Approve Account
-                                </button>
-                                <button
-                                    onClick={() => handleReject(user)}
-                                    disabled={rejectUserMutation.isPending}
-                                    className="btn-secondary"
-                                    style={{ width: 'auto', fontSize: '13px', padding: '0.625rem 1.25rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                                >
-                                    <X style={{ width: '14px' }} />
-                                    Reject Account
-                                </button>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div style={{ textAlign: 'center', padding: '3rem', background: '#f9fafb', borderRadius: '12px' }}>
-                        <User style={{ width: '48px', color: '#9ca3af', margin: '0 auto 1rem' }} />
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#374151', marginBottom: '0.5rem' }}>
-                            {searchTerm ? 'No matching pending accounts found' : 'No pending account approvals'}
-                        </h3>
-                        <p style={{ color: '#6b7280', fontSize: '14px' }}>
-                            {searchTerm ? 'Try adjusting your search terms' : 'All user accounts have been processed'}
-                        </p>
+                        ))}
                     </div>
-                )}
-            </div>
 
             {/* Approve Confirmation Modal */}
             {showApproveModal && selectedUser && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', width: '450px' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                            <div style={{ width: '48px', height: '48px', background: '#f0fdf4', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                                <Check style={{ width: '24px', color: '#16a34a' }} />
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Approve User Account</h3>
+                                    <p className="text-sm text-gray-600">Confirm account approval</p>
+                                </div>
+                                <button 
+                                    onClick={() => setShowApproveModal(false)} 
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
                             </div>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Approve User Account</h3>
-                            <p style={{ fontSize: '14px', color: '#64748b', marginTop: '0.5rem' }}>
-                                Are you sure you want to approve <strong>{selectedUser.name}</strong>?
-                            </p>
-                            <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '0.5rem' }}>
-                                This will allow the user to receive bills and access all municipal services.
-                            </p>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                            <button
-                                onClick={() => setShowApproveModal(false)}
-                                className="btn-secondary"
-                                style={{ flex: 1 }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={confirmApprove}
-                                disabled={approveUserMutation.isPending}
-                                className="btn-primary"
-                                style={{ flex: 1 }}
-                            >
-                                {approveUserMutation.isPending ? 'Approving...' : 'Approve Account'}
-                            </button>
+                        <div className="p-6 text-center">
+                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Check className="w-8 h-8 text-green-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                Approve {selectedUser.name}?
+                            </h3>
+                            <p className="text-gray-600 mb-4">
+                                This will allow the user to receive bills and access all municipal services.
+                            </p>
+                            <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
+                                <p><strong>Email:</strong> {selectedUser.email}</p>
+                                <p><strong>Properties:</strong> {selectedUser.properties?.length || 0}</p>
+                            </div>
+                        </div>
+                        
+                        <div className="p-6 border-t border-gray-200">
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowApproveModal(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmApprove}
+                                    disabled={approveUserMutation.isPending}
+                                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                                >
+                                    {approveUserMutation.isPending ? 'Approving...' : 'Approve Account'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -292,39 +394,61 @@ const AdminAccountApprovals: React.FC = () => {
 
             {/* Reject Confirmation Modal */}
             {showRejectModal && selectedUser && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', width: '450px' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                            <AlertCircle style={{ width: '48px', height: '48px', color: '#dc2626', margin: '0 auto 1rem' }} />
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Reject User Account</h3>
-                            <p style={{ fontSize: '14px', color: '#64748b', marginTop: '0.5rem' }}>
-                                Are you sure you want to reject <strong>{selectedUser.name}</strong>?
-                            </p>
-                            <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '0.5rem' }}>
-                                This will deny the user access to municipal services.
-                            </p>
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Reject User Account</h3>
+                                    <p className="text-sm text-gray-600">Confirm account rejection</p>
+                                </div>
+                                <button 
+                                    onClick={() => setShowRejectModal(false)} 
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                            <button
-                                onClick={() => setShowRejectModal(false)}
-                                className="btn-secondary"
-                                style={{ flex: 1 }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={confirmReject}
-                                disabled={rejectUserMutation.isPending}
-                                className="btn-primary"
-                                style={{ flex: 1, background: '#dc2626' }}
-                            >
-                                {rejectUserMutation.isPending ? 'Rejecting...' : 'Reject Account'}
-                            </button>
+                        <div className="p-6 text-center">
+                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <AlertCircle className="w-8 h-8 text-red-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                Reject {selectedUser.name}?
+                            </h3>
+                            <p className="text-gray-600 mb-4">
+                                This will deny the user access to municipal services.
+                            </p>
+                            <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
+                                <p><strong>Email:</strong> {selectedUser.email}</p>
+                                <p><strong>Properties:</strong> {selectedUser.properties?.length || 0}</p>
+                            </div>
+                        </div>
+                        
+                        <div className="p-6 border-t border-gray-200">
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowRejectModal(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmReject}
+                                    disabled={rejectUserMutation.isPending}
+                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                >
+                                    {rejectUserMutation.isPending ? 'Rejecting...' : 'Reject Account'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
+                </div>
+            </div>
         </Layout>
     );
 };

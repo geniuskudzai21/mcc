@@ -8,7 +8,14 @@ import {
     Edit,
     Trash2,
     X,
-    Calendar
+    Calendar,
+    Users,
+    TrendingUp,
+    Home,
+    CheckCircle2,
+    Clock,
+    AlertCircle,
+    Building2
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -104,264 +111,338 @@ const AdminUsers: React.FC = () => {
     };
 
     if (isLoading) {
-        return <Layout isAdmin><div>Loading users...</div></Layout>;
+        return (
+            <Layout isAdmin>
+                <div className="flex items-center justify-center h-[60vh] flex-col gap-4">
+                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                    <p className="text-slate-500 text-sm">Loading users...</p>
+                </div>
+            </Layout>
+        );
     }
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'VERIFIED': return 'bg-green-100 text-green-800 border-green-200';
+            case 'PENDING': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'REJECTED': return 'bg-red-100 text-red-800 border-red-200';
+            default: return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'VERIFIED': return <CheckCircle2 className="w-4 h-4" />;
+            case 'PENDING': return <Clock className="w-4 h-4" />;
+            case 'REJECTED': return <AlertCircle className="w-4 h-4" />;
+            default: return <Building2 className="w-4 h-4" />;
+        }
+    };
+
+    const stats = {
+        total: users?.length || 0,
+        withProperties: users?.filter((u: any) => {
+            const props = getUserProperties(u.id);
+            return props && props.length > 0;
+        }).length || 0,
+        noProperties: users?.filter((u: any) => {
+            const props = getUserProperties(u.id);
+            return !props || props.length === 0;
+        }).length || 0,
+        recent: users?.filter((u: any) => new Date(u.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length || 0,
+        verified: userProperties?.filter((up: any) => up.status === 'VERIFIED').length || 0,
+    };
 
     return (
         <Layout isAdmin>
-            <div className="page-header" style={{ marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div>
-                        <h1 className="page-title">User Management</h1>
-                        <p className="page-subtitle">Manage registered users in the system.</p>
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">User Management</h1>
+                            <p className="text-gray-600">Manage registered users in the system</p>
+                        </div>
                     </div>
-                    <span style={{
-                        background: '#e0e7ff',
-                        color: '#4338ca',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '9999px',
-                        fontSize: '12px',
-                        fontWeight: 600
-                    }}>
-                        {users?.length || 0} Users
-                    </span>
-                </div>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    padding: '0.5rem 0.75rem',
-                    gap: '0.5rem',
-                    width: '300px'
-                }}>
-                    <Search style={{ width: '16px', color: '#9ca3af' }} />
-                    <input
-                        type="text"
-                        placeholder="Search by name, email, or phone..."
-                        style={{ border: 'none', outline: 'none', fontSize: '13px', width: '100%', background: 'transparent' }}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-            </div>
+                    
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Total Users</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Users className="w-6 h-6 text-blue-600" />
+                                </div>
+                            </div>
+                        </div>
 
-            <div style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                        <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                            <th style={{ textAlign: 'left', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>User</th>
-                            <th style={{ textAlign: 'left', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact</th>
-                            <th style={{ textAlign: 'left', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Properties</th>
-                            <th style={{ textAlign: 'left', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Registered</th>
-                            <th style={{ textAlign: 'right', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredUsers.length > 0 ? (
-                            filteredUsers.map((user: any) => {
-                                const props = getUserProperties(user.id);
-                                return (
-                                    <tr key={user.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                        <td style={{ padding: '1rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                <div style={{ width: '36px', height: '36px', background: '#e0e7ff', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <User style={{ width: '16px', color: '#4338ca' }} />
-                                                </div>
-                                                <div>
-                                                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}>{user.name}</p>
-                                                    <p style={{ fontSize: '12px', color: '#6b7280' }}>ID: {user.id.slice(0, 8)}</p>
-                                                </div>
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">With Properties</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.withProperties}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Home className="w-6 h-6 text-green-600" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">No Properties</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.noProperties}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <AlertCircle className="w-6 h-6 text-yellow-600" />
+                                </div>
+                            </div>
+                        </div>
+
+            
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Verified Properties</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.verified}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <CheckCircle2 className="w-6 h-6 text-indigo-600" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Enhanced Search Bar */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 my-8">
+                        <div className="relative group">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
+                                <Search className="w-5 h-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search by name, email, or phone..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 transition-transform duration-200 group-focus-within:scale-x-100"></div>
+                        </div>
+                    </div>
+
+                    {/* User List - Block Layout */}
+                    <div className="space-y-2 my-8">
+                        {filteredUsers.length === 0 && (
+                            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
+                                    <Users className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">No users found</h3>
+                                <p className="text-gray-600">
+                                    {searchTerm ? 'Try adjusting your search terms' : 'No users registered yet'}
+                                </p>
+                            </div>
+                        )}
+                        
+                        {filteredUsers.map((user: any) => {
+                            const props = getUserProperties(user.id);
+                            return (
+                                <div key={user.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1 w-full">
+                                    <div className="flex items-center justify-between p-4">
+                                        {/* Left Section - User Info */}
+                                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110 flex-shrink-0">
+                                                <User className="w-5 h-5 text-blue-600" />
                                             </div>
-                                        </td>
-                                        <td style={{ padding: '1rem' }}>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                                <p style={{ fontSize: '13px', color: '#374151', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                    <Mail style={{ width: '12px', color: '#9ca3af' }} />
-                                                    {user.email}
-                                                </p>
-                                                <p style={{ fontSize: '13px', color: '#374151', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                    <Phone style={{ width: '12px', color: '#9ca3af' }} />
-                                                    {user.phone || 'N/A'}
-                                                </p>
-                                            </div>
-                                        </td>
-                                        <td style={{ padding: '1rem' }}>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                                {props.length > 0 ? (
-                                                    props.map((p: any) => (
-                                                        <span key={p.id} style={{
-                                                            fontSize: '11px',
-                                                            fontWeight: 600,
-                                                            padding: '2px 8px',
-                                                            borderRadius: '999px',
-                                                            background: p.status === 'VERIFIED' ? '#f0fdf4' : p.status === 'PENDING' ? '#fffbeb' : '#fef2f2',
-                                                            color: p.status === 'VERIFIED' ? '#16a34a' : p.status === 'PENDING' ? '#d97706' : '#dc2626',
-                                                            display: 'inline-block',
-                                                            width: 'fit-content'
-                                                        }}>
-                                                            {p.property?.account_number} - {p.status}
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-semibold text-gray-900 truncate">{user.name}</h3>
+                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                    <span className="flex items-center gap-1">
+                                                        <Mail className="w-3 h-3" />
+                                                        <span className="truncate max-w-[200px]">{user.email}</span>
+                                                    </span>
+                                                    {user.phone && (
+                                                        <span className="flex items-center gap-1">
+                                                            <Phone className="w-3 h-3" />
+                                                            {user.phone}
                                                         </span>
-                                                    ))
-                                                ) : (
-                                                    <span style={{ fontSize: '12px', color: '#9ca3af' }}>No property linked</span>
+                                                    )}
+                                                    <span className="flex items-center gap-1">
+                                                        <Calendar className="w-3 h-3" />
+                                                        {new Date(user.created_at).toLocaleDateString()}
+                                                    </span>
+                                                    <span className="text-gray-400">ID: {user.id.slice(0, 8)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Middle Section - Properties */}
+                                        <div className="flex items-center gap-2 px-4 border-l border-r border-gray-200">
+                                            <Home className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                                            <div className="text-sm">
+                                                <span className="font-medium text-gray-700">{props.length} Properties</span>
+                                                {props.length > 0 && (
+                                                    <div className="flex items-center gap-1 mt-1">
+                                                        {props.slice(0, 2).map((p: any) => (
+                                                            <span key={p.id} className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-95 flex-shrink-0 ${getStatusColor(p.status)}`}>
+                                                                {getStatusIcon(p.status)}
+                                                                {p.property.account_number}
+                                                            </span>
+                                                        ))}
+                                                        {props.length > 2 && (
+                                                            <span className="text-xs text-gray-500">+{props.length - 2} more</span>
+                                                        )}
+                                                    </div>
                                                 )}
                                             </div>
-                                        </td>
-                                        <td style={{ padding: '1rem' }}>
-                                            <p style={{ fontSize: '13px', color: '#374151', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                <Calendar style={{ width: '12px', color: '#9ca3af' }} />
-                                                {new Date(user.created_at).toLocaleDateString()}
-                                            </p>
-                                        </td>
-                                        <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                <button
-                                                    onClick={() => handleEdit(user)}
-                                                    style={{
-                                                        padding: '0.5rem',
-                                                        background: '#f3f4f6',
-                                                        border: 'none',
-                                                        borderRadius: '6px',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center'
-                                                    }}
-                                                >
-                                                    <Edit style={{ width: '14px', color: '#6b7280' }} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(user)}
-                                                    style={{
-                                                        padding: '0.5rem',
-                                                        background: '#fef2f2',
-                                                        border: 'none',
-                                                        borderRadius: '6px',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center'
-                                                    }}
-                                                >
-                                                    <Trash2 style={{ width: '14px', color: '#dc2626' }} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        ) : (
-                            <tr>
-                                <td colSpan={5} style={{ padding: '3rem', textAlign: 'center' }}>
-                                    <User style={{ width: '48px', color: '#9ca3af', margin: '0 auto 1rem' }} />
-                                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#374151', marginBottom: '0.5rem' }}>
-                                        {searchTerm ? 'No matching users found' : 'No users registered'}
-                                    </h3>
-                                    <p style={{ color: '#6b7280', fontSize: '14px' }}>
-                                        {searchTerm ? 'Try adjusting your search terms' : 'Users will appear here once they register'}
-                                    </p>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                                        </div>
+
+                                        {/* Right Section - Actions */}
+                                        <div className="flex items-center gap-2 pl-4">
+                                            <button
+                                                onClick={() => handleEdit(user)}
+                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                                title="Edit User"
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(user)}
+                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                                title="Delete User"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
 
             {/* Edit Modal */}
             {showEditModal && selectedUser && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', width: '450px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Edit User</h3>
-                            <button onClick={() => setShowEditModal(false)}><X style={{ width: '20px' }} /></button>
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-lg mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Edit User</h3>
+                                    <p className="text-sm text-gray-600">Update user information</p>
+                                </div>
+                                <button 
+                                    onClick={() => setShowEditModal(false)} 
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div className="p-6 space-y-4">
                             <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Full Name</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                                 <input
                                     type="text"
                                     value={editForm.name}
                                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
                             <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Email</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                                 <input
                                     type="email"
                                     value={editForm.email}
                                     onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
                             <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Phone</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                                 <input
                                     type="tel"
                                     value={editForm.phone}
                                     onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
                         </div>
-
-                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-                            <button
-                                onClick={() => setShowEditModal(false)}
-                                className="btn-secondary"
-                                style={{ flex: 1 }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={confirmEdit}
-                                disabled={updateUserMutation.isPending}
-                                className="btn-primary"
-                                style={{ flex: 1 }}
-                            >
-                                {updateUserMutation.isPending ? 'Saving...' : 'Save Changes'}
-                            </button>
+                        
+                        <div className="p-6 border-t border-gray-200">
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowEditModal(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmEdit}
+                                    disabled={updateUserMutation.isPending}
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                >
+                                    {updateUserMutation.isPending ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Delete Modal */}
+            {/* Delete Confirmation */}
             {showDeleteModal && selectedUser && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', width: '400px' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                            <div style={{ width: '48px', height: '48px', background: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                                <Trash2 style={{ width: '24px', color: '#dc2626' }} />
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-6 text-center">
+                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Trash2 className="w-8 h-8 text-red-600" />
                             </div>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Delete User</h3>
-                            <p style={{ fontSize: '14px', color: '#64748b', marginTop: '0.5rem' }}>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Delete User</h3>
+                            <p className="text-gray-600 mb-4">
                                 Are you sure you want to delete <strong>{selectedUser.name}</strong>? This action cannot be undone.
                             </p>
+                            <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
+                                <p><strong>Email:</strong> {selectedUser.email}</p>
+                                <p><strong>Properties:</strong> {getUserProperties(selectedUser.id)?.length || 0}</p>
+                            </div>
                         </div>
-
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                            <button
-                                onClick={() => setShowDeleteModal(false)}
-                                className="btn-secondary"
-                                style={{ flex: 1 }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={confirmDelete}
-                                disabled={deleteUserMutation.isPending}
-                                style={{ flex: 1, padding: '0.625rem', background: '#dc2626', color: 'white', borderRadius: '8px', fontWeight: 600, border: 'none', cursor: 'pointer' }}
-                            >
-                                {deleteUserMutation.isPending ? 'Deleting...' : 'Delete User'}
-                            </button>
+                        
+                        <div className="p-6 border-t border-gray-200">
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    disabled={deleteUserMutation.isPending}
+                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                >
+                                    {deleteUserMutation.isPending ? 'Deleting...' : 'Delete User'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
+                </div>
+            </div>
         </Layout>
     );
 };
