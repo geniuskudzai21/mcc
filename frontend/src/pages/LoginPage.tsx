@@ -42,7 +42,7 @@ const LoginPage: React.FC = () => {
             <div className="absolute inset-0" style={backgroundStyle}></div>
             <div className="relative z-10 min-h-screen flex items-center justify-center">
                 <div className="w-full max-w-[380px] p-6">
-                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+                    <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-8">
                         <div className="text-center mb-8">
                             <img 
                                 src="/mutarelogo.png" 
