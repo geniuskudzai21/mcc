@@ -204,7 +204,7 @@ const DashboardPage: React.FC = () => {
                     <div className="bg-white rounded-xl p-6 border border-slate-200 flex flex-col gap-3 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.3s' }}>
                         <h3 className="font-extrabold text-sm text-gray-900 mb-1">Quick Actions</h3>
 
-                        <button onClick={() => navigate('/bills')} className="w-full py-2 px-3.5 bg-blue-600 text-white border-none rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                        <button onClick={() => navigate('/bills')} className="w-full py-2 px-3.5 bg-green-200 text-green-900 border-1 border-green-400 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
                             <div className="rounded p-1"><Calendar className="w-3.5" /></div>
                             Pay My Bills
                         </button>
