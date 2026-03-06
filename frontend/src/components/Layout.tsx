@@ -38,10 +38,10 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
         || (location.pathname.startsWith('/profile') ? 'My Profile' : isAdmin ? 'Admin' : 'Portal');
 
     return (
-        <div className="flex h-screen font-['Inter',system-ui,sans-serif] bg-slate-100">
+        <div className="flex h-screen font-['Inter',system-ui,sans-serif] bg-slate-200">
             <aside className="w-60 flex-shrink-0 bg-[#001e3c] flex flex-col relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:20px_20px] pointer-events-none" />
-                <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#09d6f1]" />
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#2563eb]" />
 
                 <div className="p-5 pb-4 border-b border-white/[0.07] relative z-10">
                     <div className="flex items-center gap-3">
@@ -50,7 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
                         </div>
                         <div>
                             <h1 className="text-white text-[0.8rem] font-extrabold tracking-[0.03em] leading-tight">City of Mutare</h1>
-                            <p className="text-[#09d6f1] text-[0.6rem] font-bold uppercase tracking-[0.1em] mt-0.5">
+                            <p className="text-[#2563eb] text-[0.6rem] font-bold uppercase tracking-[0.1em] mt-0.5">
                                 {isAdmin ? 'Admin Console' : 'Citizen Portal'}
                             </p>
                         </div>
@@ -69,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
                             className={({ isActive }) => `
                                 flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[0.825rem] font-semibold no-underline transition-all duration-200
                                 ${isActive 
-                                    ? 'bg-[#09d6f1] text-[#001e3c] font-extrabold' 
+                                    ? 'bg-[#2563eb] text-[#001e3c] font-extrabold' 
                                     : 'text-white/[0.45] hover:text-white/[0.85] hover:bg-white/[0.06]'}
                             `}
                             end={item.path === '/admin' || item.path === '/dashboard'}
@@ -89,7 +89,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
                         className={({ isActive }) => `
                             flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[0.825rem] font-semibold no-underline transition-all duration-200
                             ${isActive 
-                                ? 'bg-[#09d6f1] text-[#001e3c] font-extrabold' 
+                                ? 'bg-[#2563eb] text-[#001e3c] font-extrabold' 
                                 : 'text-white/[0.45] hover:text-white/[0.85] hover:bg-white/[0.06]'}
                         `}
                     >
@@ -104,7 +104,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
 
                 <div className="p-3.5 border-t border-white/[0.07] bg-black/[0.15] relative z-10">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-[30px] h-[30px] bg-[#09d6f1] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-[30px] h-[30px] bg-[#2563eb] rounded-lg flex items-center justify-center flex-shrink-0">
                             <span className="text-[#001e3c] text-[0.75rem] font-extrabold">
                                 {user?.name ? user.name[0].toUpperCase() : 'U'}
                             </span>
@@ -119,9 +119,9 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
 
             <div className="flex-1 overflow-y-auto flex flex-col">
                 {!hideHeader && (
-                    <header className="h-16 min-h-16 bg-white border-b border-slate-200 border-t-4 border-t-[#09d6f1] px-7 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+                    <header className="h-16 min-h-16 bg-white border-b border-slate-200 border-t-4 border-t-[#2563eb] px-7 flex items-center justify-between sticky top-0 z-50 shadow-sm">
                         <div className="flex items-center gap-2">
-                            <div className="w-[3px] h-[18px] bg-[#09d6f1] rounded-sm" />
+                            <div className="w-[3px] h-[18px] bg-[#2563eb] rounded-sm" />
                             <h2 className="text-[0.925rem] font-extrabold text-gray-900 tracking-tight">{currentTitle}</h2>
                         </div>
 
@@ -137,7 +137,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
                                     <p className="text-[0.775rem] font-bold text-gray-900 leading-tight">{user?.name || 'Guest'}</p>
                                     <p className="text-[0.65rem] text-slate-400 leading-tight">{isAdmin ? 'Administrator' : 'Citizen Account'}</p>
                                 </div>
-                                <div className="w-9 h-9 rounded-full bg-[#001e3c] border-2 border-[#09d6f1] flex items-center justify-center text-white text-[0.8rem] font-extrabold flex-shrink-0 cursor-pointer transition-transform hover:scale-105">
+                                <div className="w-9 h-9 rounded-full bg-[#001e3c] border-2 border-[#2563eb] flex items-center justify-center text-white text-[0.8rem] font-extrabold flex-shrink-0 cursor-pointer transition-transform hover:scale-105">
                                     {user?.name ? user.name[0].toUpperCase() : <UserIcon className="w-3.5" />}
                                 </div>
                             </div>

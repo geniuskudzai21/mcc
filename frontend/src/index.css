@@ -3,8 +3,8 @@
 :root {
   --primary: #001e3c;
   --primary-hover: #002f5a;
-  --primary-glow: rgba(9, 214, 241, 0.15);
-  --accent: #09d6f1;
+  --primary-glow: rgba(37, 99, 235, 0.15);
+  --accent: #03a5f0;
   --bg-main: #f4f6f9;
   --bg-card: #ffffff;
   --bg-input: #f8fafc;
@@ -12,7 +12,7 @@
   --text-muted: #6b7280;
   --text-light: #9ca3af;
   --border: #e9ecf0;
-  --border-focus: #09d6f1;
+  --border-focus: #2563eb;
 }
 
 body {

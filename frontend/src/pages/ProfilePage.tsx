@@ -6,7 +6,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const NAVY = '#001e3c';
-const ACCENT = '#09d6f1';
+const ACCENT = '#2563eb';
 
 const ProfilePage: React.FC = () => {
     const { user: authUser } = useAuth();

@@ -14,7 +14,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-const ACCENT = '#09d6f1';
+const ACCENT = '#2563eb';
 const NAVY = '#001e3c';
 
 const DashboardPage: React.FC = () => {
@@ -81,10 +81,10 @@ const DashboardPage: React.FC = () => {
 
     return (
         <Layout hideHeader>
-            <div className="animate-[fadeIn_0.3s_ease_both]">
-                <div className="relative overflow-hidden rounded-2xl border-t-4 border-t-cyan-400 p-10 mb-6" style={{ background: NAVY }}>
+            <div>
+                <div className="relative overflow-hidden rounded-2xl p-6 mb-6 justify-between z-10 flex" style={{ background: NAVY }}>
                     <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:20px_20px] pointer-events-none" />
-                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-cyan-400" />
+                    <div className="absolute top-0 left-0 right-0 h-[4px] bg-blue-600" />
 
                     <div className="relative z-10">
                         <p className="text-white/50 text-xs uppercase tracking-widest mb-1">{greeting}</p>
@@ -92,7 +92,7 @@ const DashboardPage: React.FC = () => {
                         <p className="text-white/45 text-sm">Mutare Municipal Digital Billing Portal</p>
                     </div>
 
-                    <div className="flex gap-4 mt-6 relative z-10">
+                    <div className="relative z-10 ml-auto">
                         {outstanding > 0 && (
                             <div className="bg-red-500/15 border border-red-500/30 rounded-xl p-4 text-right">
                                 <p className="text-white/50 text-xs uppercase tracking-widest mb-1">Outstanding Balance</p>
@@ -118,13 +118,13 @@ const DashboardPage: React.FC = () => {
                     {[
                         { icon: <CreditCard className="w-4.5 h-4.5 text-cyan-400" />, label: 'Outstanding', value: `$${outstanding.toFixed(2)}`, sub: unpaidBills.length > 0 ? `${unpaidBills.length} unpaid bill${unpaidBills.length > 1 ? 's' : ''}` : 'No pending bills', bg: outstanding > 0 ? 'bg-red-50' : 'bg-green-50' },
                         { icon: <CheckCircle2 className="w-4.5 h-4.5 text-green-600" />, label: 'Total Paid', value: `$${paidTotal.toFixed(2)}`, sub: `${bills?.filter((b: any) => b.status === 'PAID').length || 0} bills settled`, bg: 'bg-green-50' },
-                        { icon: <HomeIcon className="w-4.5 h-4.5 text-purple-600" />, label: 'Properties', value: `${properties.length}`, sub: 'Linked to account', bg: 'bg-purple-50' },
+                        { icon: <HomeIcon className="w-4.5 h-4.5 text-purple-600" />, label: 'Properties', value: `${properties.length}`, sub: 'Linked to account'},
                         { icon: <Wrench className="w-4.5 h-4.5 text-amber-600" />, label: 'Active Requests', value: `${activeRequests.length}`, sub: 'Pending resolution', bg: 'bg-amber-50' },
                     ].map((m, i) => (
-                        <div key={i} className="bg-white rounded-xl p-5 border border-slate-200 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: `${i * 0.05}s` }}>
+                        <div key={i} className="bg-white rounded-xl p-5 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both] transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-600/30 cursor-pointer" style={{ animationDelay: `${i * 0.05}s` }}>
                             <div className="flex items-center justify-between mb-3.5">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-slate-500">{m.label}</span>
-                                <div className={`rounded-lg p-1.5 ${m.bg}`}>{m.icon}</div>
+                                {m.icon}
                             </div>
                             <p className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1">{m.value}</p>
                             <p className="text-xs text-slate-400">{m.sub}</p>
@@ -133,7 +133,7 @@ const DashboardPage: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-[1fr_1fr_320px] gap-4 mb-6">
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.2s' }}>
+                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.2s' }}>
                         <div className="flex items-center justify-between mb-5">
                             <div>
                                 <h3 className="font-extrabold text-sm text-gray-900 mb-0.5">Billing History</h3>
@@ -162,7 +162,7 @@ const DashboardPage: React.FC = () => {
                         )}
                     </div>
 
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.25s' }}>
+                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.25s' }}>
                         <div className="flex items-center justify-between mb-5">
                             <div>
                                 <h3 className="font-extrabold text-sm text-gray-900 mb-0.5">Outstanding Bills</h3>
@@ -201,37 +201,28 @@ const DashboardPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 flex flex-col gap-3 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.3s' }}>
+                    <div className="bg-white rounded-xl p-6 border border-slate-200 flex flex-col gap-3 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.3s' }}>
                         <h3 className="font-extrabold text-sm text-gray-900 mb-1">Quick Actions</h3>
 
-                        <button onClick={() => navigate('/bills')} className="w-full py-2.5 px-3.5 bg-slate-800 text-white border-none rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                            <div className="bg-white/20 rounded p-1"><Calendar className="w-3.5" /></div>
+                        <button onClick={() => navigate('/bills')} className="w-full py-2 px-3.5 bg-blue-600 text-white border-none rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                            <div className="rounded p-1"><Calendar className="w-3.5" /></div>
                             Pay My Bills
                         </button>
 
-                        <button onClick={() => navigate('/requests')} className="w-full py-2.5 px-3.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                            <div className="bg-orange-100/50 rounded p-1"><AlertCircle className="w-3.5" /></div>
+                        <button onClick={() => navigate('/requests')} className="w-full py-2 px-3.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                            <div className="rounded p-1"><AlertCircle className="w-3.5" /></div>
                             Report an Issue
                         </button>
 
-                        <button onClick={() => navigate('/profile')} className="w-full py-2.5 px-3.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
-                            <div className="bg-sky-100/50 rounded p-1"><HomeIcon className="w-3.5" /></div>
+                        <button onClick={() => navigate('/profile')} className="w-full py-2 px-3.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                            <div className="rounded p-1"><HomeIcon className="w-3.5" /></div>
                             My Profile
                         </button>
-
-                        <div className="mt-auto p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                            <div className="flex items-center gap-1.5 mb-1">
-                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                                <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Support Hotline</p>
-                            </div>
-                            <p className="font-extrabold text-slate-800 text-sm">+263 20 20601</p>
-                            <p className="text-xs text-slate-400">Mon–Fri, 8AM – 5PM</p>
-                        </div>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-[1fr_380px] gap-4">
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.35s' }}>
+                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.35s' }}>
                         <div className="flex items-center justify-between mb-5">
                             <div className="flex items-center gap-2">
                                 <Megaphone className="w-4 text-cyan-400" />
@@ -266,7 +257,7 @@ const DashboardPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.4s' }}>
+                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.4s' }}>
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="font-extrabold text-sm text-gray-900">Linked Properties</h3>
                             <div className="bg-sky-50 text-slate-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full">
