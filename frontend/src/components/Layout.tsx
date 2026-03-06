@@ -7,9 +7,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const NAVY = '#001e3c';
-const ACCENT = '#09d6f1';
-
 interface LayoutProps {
     children: ReactNode;
     isAdmin?: boolean;
@@ -41,221 +38,118 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
         || (location.pathname.startsWith('/profile') ? 'My Profile' : isAdmin ? 'Admin' : 'Portal');
 
     return (
-        <>
-            <style>{`
-                @keyframes fadeSlideRight {
-                    from { opacity: 0; transform: translateX(-8px); }
-                    to   { opacity: 1; transform: translateX(0); }
-                }
-                .sidebar-nav-link {
-                    display: flex; align-items: center; gap: 0.75rem;
-                    padding: 0.6rem 0.875rem;
-                    border-radius: 8px;
-                    font-size: 0.825rem; font-weight: 600;
-                    color: rgba(255,255,255,0.45);
-                    text-decoration: none;
-                    transition: all 0.18s ease;
-                    position: relative;
-                }
-                .sidebar-nav-link:hover {
-                    color: rgba(255,255,255,0.85);
-                    background: rgba(255,255,255,0.06);
-                }
-                .sidebar-nav-link.active {
-                    color: ${NAVY};
-                    background: ${ACCENT};
-                    font-weight: 800;
-                }
-                .sidebar-nav-link.active svg {
-                    color: ${NAVY};
-                }
-                .sidebar-nav-link svg {
-                    width: 16px; height: 16px; flex-shrink: 0;
-                    transition: color 0.18s ease;
-                }
-                .logout-btn {
-                    display: flex; align-items: center; gap: 0.75rem;
-                    width: 100%; padding: 0.6rem 0.875rem;
-                    border-radius: 8px; font-size: 0.825rem; font-weight: 600;
-                    color: rgba(255,255,255,0.35);
-                    background: none; border: none; cursor: pointer;
-                    transition: all 0.18s ease; text-align: left;
-                }
-                .logout-btn:hover {
-                    color: #fca5a5;
-                    background: rgba(239,68,68,0.12);
-                }
-                .header-btn {
-                    display: flex; align-items: center; gap: 6px;
-                    padding: 0.4rem 0.75rem; border-radius: 8px;
-                    font-size: 0.75rem; font-weight: 700;
-                    background: none; border: 1px solid #f3f4f6;
-                    color: #374151; cursor: pointer;
-                    transition: all 0.15s ease;
-                }
-                .header-btn:hover { background: #f9fafb; border-color: #e5e7eb; }
-                .avatar-ring {
-                    width: 34px; height: 34px; border-radius: 50%;
-                    background: ${NAVY};
-                    border: 2px solid ${ACCENT};
-                    display: flex; align-items: center; justify-content: center;
-                    color: white; font-size: 0.8rem; font-weight: 900;
-                    flex-shrink: 0; cursor: pointer;
-                    transition: all 0.2s ease;
-                }
-                .avatar-ring:hover { transform: scale(1.05); }
-                tr:hover td { background: #f8fafc; }
-                .main-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-            `}</style>
+        <div className="flex h-screen font-['Inter',system-ui,sans-serif] bg-slate-100">
+            <aside className="w-60 flex-shrink-0 bg-[#001e3c] flex flex-col relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:20px_20px] pointer-events-none" />
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#09d6f1]" />
 
-            <div className="app-layout-wrapper" style={{ display: 'flex', height: '100vh', fontFamily: "'Inter', system-ui, sans-serif", background: '#f4f6f9' }}>
-
-                {/* ━━━━━━━━━━ SIDEBAR ━━━━━━━━━━ */}
-                <aside className="app-sidebar" style={{
-                    width: '240px', flexShrink: 0,
-                    background: NAVY,
-                    display: 'flex', flexDirection: 'column',
-                    position: 'relative', overflow: 'hidden'
-                }}>
-                    {/* Dot grid texture */}
-                    <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '20px 20px', pointerEvents: 'none' }} />
-                    {/* Cyan top accent */}
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: ACCENT }} />
-
-                    {/* Brand */}
-                    <div style={{ padding: '1.5rem 1.25rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.07)', position: 'relative', zIndex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', padding: '7px', flexShrink: 0 }}>
-                                <img src="/mutarelogo.png" alt="Logo" style={{ width: '26px', height: '26px', display: 'block' }} />
-                            </div>
-                            <div>
-                                <h1 style={{ color: 'white', fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.03em', lineHeight: 1.2 }}>City of Mutare</h1>
-                                <p style={{ color: ACCENT, fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '2px' }}>
-                                    {isAdmin ? 'Admin Console' : 'Citizen Portal'}
-                                </p>
-                            </div>
+                <div className="p-5 pb-4 border-b border-white/[0.07] relative z-10">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-white/[0.08] border border-white/[0.12] rounded-lg p-1.5 flex-shrink-0">
+                            <img src="/mutarelogo.png" alt="Logo" className="w-6 h-6 block" />
                         </div>
-                    </div>
-
-                    {/* Nav section label */}
-                    <div style={{ padding: '1.25rem 1.25rem 0.5rem', position: 'relative', zIndex: 1 }}>
-                        <span style={{ fontSize: '0.55rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.2)' }}>
-                            Navigation
-                        </span>
-                    </div>
-
-                    {/* Nav items */}
-                    <nav className="sidebar-nav-container" style={{ flex: 1, padding: '0 0.75rem', display: 'flex', flexDirection: 'column', gap: '2px', position: 'relative', zIndex: 1 }}>
-                        {currentNavItems.map((item, i) => (
-                            <NavLink
-                                key={item.path}
-                                to={item.path}
-                                className={({ isActive }) => `sidebar-nav-link ${isActive ? 'active' : ''}`}
-                                end={item.path === '/admin' || item.path === '/dashboard'}
-                                style={{ animationDelay: `${i * 0.05}s` }}
-                            >
-                                <item.icon />
-                                {item.name}
-                                {/* Active indicator dot */}
-                            </NavLink>
-                        ))}
-                    </nav>
-
-                    {/* Divider */}
-                    <div style={{ margin: '0 1rem', height: '1px', background: 'rgba(255,255,255,0.07)', position: 'relative', zIndex: 1 }} />
-
-                    {/* Footer nav */}
-                    <div style={{ padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '2px', position: 'relative', zIndex: 1 }}>
-                        <NavLink
-                            to="/profile"
-                            className={({ isActive }) => `sidebar-nav-link ${isActive ? 'active' : ''}`}
-                        >
-                            <UserIcon style={{ width: '16px', height: '16px' }} />
-                            My Profile
-                        </NavLink>
-                        <button className="logout-btn" onClick={logout}>
-                            <LogOut style={{ width: '16px', height: '16px' }} />
-                            Sign Out
-                        </button>
-                    </div>
-
-                    {/* Bottom user card */}
-                    <div style={{ padding: '0.875rem 1rem', borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(0,0,0,0.15)', position: 'relative', zIndex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                            <div style={{ width: '30px', height: '30px', background: ACCENT, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <span style={{ color: NAVY, fontSize: '0.75rem', fontWeight: 900 }}>
-                                    {user?.name ? user.name[0].toUpperCase() : 'U'}
-                                </span>
-                            </div>
-                            <div style={{ overflow: 'hidden' }}>
-                                <p style={{ color: 'white', fontSize: '0.775rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    {user?.name || 'Citizen'}
-                                </p>
-                                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.6rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    {user?.email || ''}
-                                </p>
-                            </div>
+                        <div>
+                            <h1 className="text-white text-[0.8rem] font-extrabold tracking-[0.03em] leading-tight">City of Mutare</h1>
+                            <p className="text-[#09d6f1] text-[0.6rem] font-bold uppercase tracking-[0.1em] mt-0.5">
+                                {isAdmin ? 'Admin Console' : 'Citizen Portal'}
+                            </p>
                         </div>
-                    </div>
-                </aside>
-
-                {/* ━━━━━━━━━━ MAIN AREA ━━━━━━━━━━ */}
-                <div className="main-scroll">
-
-                    {/* ── TOP HEADER ── */}
-                    {!hideHeader && (
-                        <header style={{
-                            height: '64px', minHeight: '64px', background: 'white',
-                            borderBottom: '1px solid #e9ecf0',
-                            borderTop: `3px solid ${ACCENT}`,
-                            padding: '0 1.75rem',
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                            position: 'sticky', top: 0, zIndex: 50,
-                            boxShadow: '0 1px 4px rgba(0,0,0,0.05)'
-                        }}>
-                            {/* Left: breadcrumb */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '3px', height: '18px', background: ACCENT, borderRadius: '2px' }} />
-                                <h2 style={{ fontSize: '0.925rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.01em' }}>
-                                    {currentTitle}
-                                </h2>
-                            </div>
-
-                            {/* Right: actions + user */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                {/* Notification bell */}
-                                <button className="header-btn" style={{ padding: '0.4rem', width: '34px', height: '34px', justifyContent: 'center' }}>
-                                    <Bell style={{ width: '15px', color: '#6b7280' }} />
-                                </button>
-
-                                {/* Divider */}
-                                <div style={{ width: '1px', height: '24px', background: '#f3f4f6' }} />
-
-                                {/* User info */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>
-                                            {user?.name || 'Guest'}
-                                        </p>
-                                        <p style={{ fontSize: '0.65rem', color: '#9ca3af', lineHeight: 1.2 }}>
-                                            {isAdmin ? 'Administrator' : 'Citizen Account'}
-                                        </p>
-                                    </div>
-                                    <div className="avatar-ring">
-                                        {user?.name ? user.name[0].toUpperCase() : <UserIcon style={{ width: '14px' }} />}
-                                    </div>
-                                </div>
-                            </div>
-                        </header>
-                    )}
-
-                    {/* ── CONTENT ── */}
-                    <div style={{ padding: '1.75rem', flex: 1 }}>
-                        {children}
                     </div>
                 </div>
+
+                <div className="px-5 pt-5 pb-2 relative z-10">
+                    <span className="text-[0.55rem] font-extrabold uppercase tracking-[0.15em] text-white/[0.2]">Navigation</span>
+                </div>
+
+                <nav className="flex-1 px-3 flex flex-col gap-0.5 relative z-10">
+                    {currentNavItems.map((item, i) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            className={({ isActive }) => `
+                                flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[0.825rem] font-semibold no-underline transition-all duration-200
+                                ${isActive 
+                                    ? 'bg-[#09d6f1] text-[#001e3c] font-extrabold' 
+                                    : 'text-white/[0.45] hover:text-white/[0.85] hover:bg-white/[0.06]'}
+                            `}
+                            end={item.path === '/admin' || item.path === '/dashboard'}
+                            style={{ animationDelay: `${i * 0.05}s` }}
+                        >
+                            <item.icon className="w-4 h-4 flex-shrink-0" />
+                            {item.name}
+                        </NavLink>
+                    ))}
+                </nav>
+
+                <div className="mx-4 h-px bg-white/[0.07]" />
+
+                <div className="px-3 py-3 flex flex-col gap-0.5 relative z-10">
+                    <NavLink
+                        to="/profile"
+                        className={({ isActive }) => `
+                            flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[0.825rem] font-semibold no-underline transition-all duration-200
+                            ${isActive 
+                                ? 'bg-[#09d6f1] text-[#001e3c] font-extrabold' 
+                                : 'text-white/[0.45] hover:text-white/[0.85] hover:bg-white/[0.06]'}
+                        `}
+                    >
+                        <UserIcon className="w-4 h-4" />
+                        My Profile
+                    </NavLink>
+                    <button onClick={logout} className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[0.825rem] font-semibold text-white/[0.35] bg-none border-none cursor-pointer transition-all duration-200 hover:text-red-300 hover:bg-red-500/[0.12] text-left">
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                    </button>
+                </div>
+
+                <div className="p-3.5 border-t border-white/[0.07] bg-black/[0.15] relative z-10">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-[30px] h-[30px] bg-[#09d6f1] rounded-lg flex items-center justify-center flex-shrink-0">
+                            <span className="text-[#001e3c] text-[0.75rem] font-extrabold">
+                                {user?.name ? user.name[0].toUpperCase() : 'U'}
+                            </span>
+                        </div>
+                        <div className="overflow-hidden">
+                            <p className="text-white text-[0.775rem] font-bold truncate">{user?.name || 'Citizen'}</p>
+                            <p className="text-white/[0.35] text-[0.6rem] truncate">{user?.email || ''}</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div className="flex-1 overflow-y-auto flex flex-col">
+                {!hideHeader && (
+                    <header className="h-16 min-h-16 bg-white border-b border-slate-200 border-t-4 border-t-[#09d6f1] px-7 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <div className="w-[3px] h-[18px] bg-[#09d6f1] rounded-sm" />
+                            <h2 className="text-[0.925rem] font-extrabold text-gray-900 tracking-tight">{currentTitle}</h2>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <button className="p-2 rounded-lg border border-slate-200 bg-none cursor-pointer transition-colors hover:bg-slate-50">
+                                <Bell className="w-[15px] text-slate-500" />
+                            </button>
+
+                            <div className="w-px h-6 bg-slate-200" />
+
+                            <div className="flex items-center gap-2.5">
+                                <div className="text-right">
+                                    <p className="text-[0.775rem] font-bold text-gray-900 leading-tight">{user?.name || 'Guest'}</p>
+                                    <p className="text-[0.65rem] text-slate-400 leading-tight">{isAdmin ? 'Administrator' : 'Citizen Account'}</p>
+                                </div>
+                                <div className="w-9 h-9 rounded-full bg-[#001e3c] border-2 border-[#09d6f1] flex items-center justify-center text-white text-[0.8rem] font-extrabold flex-shrink-0 cursor-pointer transition-transform hover:scale-105">
+                                    {user?.name ? user.name[0].toUpperCase() : <UserIcon className="w-3.5" />}
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                )}
+
+                <div className="p-7 flex-1">
+                    {children}
+                </div>
             </div>
-        </>
+        </div>
     );
 };
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Brain, TrendingUp, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
-import { useAIRequestProcessor } from '../utils/ai-classifier';
 
 interface AIInsight {
   type: 'prediction' | 'anomaly' | 'recommendation';
@@ -11,7 +10,6 @@ interface AIInsight {
 }
 
 const AIInsightsPanel: React.FC = () => {
-  const { processRequest } = useAIRequestProcessor();
   const [insights, setInsights] = useState<AIInsight[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 

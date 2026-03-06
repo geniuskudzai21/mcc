@@ -1,24 +1,12 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import {
-    DollarSign,
-    Users,
-    AlertCircle,
-    FileText,
-    TrendingUp,
-    Building2,
-    X,
-    Check,
-    Megaphone
+    DollarSign, Users, AlertCircle, FileText,
+    TrendingUp, Building2, X, Check, Megaphone
 } from 'lucide-react';
 import {
-    AreaChart,
-    Area,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer
+    AreaChart, Area, XAxis, YAxis, CartesianGrid,
+    Tooltip, ResponsiveContainer
 } from 'recharts';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -31,162 +19,99 @@ const AdminDashboard: React.FC = () => {
     const [newTariff, setNewTariff] = useState({ service_type: '', cost_per_unit: '' });
     const [announcement, setAnnouncement] = useState({ title: '', body: '' });
 
-    const { data: metrics, isLoading: metricsLoading } = useQuery({
+    const { data: metrics } = useQuery({
         queryKey: ['admin-dashboard'],
-        queryFn: async () => {
-            const res = await api.get('/admin/dashboard');
-            console.log('Dashboard metrics:', res.data);
-            return res.data;
-        }
+        queryFn: async () => { const res = await api.get('/admin/dashboard'); return res.data; }
     });
 
     const { data: tariffs } = useQuery({
         queryKey: ['admin-tariffs'],
-        queryFn: async () => {
-            const res = await api.get('/admin/tariffs');
-            return res.data;
-        },
+        queryFn: async () => { const res = await api.get('/admin/tariffs'); return res.data; },
         enabled: showTariffModal
     });
 
     const { data: properties } = useQuery({
         queryKey: ['admin-properties'],
-        queryFn: async () => {
-            const res = await api.get('/admin/properties');
-            return res.data;
-        },
+        queryFn: async () => { const res = await api.get('/admin/properties'); return res.data; },
         enabled: showPropertyModal
     });
 
-    const { data: announcements } = useQuery({
-        queryKey: ['admin-announcements'],
-        queryFn: async () => {
-            const res = await api.get('/admin/announcements');
-            return res.data;
-        },
-        enabled: showAnnouncementModal
-    });
-
     const generateBillsMutation = useMutation({
-        mutationFn: async () => {
-            return api.post('/admin/generate-bills');
-        },
+        mutationFn: async () => api.post('/admin/generate-bills'),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
             alert('Bills generated successfully!');
         },
-        onError: () => {
-            alert('Failed to generate bills');
-        }
+        onError: () => alert('Failed to generate bills')
     });
 
     const createTariffMutation = useMutation({
-        mutationFn: async () => {
-            return api.post('/admin/tariffs', {
-                service_type: newTariff.service_type,
-                cost_per_unit: parseFloat(newTariff.cost_per_unit)
-            });
-        },
+        mutationFn: async () => api.post('/admin/tariffs', { service_type: newTariff.service_type, cost_per_unit: parseFloat(newTariff.cost_per_unit) }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-tariffs'] });
             setNewTariff({ service_type: '', cost_per_unit: '' });
             alert('Tariff created successfully!');
         },
-        onError: () => {
-            alert('Failed to create tariff');
-        }
+        onError: () => alert('Failed to create tariff')
     });
 
     const createAnnouncementMutation = useMutation({
-        mutationFn: async () => {
-            return api.post('/admin/announcements', announcement);
-        },
+        mutationFn: async () => api.post('/admin/announcements', announcement),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-announcements'] });
             setAnnouncement({ title: '', body: '' });
             setShowAnnouncementModal(false);
             alert('Announcement sent to all users!');
         },
-        onError: () => {
-            alert('Failed to send announcement');
-        }
+        onError: () => alert('Failed to send announcement')
     });
 
-    const formatNumber = (num: number | undefined | null) => {
-        if (num === undefined || num === null) return '0.00';
-        return Number(num).toFixed(2);
-    };
+    const formatNumber = (num: number | undefined | null) => num === undefined || num === null ? '0.00' : Number(num).toFixed(2);
 
-    // Use real weekly revenue data from the API, with a sensible fallback
-    const data = (metrics?.weeklyRevenue && metrics.weeklyRevenue.length > 0)
-        ? metrics.weeklyRevenue
-        : [{ name: 'Week 1', revenue: 0 }];
+    const data = (metrics?.weeklyRevenue && metrics.weeklyRevenue.length > 0) ? metrics.weeklyRevenue : [{ name: 'Week 1', revenue: 0 }];
 
     return (
         <Layout isAdmin>
             <div className="grid grid-cols-4 gap-6 mb-8">
-                <div className="stat-card">
+                <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="stat-icon-wrapper bg-blue-light" style={{ width: '3rem', height: '3rem' }}>
-                            <DollarSign className="nav-icon" style={{ width: '1.25rem' }} />
-                        </div>
-                        <div>
-                            <p className="stat-label">Daily Collection</p>
-                            <h3 className="stat-value">${formatNumber(metrics?.revenueToday)}</h3>
-                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center"><DollarSign className="w-5 h-5 text-blue-600" /></div>
+                        <div><p className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Daily Collection</p><h3 className="text-2xl font-extrabold text-gray-900">${formatNumber(metrics?.revenueToday)}</h3></div>
                     </div>
                 </div>
 
-                <div className="stat-card">
+                <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="stat-icon-wrapper bg-orange-light" style={{ width: '3rem', height: '3rem' }}>
-                            <TrendingUp className="nav-icon" style={{ width: '1.25rem' }} />
-                        </div>
-                        <div>
-                            <p className="stat-label">Outstanding Arrears</p>
-                            <h3 className="stat-value">${formatNumber(metrics?.outstanding)}</h3>
-                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center"><TrendingUp className="w-5 h-5 text-orange-600" /></div>
+                        <div><p className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Outstanding Arrears</p><h3 className="text-2xl font-extrabold text-gray-900">${formatNumber(metrics?.outstanding)}</h3></div>
                     </div>
                 </div>
 
-                <div className="stat-card">
+                <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="stat-icon-wrapper bg-green-light" style={{ width: '3rem', height: '3rem' }}>
-                            <Users className="nav-icon" style={{ width: '1.25rem' }} />
-                        </div>
-                        <div>
-                            <p className="stat-label">Active Residents</p>
-                            <h3 className="stat-value">{metrics?.totalUsers || 0}</h3>
-                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center"><Users className="w-5 h-5 text-green-600" /></div>
+                        <div><p className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Active Residents</p><h3 className="text-2xl font-extrabold text-gray-900">{metrics?.totalUsers || 0}</h3></div>
                     </div>
                 </div>
 
-                <div className="stat-card">
+                <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="stat-icon-wrapper bg-red-light" style={{ width: '3rem', height: '3rem' }}>
-                            <AlertCircle className="nav-icon" style={{ width: '1.25rem' }} />
-                        </div>
-                        <div>
-                            <p className="stat-label">Pending Requests</p>
-                            <h3 className="stat-value">{metrics?.pendingRequests || 0}</h3>
-                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center"><AlertCircle className="w-5 h-5 text-red-600" /></div>
+                        <div><p className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Pending Requests</p><h3 className="text-2xl font-extrabold text-gray-900">{metrics?.pendingRequests || 0}</h3></div>
                     </div>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '1.5rem', minWidth: 0 }}>
-                <div className="chart-card" style={{ gridColumn: 'span 1', minWidth: 0 }}>
-                    <div className="card-title-row">
-                        <div>
-                            <h3 className="card-title">Monthly Collections</h3>
-                            <p className="page-subtitle">Current month: ${formatNumber(metrics?.revenueMonth)}</p>
-                        </div>
+            <div className="grid grid-cols-[1fr_350px] gap-6 min-w-0">
+                <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm min-w-0">
+                    <div className="flex items-center justify-between mb-6">
+                        <div><h3 className="text-lg font-bold text-gray-900">Monthly Collections</h3><p className="text-sm text-slate-500">Current month: ${formatNumber(metrics?.revenueMonth)}</p></div>
                     </div>
-                    <div style={{ height: '300px', width: '100%', minWidth: 0 }}>
+                    <div className="h-[300px] w-full min-w-0">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={data}>
                                 <defs>
-                                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                                    <linearGradient id="colorRevAdmin" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1} />
                                         <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                                     </linearGradient>
@@ -195,209 +120,92 @@ const AdminDashboard: React.FC = () => {
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
                                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
                                 <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                <Area type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
+                                <Area type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorRevAdmin)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                <div className="stat-card">
-                    <h3 className="card-title" style={{ marginBottom: '1.5rem' }}>Administrative Tasks</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        <button
-                            className="admin-action-btn"
-                            onClick={() => generateBillsMutation.mutate()}
-                            disabled={generateBillsMutation.isPending}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <FileText className="nav-icon" />
-                                <span style={{ fontWeight: 700, fontSize: '14px' }}>
-                                    {generateBillsMutation.isPending ? 'Generating Bills...' : 'Generate Monthly Bills'}
-                                </span>
-                            </div>
-                            <Check style={{ width: '14px', color: '#16a34a' }} />
+                <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                    <h3 className="text-lg font-bold text-gray-900 mb-6">Administrative Tasks</h3>
+                    <div className="flex flex-col gap-3">
+                        <button className="w-full p-5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between cursor-pointer transition-all hover:bg-slate-800 hover:text-white hover:border-slate-800" onClick={() => generateBillsMutation.mutate()} disabled={generateBillsMutation.isPending}>
+                            <div className="flex items-center gap-4"><FileText className="w-5 h-5" /><span className="font-bold text-sm">{generateBillsMutation.isPending ? 'Generating Bills...' : 'Generate Monthly Bills'}</span></div>
+                            <Check className="w-4 h-4 text-green-600" />
                         </button>
 
-                        <button className="admin-action-btn" onClick={() => setShowTariffModal(true)}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <DollarSign className="nav-icon" />
-                                <span style={{ fontWeight: 700, fontSize: '14px' }}>Manage Tariffs</span>
-                            </div>
+                        <button className="w-full p-5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between cursor-pointer transition-all hover:bg-slate-800 hover:text-white hover:border-slate-800" onClick={() => setShowTariffModal(true)}>
+                            <div className="flex items-center gap-4"><DollarSign className="w-5 h-5" /><span className="font-bold text-sm">Manage Tariffs</span></div>
                         </button>
 
-                        <button className="admin-action-btn" onClick={() => setShowPropertyModal(true)}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <Building2 className="nav-icon" />
-                                <span style={{ fontWeight: 700, fontSize: '14px' }}>Property Audit</span>
-                            </div>
+                        <button className="w-full p-5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between cursor-pointer transition-all hover:bg-slate-800 hover:text-white hover:border-slate-800" onClick={() => setShowPropertyModal(true)}>
+                            <div className="flex items-center gap-4"><Building2 className="w-5 h-5" /><span className="font-bold text-sm">Property Audit</span></div>
                         </button>
 
-                        <button className="admin-action-btn" onClick={() => setShowAnnouncementModal(true)}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <Megaphone className="nav-icon" />
-                                <span style={{ fontWeight: 700, fontSize: '14px' }}>Send Announcement</span>
-                            </div>
-                            <Check style={{ width: '14px', color: '#16a34a' }} />
+                        <button className="w-full p-5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between cursor-pointer transition-all hover:bg-slate-800 hover:text-white hover:border-slate-800" onClick={() => setShowAnnouncementModal(true)}>
+                            <div className="flex items-center gap-4"><Megaphone className="w-5 h-5" /><span className="font-bold text-sm">Send Announcement</span></div>
+                            <Check className="w-4 h-4 text-green-600" />
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Tariff Modal */}
             {showTariffModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
-                    <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', width: '500px', maxHeight: '80vh', overflow: 'auto' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Manage Tariffs</h3>
-                            <button onClick={() => setShowTariffModal(false)}><X style={{ width: '20px' }} /></button>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 w-[500px] max-h-[80vh] overflow-auto">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Manage Tariffs</h3>
+                            <button onClick={() => setShowTariffModal(false)}><X className="w-5" /></button>
                         </div>
-
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '0.5rem' }}>Add New Tariff</h4>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <input
-                                    type="text"
-                                    placeholder="Service type"
-                                    value={newTariff.service_type}
-                                    onChange={(e) => setNewTariff({ ...newTariff, service_type: e.target.value })}
-                                    style={{ flex: 1, padding: '0.5rem', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-                                />
-                                <input
-                                    type="number"
-                                    placeholder="Cost"
-                                    value={newTariff.cost_per_unit}
-                                    onChange={(e) => setNewTariff({ ...newTariff, cost_per_unit: e.target.value })}
-                                    style={{ width: '100px', padding: '0.5rem', border: '1px solid #e5e7eb', borderRadius: '6px' }}
-                                />
-                                <button
-                                    onClick={() => createTariffMutation.mutate()}
-                                    disabled={!newTariff.service_type || !newTariff.cost_per_unit}
-                                    style={{ padding: '0.5rem 1rem', background: '#2563eb', color: 'white', borderRadius: '6px', fontWeight: 500 }}
-                                >
-                                    Add
-                                </button>
+                        <div className="mb-6">
+                            <h4 className="text-sm font-semibold mb-2">Add New Tariff</h4>
+                            <div className="flex gap-2">
+                                <input type="text" placeholder="Service type" value={newTariff.service_type} onChange={(e) => setNewTariff({ ...newTariff, service_type: e.target.value })} className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                                <input type="number" placeholder="Cost" value={newTariff.cost_per_unit} onChange={(e) => setNewTariff({ ...newTariff, cost_per_unit: e.target.value })} className="w-24 px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                                <button onClick={() => createTariffMutation.mutate()} disabled={!newTariff.service_type || !newTariff.cost_per_unit} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm disabled:opacity-50">Add</button>
                             </div>
                         </div>
-
                         <div>
-                            <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '0.5rem' }}>Current Tariffs</h4>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead>
-                                    <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                                        <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '12px' }}>Service</th>
-                                        <th style={{ textAlign: 'right', padding: '0.5rem', fontSize: '12px' }}>Cost</th>
-                                        <th style={{ textAlign: 'right', padding: '0.5rem', fontSize: '12px' }}>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {tariffs?.map((t: any) => (
-                                        <tr key={t.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                            <td style={{ padding: '0.5rem', fontSize: '13px' }}>{t.service_type}</td>
-                                            <td style={{ padding: '0.5rem', fontSize: '13px', textAlign: 'right' }}>${parseFloat(t.cost_per_unit).toFixed(2)}</td>
-                                            <td style={{ padding: '0.5rem', fontSize: '13px', textAlign: 'right' }}>{new Date(t.effective_date).toLocaleDateString()}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
+                            <h4 className="text-sm font-semibold mb-2">Current Tariffs</h4>
+                            <table className="w-full">
+                                <thead><tr className="border-b border-slate-200"><th className="text-left p-2 text-xs">Service</th><th className="text-right p-2 text-xs">Cost</th><th className="text-right p-2 text-xs">Date</th></tr></thead>
+                                <tbody>{tariffs?.map((t: any) => (<tr key={t.id} className="border-b border-slate-100"><td className="p-2 text-sm">{t.service_type}</td><td className="p-2 text-sm text-right">${parseFloat(t.cost_per_unit).toFixed(2)}</td><td className="p-2 text-sm text-right">{new Date(t.effective_date).toLocaleDateString()}</td></tr>))}</tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Property Modal */}
             {showPropertyModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
-                    <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', width: '600px', maxHeight: '80vh', overflow: 'auto' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Property Audit</h3>
-                            <button onClick={() => setShowPropertyModal(false)}><X style={{ width: '20px' }} /></button>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 w-[600px] max-h-[80vh] overflow-auto">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Property Audit</h3>
+                            <button onClick={() => setShowPropertyModal(false)}><X className="w-5" /></button>
                         </div>
-
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                            <thead>
-                                <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                                    <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '12px' }}>Stand</th>
-                                    <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '12px' }}>Address</th>
-                                    <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '12px' }}>Owner</th>
-                                    <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '12px' }}>Account</th>
-                                    <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '12px' }}>Users</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {properties?.map((p: any) => (
-                                    <tr key={p.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                        <td style={{ padding: '0.5rem', fontSize: '13px' }}>{p.stand_number}</td>
-                                        <td style={{ padding: '0.5rem', fontSize: '13px' }}>{p.address}, {p.suburb}</td>
-                                        <td style={{ padding: '0.5rem', fontSize: '13px' }}>{p.owner_name}</td>
-                                        <td style={{ padding: '0.5rem', fontSize: '13px', fontFamily: 'monospace' }}>{p.account_number}</td>
-                                        <td style={{ padding: '0.5rem', fontSize: '13px' }}>{p.users?.length || 0}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
+                        <table className="w-full">
+                            <thead><tr className="border-b border-slate-200"><th className="text-left p-2 text-xs">Stand</th><th className="text-left p-2 text-xs">Address</th><th className="text-left p-2 text-xs">Owner</th><th className="text-left p-2 text-xs">Account</th><th className="text-left p-2 text-xs">Users</th></tr></thead>
+                            <tbody>{properties?.map((p: any) => (<tr key={p.id} className="border-b border-slate-100"><td className="p-2 text-sm">{p.stand_number}</td><td className="p-2 text-sm">{p.address}, {p.suburb}</td><td className="p-2 text-sm">{p.owner_name}</td><td className="p-2 text-sm font-mono">{p.account_number}</td><td className="p-2 text-sm">{p.users?.length || 0}</td></tr>))}</tbody>
                         </table>
                     </div>
                 </div>
             )}
 
-            {/* Announcement Modal */}
             {showAnnouncementModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
-                    <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', width: '500px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Send Announcement</h3>
-                            <button onClick={() => setShowAnnouncementModal(false)}><X style={{ width: '20px' }} /></button>
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 w-[500px]">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-bold">Send Announcement</h3>
+                            <button onClick={() => setShowAnnouncementModal(false)}><X className="w-5" /></button>
                         </div>
-
-                        <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '1.5rem' }}>
-                            This announcement will be sent to all registered users.
-                        </p>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Title</label>
-                                <input
-                                    type="text"
-                                    placeholder="Announcement title"
-                                    value={announcement.title}
-                                    onChange={(e) => setAnnouncement({ ...announcement, title: e.target.value })}
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
-                                />
-                            </div>
-                            <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Message</label>
-                                <textarea
-                                    rows={4}
-                                    placeholder="Enter your announcement message..."
-                                    value={announcement.body}
-                                    onChange={(e) => setAnnouncement({ ...announcement, body: e.target.value })}
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', resize: 'vertical' }}
-                                />
-                            </div>
+                        <p className="text-sm text-slate-500 mb-6">This announcement will be sent to all registered users.</p>
+                        <div className="flex flex-col gap-4">
+                            <div><label className="block text-xs font-semibold mb-1">Title</label><input type="text" placeholder="Announcement title" value={announcement.title} onChange={(e) => setAnnouncement({ ...announcement, title: e.target.value })} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm" /></div>
+                            <div><label className="block text-xs font-semibold mb-1">Message</label><textarea rows={4} placeholder="Enter your announcement message..." value={announcement.body} onChange={(e) => setAnnouncement({ ...announcement, body: e.target.value })} className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm resize-none" /></div>
                         </div>
-
-                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-                            <button
-                                onClick={() => setShowAnnouncementModal(false)}
-                                style={{ flex: 1, padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontWeight: 600, background: '#f9fafb' }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => createAnnouncementMutation.mutate()}
-                                disabled={!announcement.title || !announcement.body || createAnnouncementMutation.isPending}
-                                style={{ flex: 1, padding: '0.625rem', background: '#2563eb', color: 'white', borderRadius: '8px', fontWeight: 600, opacity: (!announcement.title || !announcement.body) ? 0.5 : 1 }}
-                            >
-                                {createAnnouncementMutation.isPending ? 'Sending...' : 'Send to All Users'}
-                            </button>
+                        <div className="flex gap-3 mt-6">
+                            <button onClick={() => setShowAnnouncementModal(false)} className="flex-1 py-2.5 border border-slate-200 rounded-lg font-semibold bg-slate-50">Cancel</button>
+                            <button onClick={() => createAnnouncementMutation.mutate()} disabled={!announcement.title || !announcement.body || createAnnouncementMutation.isPending} className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-semibold disabled:opacity-50">{createAnnouncementMutation.isPending ? 'Sending...' : 'Send to All Users'}</button>
                         </div>
                     </div>
                 </div>

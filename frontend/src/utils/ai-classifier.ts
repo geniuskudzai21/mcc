@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as tf from '@tensorflow/tfjs';
 
 // Simple text classification for service requests
@@ -55,7 +56,7 @@ export class ServiceRequestClassifier {
 
     const input = this.preprocessText(description);
     const prediction = this.model!.predict(input) as tf.Tensor;
-    const probabilities = await prediction.data();
+    const probabilities = await prediction.data() as Float32Array;
     
     const maxIndex = probabilities.indexOf(Math.max(...Array.from(probabilities)));
     const confidence = probabilities[maxIndex];

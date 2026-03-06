@@ -8,8 +8,6 @@ import {
     User,
     Trash2,
     X,
-    Building2,
-    Hash,
     FileText
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -383,7 +381,7 @@ const AdminMeterReadings: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {readingHistory?.map((r: any, index: number) => (
+                                {readingHistory?.map((r: any) => (
                                     <tr key={r.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                                         <td style={{ padding: '0.5rem', fontSize: '13px' }}>
                                             {new Date(r.reading_date).toLocaleDateString()}

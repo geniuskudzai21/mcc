@@ -18,7 +18,6 @@ import { useNavigate } from 'react-router-dom';
 const BillsPage: React.FC = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const [searchTerm, setSearchTerm] = useState('');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedBill, setSelectedBill] = useState<any>(null);
     const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'ECOCASH'>('CARD');
