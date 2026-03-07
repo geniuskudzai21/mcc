@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate, authorizeAdmin, AuthRequest } from '../middlewares/auth.middleware';
 import { prisma } from '../config/database';
-import { generateMonthlyBills } from '../jobs/monthlyBilling.job';
+import { generateMonthlyBills, generateSingleUserBill } from '../jobs/monthlyBilling.job';
 
 const router = Router();
 
@@ -341,73 +341,25 @@ router.post('/generate-bills', authenticate, authorizeAdmin, async (req, res, ne
         await generateMonthlyBills();
         res.json({ message: 'Monthly bills generated successfully' });
     } catch (err) {
-        next(err);
+        console.error('Generate bills error:', err);
+        res.status(500).json({ message: 'Failed to generate bills' });
     }
 });
 
-router.post('/properties/:id/generate-bill', authenticate, authorizeAdmin, async (req, res, next) => {
+router.post('/generate-bill/:userId', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
     try {
-        const id = req.params.id as string;
-        console.log('Generating bill for property ID:', id);
-        const property = await prisma.property.findUnique({ where: { id } });
-        if (!property) return res.status(404).json({ message: 'Property not found' });
-        console.log('Found property:', property);
-
-        const tariffs = await prisma.tariff.findMany();
-        console.log('Found tariffs:', tariffs.length);
-        const tariffMap: Record<string, number> = {};
-        tariffs.forEach(t => {
-            tariffMap[t.service_type] = Number(t.cost_per_unit);
+        const { userId } = req.params;
+        const { targetMonth, targetYear } = req.body || {};
+        
+        const result = await generateSingleUserBill(userId as string, targetMonth, targetYear);
+        res.json({ 
+            message: 'Bill generated successfully for user', 
+            ...result 
         });
-
-        const now = new Date();
-        const month = now.getMonth() + 1;
-        const year = now.getFullYear();
-        const dueDate = new Date(year, month, 15);
-
-        // Check if bill already exists
-        const existing = await prisma.bill.findFirst({
-            where: {
-                property_id: id,
-                billing_month: month,
-                billing_year: year
-            }
-        });
-
-        if (existing) return res.status(400).json({ message: 'Bill already exists for this month' });
-
-        const charges = [
-            { description: 'Water Consumption (Base)', amount: tariffMap['Water'] || 15.00 },
-            { description: 'Sewer Charges', amount: tariffMap['Sewer'] || 10.00 },
-            { description: 'Refuse Collection', amount: tariffMap['Refuse'] || 8.00 },
-            { description: 'Property Rates', amount: tariffMap['Rates'] || 25.00 }
-        ];
-
-        const totalAmount = charges.reduce((sum, item) => sum + Number(item.amount), 0);
-
-        const bill = await prisma.bill.create({
-            data: {
-                property_id: id,
-                billing_month: month,
-                billing_year: year,
-                total_amount: totalAmount,
-                due_date: dueDate,
-                status: 'UNPAID',
-                items: {
-                    create: charges.map(c => ({
-                        description: c.description,
-                        amount: c.amount
-                    }))
-                }
-            },
-            include: { property: true, items: true }
-        });
-
-        res.json(bill);
-        console.log('Bill generated successfully:', bill);
-    } catch (err) {
-        console.error('Error generating bill:', err);
-        next(err);
+    } catch (err: any) {
+        console.error('Generate single bill error:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to generate bill';
+        res.status(500).json({ message: errorMessage });
     }
 });
 
@@ -538,108 +490,7 @@ router.put('/users/:id/reject', authenticate, authorizeAdmin, async (req: AuthRe
                 status: 'REJECTED'
             }
         });
-
         res.json({ message: 'User account rejected successfully' });
-    } catch (err) {
-        next(err);
-    }
-});
-
-// Meter Readings Management
-router.get('/meter-readings', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
-    try {
-        const { propertyId, month, year } = req.query;
-        
-        const where: any = {};
-        
-        if (propertyId) {
-            where.property_id = propertyId as string;
-        }
-        
-        if (month && year) {
-            const startDate = new Date(parseInt(year as string), parseInt(month as string) - 1, 1);
-            const endDate = new Date(parseInt(year as string), parseInt(month as string), 0, 23, 59, 59);
-            where.reading_date = {
-                gte: startDate,
-                lte: endDate
-            };
-        }
-
-        const readings = await prisma.meterReading.findMany({
-            where,
-            include: { property: true },
-            orderBy: { reading_date: 'desc' }
-        });
-
-        res.json(readings);
-    } catch (err) {
-        next(err);
-    }
-});
-
-router.post('/meter-readings', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
-    try {
-        const { property_id, reading, reading_date, officer_name, notes } = req.body;
-
-        // Get previous reading for this property to calculate consumption
-        const previousReading = await prisma.meterReading.findFirst({
-            where: { property_id },
-            orderBy: { reading_date: 'desc' }
-        });
-
-        const newReading = await prisma.meterReading.create({
-            data: {
-                property_id,
-                reading: parseFloat(reading),
-                reading_date: new Date(reading_date),
-                officer_name,
-                notes
-            },
-            include: { property: true }
-        });
-
-        res.json(newReading);
-    } catch (err) {
-        next(err);
-    }
-});
-
-router.get('/properties/:id/readings/history', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
-    try {
-        const propertyId = req.params.id;
-
-        const readings = await prisma.meterReading.findMany({
-            where: { property_id: propertyId },
-            orderBy: { reading_date: 'desc' }
-        });
-
-        // Calculate consumption between readings
-        const readingsWithConsumption = readings.map((reading, index) => {
-            const nextReading = readings[index + 1];
-            const consumption = nextReading 
-                ? parseFloat(reading.reading.toString()) - parseFloat(nextReading.reading.toString())
-                : null;
-            return {
-                ...reading,
-                consumption
-            };
-        });
-
-        res.json(readingsWithConsumption);
-    } catch (err) {
-        next(err);
-    }
-});
-
-router.delete('/meter-readings/:id', authenticate, authorizeAdmin, async (req: AuthRequest, res, next) => {
-    try {
-        const id = req.params.id;
-        
-        await prisma.meterReading.delete({
-            where: { id }
-        });
-
-        res.json({ message: 'Meter reading deleted successfully' });
     } catch (err) {
         next(err);
     }

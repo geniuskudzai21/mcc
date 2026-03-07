@@ -15,7 +15,9 @@ import {
     CheckCircle2,
     Clock,
     AlertCircle,
-    Building2
+    Building2,
+    FileText,
+    DollarSign
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -25,6 +27,7 @@ const AdminUsers: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showGenerateBillModal, setShowGenerateBillModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [editForm, setEditForm] = useState({ name: '', email: '', phone: '' });
 
@@ -60,8 +63,8 @@ const AdminUsers: React.FC = () => {
     });
 
     const deleteUserMutation = useMutation({
-        mutationFn: async (userId: string) => {
-            return api.delete(`/admin/users/${userId}`);
+        mutationFn: async (id: string) => {
+            return api.delete(`/admin/users/${id}`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-users'] });
@@ -71,6 +74,23 @@ const AdminUsers: React.FC = () => {
         },
         onError: () => {
             alert('Failed to delete user');
+        }
+    });
+
+    const generateBillMutation = useMutation({
+        mutationFn: async (userId: string) => {
+            const response = await api.post(`/admin/generate-bill/${userId}`);
+            return response.data;
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ['admin-bills'] });
+            queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+            alert(`Bill generated successfully! Generated ${data.billsCreated} bills.`);
+            setShowGenerateBillModal(false);
+        },
+        onError: (error: any) => {
+            const errorMessage = error?.response?.data?.message || error?.message || 'Failed to generate bill';
+            alert(`Error: ${errorMessage}`);
         }
     });
 
@@ -98,6 +118,11 @@ const AdminUsers: React.FC = () => {
         setShowDeleteModal(true);
     };
 
+    const handleGenerateBill = (user: any) => {
+        setSelectedUser(user);
+        setShowGenerateBillModal(true);
+    };
+
     const confirmEdit = () => {
         if (selectedUser) {
             updateUserMutation.mutate({ id: selectedUser.id, data: editForm });
@@ -107,6 +132,12 @@ const AdminUsers: React.FC = () => {
     const confirmDelete = () => {
         if (selectedUser) {
             deleteUserMutation.mutate(selectedUser.id);
+        }
+    };
+
+    const confirmGenerateBill = () => {
+        if (selectedUser) {
+            generateBillMutation.mutate(selectedUser.id);
         }
     };
 
@@ -313,6 +344,13 @@ const AdminUsers: React.FC = () => {
                                         {/* Right Section - Actions */}
                                         <div className="flex items-center gap-2 pl-4">
                                             <button
+                                                onClick={() => handleGenerateBill(user)}
+                                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                                title="Generate Bill"
+                                            >
+                                                <DollarSign className="w-4 h-4" />
+                                            </button>
+                                            <button
                                                 onClick={() => handleEdit(user)}
                                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
                                                 title="Edit User"
@@ -435,6 +473,63 @@ const AdminUsers: React.FC = () => {
                                     className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                                 >
                                     {deleteUserMutation.isPending ? 'Deleting...' : 'Delete User'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Generate Bill Modal */}
+            {showGenerateBillModal && selectedUser && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Generate Bill</h3>
+                                    <p className="text-sm text-gray-600">Generate bill for user</p>
+                                </div>
+                                <button 
+                                    onClick={() => setShowGenerateBillModal(false)} 
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6 text-center">
+                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <DollarSign className="w-8 h-8 text-green-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                Generate Bill for {selectedUser.name}?
+                            </h3>
+                            <p className="text-gray-600 mb-4">
+                                This will generate a bill for all properties linked to this user for the current billing period.
+                            </p>
+                            <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
+                                <p><strong>User:</strong> {selectedUser.name}</p>
+                                <p><strong>Email:</strong> {selectedUser.email}</p>
+                                <p><strong>Properties:</strong> {getUserProperties(selectedUser.id)?.length || 0}</p>
+                            </div>
+                        </div>
+                        
+                        <div className="p-6 border-t border-gray-200">
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowGenerateBillModal(false)}
+                                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmGenerateBill}
+                                    disabled={generateBillMutation.isPending}
+                                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                                >
+                                    {generateBillMutation.isPending ? 'Generating...' : 'Generate Bill'}
                                 </button>
                             </div>
                         </div>

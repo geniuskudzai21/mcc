@@ -18,6 +18,7 @@ const AdminDashboard: React.FC = () => {
     const [showTariffModal, setShowTariffModal] = useState(false);
     const [showPropertyModal, setShowPropertyModal] = useState(false);
     const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+    const [showGenerateBillsModal, setShowGenerateBillsModal] = useState(false);
     const [newTariff, setNewTariff] = useState({ service_type: '', cost_per_unit: '' });
     const [announcement, setAnnouncement] = useState({ title: '', body: '' });
 
@@ -39,12 +40,25 @@ const AdminDashboard: React.FC = () => {
     });
 
     const generateBillsMutation = useMutation({
-        mutationFn: async () => api.post('/admin/generate-bills'),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
-            alert('Bills generated successfully!');
+        mutationFn: async () => {
+            try {
+                const response = await api.post('/admin/generate-bills');
+                return response.data;
+            } catch (error) {
+                console.error('Generate bills error:', error);
+                throw error;
+            }
         },
-        onError: () => alert('Failed to generate bills')
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+            queryClient.invalidateQueries({ queryKey: ['admin-bills'] });
+            alert(`Bills generated successfully! Generated ${data?.billsGenerated || 'multiple'} bills.`);
+        },
+        onError: (error: any) => {
+            console.error('Generate bills failed:', error);
+            const errorMessage = error?.response?.data?.message || error?.message || 'Failed to generate bills';
+            alert(`Error: ${errorMessage}`);
+        }
     });
 
     const createTariffMutation = useMutation({
@@ -181,7 +195,7 @@ const AdminDashboard: React.FC = () => {
                                 <div className="space-y-3">
                                     <button 
                                         className="w-full p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 transform hover:scale-105 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-600/20"
-                                        onClick={() => generateBillsMutation.mutate()} 
+                                        onClick={() => setShowGenerateBillsModal(true)} 
                                         disabled={generateBillsMutation.isPending}
                                     >
                                         <div className="flex items-center gap-3">
@@ -439,6 +453,65 @@ const AdminDashboard: React.FC = () => {
                                     className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
                                 >
                                     {createAnnouncementMutation.isPending ? 'Sending...' : 'Send to All Users'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Generate Bills Confirmation Modal */}
+            {showGenerateBillsModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Generate Monthly Bills</h3>
+                                    <p className="text-sm text-gray-600">Confirm bill generation</p>
+                                </div>
+                                <button 
+                                    onClick={() => setShowGenerateBillsModal(false)} 
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6 text-center">
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <FileText className="w-8 h-8 text-blue-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                Generate Monthly Bills?
+                            </h3>
+                            <p className="text-gray-600 mb-4">
+                                This will generate bills for all properties based on current meter readings and tariffs.
+                            </p>
+                            <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
+                                <p><strong>Properties:</strong> {metrics?.totalUsers || 0}</p>
+                                <p><strong>Current Month:</strong> {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                            </div>
+                        </div>
+                        
+                        <div className="p-6 border-t border-gray-200">
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowGenerateBillsModal(false)}
+                                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        generateBillsMutation.mutate();
+                                        setShowGenerateBillsModal(false);
+                                    }}
+                                    disabled={generateBillsMutation.isPending}
+                                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                >
+                                    {generateBillsMutation.isPending ? 'Generating...' : 'Generate Bills'}
                                 </button>
                             </div>
                         </div>

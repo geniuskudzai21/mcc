@@ -78,16 +78,16 @@ router.post('/link-property', authenticate, async (req: AuthRequest, res, next) 
             return res.status(400).json({ message: 'This property is already linked to your account' });
         }
 
-        // Link property to user with PENDING state
+        // Link property to user with VERIFIED state (auto-verify since user provided correct account info)
         await prisma.userProperty.create({
             data: {
                 user_id: req.user?.id as string,
                 property_id: property.id,
-                status: 'PENDING'
+                status: 'VERIFIED'  // Auto-verify since user has correct account details
             } as any
         });
 
-        res.json({ message: 'Property linked successfully and awaiting admin approval', property });
+        res.json({ message: 'Property linked successfully! You can now view your bills.', property });
     } catch (err) {
         next(err);
     }

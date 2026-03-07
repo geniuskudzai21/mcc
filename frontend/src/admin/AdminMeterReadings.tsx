@@ -8,7 +8,17 @@ import {
     User,
     Trash2,
     X,
-    FileText
+    FileText,
+    Home,
+    TrendingUp,
+    Activity,
+    BarChart3,
+    CheckCircle2,
+    AlertCircle,
+    Clock,
+    Building2,
+    Zap,
+    Droplets
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -110,181 +120,258 @@ const AdminMeterReadings: React.FC = () => {
     };
 
     if (isLoading) {
-        return <Layout isAdmin><div>Loading meter readings...</div></Layout>;
+        return (
+            <Layout isAdmin>
+                <div className="flex items-center justify-center h-[60vh] flex-col gap-4">
+                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                    <p className="text-slate-500 text-sm">Loading meter readings...</p>
+                </div>
+            </Layout>
+        );
     }
+
+    const stats = {
+        total: readings?.length || 0,
+        today: readings?.filter((r: any) => new Date(r.reading_date).toDateString() === new Date().toDateString()).length || 0,
+        thisMonth: readings?.filter((r: any) => new Date(r.reading_date).getMonth() === new Date().getMonth() && new Date(r.reading_date).getFullYear() === new Date().getFullYear()).length || 0,
+        properties: properties?.length || 0,
+        avgReading: readings?.length > 0 ? readings.reduce((sum: number, r: any) => sum + parseFloat(r.reading), 0) / readings.length : 0,
+    };
 
     return (
         <Layout isAdmin>
-            <div className="page-header" style={{ marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div>
-                        <h1 className="page-title">Meter Readings</h1>
-                        <p className="page-subtitle">Record and manage water meter readings for billing.</p>
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Meter Readings</h1>
+                            <p className="text-gray-600">Record and manage water meter readings for billing</p>
+                        </div>
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transform hover:scale-105"
+                        >
+                            <Plus className="w-5 h-5" />
+                            Add Reading
+                        </button>
                     </div>
-                    <span style={{
-                        background: '#dbeafe',
-                        color: '#1d4ed8',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '9999px',
-                        fontSize: '12px',
-                        fontWeight: 600
-                    }}>
-                        {readings?.length || 0} Readings
-                    </span>
-                </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button
-                        className="btn-primary"
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                        onClick={() => setShowAddModal(true)}
-                    >
-                        <Plus style={{ width: '16px' }} />
-                        Add Reading
-                    </button>
-                </div>
-            </div>
-
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                background: 'white',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                padding: '0.5rem 0.75rem',
-                gap: '0.5rem',
-                width: '300px',
-                marginBottom: '1.5rem'
-            }}>
-                <Search style={{ width: '16px', color: '#9ca3af' }} />
-                <input
-                    type="text"
-                    placeholder="Search by account, address, or officer..."
-                    style={{ border: 'none', outline: 'none', fontSize: '13px', width: '100%', background: 'transparent' }}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
-
-            <div style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                        <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                            <th style={{ textAlign: 'left', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Property</th>
-                            <th style={{ textAlign: 'left', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Account No.</th>
-                            <th style={{ textAlign: 'left', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Reading (kL)</th>
-                            <th style={{ textAlign: 'left', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Reading Date</th>
-                            <th style={{ textAlign: 'left', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Officer</th>
-                            <th style={{ textAlign: 'right', padding: '0.875rem 1rem', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredReadings.length > 0 ? (
-                            filteredReadings.map((reading: any) => (
-                                <tr key={reading.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                    <td style={{ padding: '1rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                            <div style={{ width: '36px', height: '36px', background: '#e0f2fe', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Gauge style={{ width: '16px', color: '#0284c7' }} />
-                                            </div>
-                                            <div>
-                                                <p style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}>{reading.property?.address}</p>
-                                                <p style={{ fontSize: '12px', color: '#6b7280' }}>{reading.property?.suburb}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '1rem' }}>
-                                        <span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '12px' }}>
-                                            {reading.property?.account_number}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '1rem' }}>
-                                        <span style={{ fontWeight: 700, fontSize: '14px', color: '#059669' }}>
-                                            {parseFloat(reading.reading).toFixed(2)}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '1rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '13px', color: '#374151' }}>
-                                            <Calendar style={{ width: '14px', color: '#9ca3af' }} />
-                                            {new Date(reading.reading_date).toLocaleDateString()}
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '1rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '13px', color: '#374151' }}>
-                                            <User style={{ width: '14px', color: '#9ca3af' }} />
-                                            {reading.officer_name || 'N/A'}
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                            <button
-                                                onClick={() => handleViewHistory(reading.property)}
-                                                style={{
-                                                    padding: '0.5rem',
-                                                    background: '#f3f4f6',
-                                                    border: 'none',
-                                                    borderRadius: '6px',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}
-                                                title="View History"
-                                            >
-                                                <FileText style={{ width: '14px', color: '#6b7280' }} />
-                                            </button>
-                                            <button
-                                                onClick={() => deleteReadingMutation.mutate(reading.id)}
-                                                style={{
-                                                    padding: '0.5rem',
-                                                    background: '#fef2f2',
-                                                    border: 'none',
-                                                    borderRadius: '6px',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}
-                                                title="Delete"
-                                            >
-                                                <Trash2 style={{ width: '14px', color: '#dc2626' }} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center' }}>
-                                    <Gauge style={{ width: '48px', color: '#9ca3af', margin: '0 auto 1rem' }} />
-                                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#374151', marginBottom: '0.5rem' }}>
-                                        {searchTerm ? 'No readings found' : 'No meter readings recorded'}
-                                    </h3>
-                                    <p style={{ color: '#6b7280', fontSize: '14px' }}>
-                                        {searchTerm ? 'Try adjusting your search terms' : 'Click "Add Reading" to record a new meter reading'}
-                                    </p>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Add Reading Modal */}
-            {showAddModal && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', width: '500px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Add Meter Reading</h3>
-                            <button onClick={() => setShowAddModal(false)}><X style={{ width: '20px' }} /></button>
+                    
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 my-8">
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Total Readings</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Gauge className="w-6 h-6 text-blue-600" />
+                                </div>
+                            </div>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Today</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.today}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Calendar className="w-6 h-6 text-green-600" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">This Month</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.thisMonth}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <TrendingUp className="w-6 h-6 text-purple-600" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Properties</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.properties}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Home className="w-6 h-6 text-orange-600" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Avg Reading</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats.avgReading.toFixed(1)} kL</p>
+                                </div>
+                                <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Droplets className="w-6 h-6 text-cyan-600" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Enhanced Search Bar */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 my-8">
+                        <div className="relative group">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
+                                <Search className="w-5 h-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search by account, address, or officer..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 transition-transform duration-200 group-focus-within:scale-x-100"></div>
+                        </div>
+                    </div>
+
+                    {/* Meter Readings Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+                        {filteredReadings.length === 0 && (
+                            <div className="col-span-full bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
+                                    <Gauge className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-2">No meter readings</h3>
+                                <p className="text-gray-600">
+                                    {searchTerm ? 'Try adjusting your search terms' : 'Click "Add Reading" to record a new meter reading'}
+                                </p>
+                            </div>
+                        )}
+                        
+                        {filteredReadings.map((reading: any) => (
+                            <div key={reading.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="p-6">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
+                                            <Gauge className="w-6 h-6 text-blue-600" />
+                                        </div>
+                                        
+                                        <div className="text-right">
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-105 bg-green-100 text-green-800 border-green-200">
+                                                <CheckCircle2 className="w-4 h-4" />
+                                                Recorded
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                                {reading.property?.address}
+                                            </h3>
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                    <Home className="w-4 h-4" />
+                                                    <span className="text-xs">{reading.property?.suburb}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                    <Building2 className="w-4 h-4" />
+                                                    <span className="text-xs font-mono">{reading.property?.account_number}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="border-t border-gray-100 pt-3">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <p className="text-xs text-gray-500 mb-1">Reading</p>
+                                                    <p className="text-lg font-bold text-green-600">{parseFloat(reading.reading).toFixed(2)} kL</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-gray-500 mb-1">Date</p>
+                                                    <div className="flex items-center gap-1">
+                                                        <Calendar className="w-3 h-3 text-gray-400" />
+                                                        <span className="text-sm text-gray-700">{new Date(reading.reading_date).toLocaleDateString()}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="mt-3">
+                                                <p className="text-xs text-gray-500 mb-1">Officer</p>
+                                                <div className="flex items-center gap-1">
+                                                    <User className="w-3 h-3 text-gray-400" />
+                                                    <span className="text-sm text-gray-700">{reading.officer_name || 'N/A'}</span>
+                                                </div>
+                                            </div>
+
+                                            {reading.notes && (
+                                                <div className="mt-3">
+                                                    <p className="text-xs text-gray-500 mb-1">Notes</p>
+                                                    <p className="text-xs text-gray-600 italic">{reading.notes}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2 mt-4">
+                                        <button
+                                            onClick={() => handleViewHistory(reading.property)}
+                                            className="flex-1 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                        >
+                                            <FileText className="w-4 h-4" />
+                                            History
+                                        </button>
+                                        <button
+                                            onClick={() => deleteReadingMutation.mutate(reading.id)}
+                                            className="flex-1 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+            {/* Enhanced Add Reading Modal */}
+            {showAddModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-lg mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Add Meter Reading</h3>
+                                    <p className="text-sm text-gray-600">Record new water meter reading</p>
+                                </div>
+                                <button 
+                                    onClick={() => setShowAddModal(false)} 
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6 space-y-4">
                             <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Property</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Property</label>
                                 <select
                                     value={readingForm.property_id}
                                     onChange={(e) => setReadingForm({ ...readingForm, property_id: e.target.value })}
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
                                     <option value="">Select Property</option>
                                     {properties?.map((p: any) => (
@@ -294,121 +381,152 @@ const AdminMeterReadings: React.FC = () => {
                                     ))}
                                 </select>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Meter Reading (kL)</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Meter Reading (kL)</label>
                                     <input
                                         type="number"
                                         step="0.01"
                                         value={readingForm.reading}
                                         onChange={(e) => setReadingForm({ ...readingForm, reading: e.target.value })}
                                         placeholder="e.g., 125.50"
-                                        style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Reading Date</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Reading Date</label>
                                     <input
                                         type="date"
                                         value={readingForm.reading_date}
                                         onChange={(e) => setReadingForm({ ...readingForm, reading_date: e.target.value })}
-                                        style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
                             </div>
+                            
                             <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Officer Name</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Officer Name</label>
                                 <input
                                     type="text"
                                     value={readingForm.officer_name}
                                     onChange={(e) => setReadingForm({ ...readingForm, officer_name: e.target.value })}
                                     placeholder="Name of officer taking reading"
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px' }}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
+                            
                             <div>
-                                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '0.25rem' }}>Notes (Optional)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
                                 <textarea
                                     value={readingForm.notes}
                                     onChange={(e) => setReadingForm({ ...readingForm, notes: e.target.value })}
                                     placeholder="Any observations..."
-                                    rows={2}
-                                    style={{ width: '100%', padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '14px', resize: 'vertical' }}
+                                    rows={3}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                                 />
                             </div>
                         </div>
-
-                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-                            <button
-                                onClick={() => setShowAddModal(false)}
-                                style={{ flex: 1, padding: '0.625rem', border: '1px solid #e5e7eb', borderRadius: '8px', fontWeight: 600, background: '#f9fafb' }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleAddReading}
-                                disabled={addReadingMutation.isPending}
-                                style={{ flex: 1, padding: '0.625rem', background: '#2563eb', color: 'white', borderRadius: '8px', fontWeight: 600, border: 'none', cursor: 'pointer' }}
-                            >
-                                {addReadingMutation.isPending ? 'Saving...' : 'Save Reading'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Reading History Modal */}
-            {showHistoryModal && selectedProperty && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', width: '600px', maxHeight: '80vh', overflow: 'auto' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <div>
-                                <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Reading History</h3>
-                                <p style={{ fontSize: '13px', color: '#6b7280' }}>
-                                    {selectedProperty.address}, {selectedProperty.suburb}
-                                </p>
+                        
+                        <div className="p-6 border-t border-gray-200">
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowAddModal(false)}
+                                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleAddReading}
+                                    disabled={addReadingMutation.isPending}
+                                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                >
+                                    {addReadingMutation.isPending ? 'Saving...' : 'Save Reading'}
+                                </button>
                             </div>
-                            <button onClick={() => setShowHistoryModal(false)}><X style={{ width: '20px' }} /></button>
                         </div>
-
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                            <thead>
-                                <tr style={{ background: '#f9fafb' }}>
-                                    <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '11px' }}>Date</th>
-                                    <th style={{ textAlign: 'right', padding: '0.5rem', fontSize: '11px' }}>Reading</th>
-                                    <th style={{ textAlign: 'right', padding: '0.5rem', fontSize: '11px' }}>Consumption</th>
-                                    <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '11px' }}>Officer</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {readingHistory?.map((r: any) => (
-                                    <tr key={r.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                        <td style={{ padding: '0.5rem', fontSize: '13px' }}>
-                                            {new Date(r.reading_date).toLocaleDateString()}
-                                        </td>
-                                        <td style={{ padding: '0.5rem', fontSize: '13px', textAlign: 'right', fontWeight: 600 }}>
-                                            {parseFloat(r.reading).toFixed(2)} kL
-                                        </td>
-                                        <td style={{ padding: '0.5rem', fontSize: '13px', textAlign: 'right', color: r.consumption > 0 ? '#059669' : '#6b7280' }}>
-                                            {r.consumption !== null ? `${r.consumption.toFixed(2)} kL` : '-'}
-                                        </td>
-                                        <td style={{ padding: '0.5rem', fontSize: '13px' }}>
-                                            {r.officer_name || 'N/A'}
-                                        </td>
-                                    </tr>
-                                ))}
-                                {(!readingHistory || readingHistory.length === 0) && (
-                                    <tr>
-                                        <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
-                                            No reading history available
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             )}
+
+            {/* Enhanced Reading History Modal */}
+            {showHistoryModal && selectedProperty && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-2xl mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Reading History</h3>
+                                    <p className="text-sm text-gray-600">
+                                        {selectedProperty.address}, {selectedProperty.suburb}
+                                    </p>
+                                </div>
+                                <button 
+                                    onClick={() => setShowHistoryModal(false)} 
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6">
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="bg-gray-50 border-b border-gray-200">
+                                            <th className="text-left p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Date</th>
+                                            <th className="text-right p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Reading</th>
+                                            <th className="text-right p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Consumption</th>
+                                            <th className="text-left p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Officer</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {readingHistory?.map((r: any) => (
+                                            <tr key={r.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                                <td className="p-3 text-sm">
+                                                    <div className="flex items-center gap-2">
+                                                        <Calendar className="w-4 h-4 text-gray-400" />
+                                                        {new Date(r.reading_date).toLocaleDateString()}
+                                                    </div>
+                                                </td>
+                                                <td className="p-3 text-sm text-right font-mono font-semibold text-green-600">
+                                                    {parseFloat(r.reading).toFixed(2)} kL
+                                                </td>
+                                                <td className="p-3 text-sm text-right">
+                                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                                        r.consumption > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                        {r.consumption !== null ? `${r.consumption.toFixed(2)} kL` : '-'}
+                                                    </span>
+                                                </td>
+                                                <td className="p-3 text-sm">
+                                                    <div className="flex items-center gap-2">
+                                                        <User className="w-4 h-4 text-gray-400" />
+                                                        {r.officer_name || 'N/A'}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {(!readingHistory || readingHistory.length === 0) && (
+                                            <tr>
+                                                <td colSpan={4} className="p-8 text-center text-gray-500">
+                                                    <div className="flex flex-col items-center gap-2">
+                                                        <FileText className="w-8 h-8 text-gray-300" />
+                                                        <span>No reading history available</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+                </div>
+            </div>
         </Layout>
     );
 };
