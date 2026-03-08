@@ -80,31 +80,38 @@ const DashboardPage: React.FC = () => {
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
+    const regularNavItems = [
+        { name: 'Dashboard', icon: HomeIcon, path: '/dashboard' },
+        { name: 'My Bills', icon: FileText, path: '/bills' },
+        { name: 'Payments', icon: CreditCard, path: '/payments' },
+        { name: 'Requests', icon: AlertCircle, path: '/requests' },
+    ];
+
     return (
         <Layout hideHeader>
             <div>
-                <div className="relative overflow-hidden rounded-2xl p-6 mb-6 justify-between z-10 flex" style={{ background: NAVY }}>
+                <div className="relative overflow-hidden rounded-2xl p-4 sm:p-6 mb-6 justify-between z-10 flex flex-col sm:flex-row gap-4" style={{ background: NAVY }}>
                     <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:20px_20px] pointer-events-none" />
                     <div className="absolute top-0 left-0 right-0 h-[4px] bg-blue-600" />
 
                     <div className="relative z-10">
                         <p className="text-white/50 text-xs uppercase tracking-widest mb-1">{greeting}</p>
-                        <h1 className="text-white text-3xl font-extrabold tracking-tight mb-1">{user?.name || 'Welcome back'}</h1>
+                        <h1 className="text-white text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">{user?.name || 'Welcome back'}</h1>
                         <p className="text-white/45 text-sm">Mutare Municipal Digital Billing Portal</p>
                     </div>
 
-                    <div className="relative z-10 ml-auto">
+                    <div className="relative z-10">
                         {outstanding > 0 && (
-                            <div className="bg-red-500/15 border border-red-500/30 rounded-xl p-4 text-right">
+                            <div className="bg-red-500/15 border border-red-500/30 rounded-xl p-3 sm:p-4 text-right">
                                 <p className="text-white/50 text-xs uppercase tracking-widest mb-1">Outstanding Balance</p>
-                                <p className="text-red-200 text-2xl font-extrabold tracking-tight">${outstanding.toFixed(2)}</p>
+                                <p className="text-red-200 text-xl sm:text-2xl font-extrabold tracking-tight">${outstanding.toFixed(2)}</p>
                                 <p className="text-white/35 text-xs mt-0.5">
                                     {lastBill ? `Due ${new Date(lastBill.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}` : ''}
                                 </p>
                             </div>
                         )}
                         {outstanding === 0 && (
-                            <div className="bg-green-500/15 border border-green-500/30 rounded-xl p-4 flex items-center gap-2.5">
+                            <div className="bg-green-500/15 border border-green-500/30 rounded-xl p-3 sm:p-4 flex items-center gap-2.5">
                                 <CheckCircle2 className="w-5 text-green-400" />
                                 <div>
                                     <p className="text-green-400 font-extrabold text-sm">All Clear</p>
@@ -115,26 +122,26 @@ const DashboardPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     {[
                         { icon: <CreditCard className="w-4.5 h-4.5 text-blue-600" />, label: 'Outstanding', value: `$${outstanding.toFixed(2)}`, sub: unpaidBills.length > 0 ? `${unpaidBills.length} unpaid bill${unpaidBills.length > 1 ? 's' : ''}` : 'No pending bills', bg: outstanding > 0 ? 'bg-red-50' : 'bg-green-50' },
                         { icon: <CheckCircle2 className="w-4.5 h-4.5 text-green-600" />, label: 'Total Paid', value: `$${paidTotal.toFixed(2)}`, sub: `${bills?.filter((b: any) => b.status === 'PAID').length || 0} bills settled`, bg: 'bg-green-50' },
                         { icon: <HomeIcon className="w-4.5 h-4.5 text-purple-600" />, label: 'Properties', value: `${properties.length}`, sub: 'Linked to account'},
                         { icon: <Wrench className="w-4.5 h-4.5 text-amber-600" />, label: 'Active Requests', value: `${activeRequests.length}`, sub: 'Pending resolution', bg: 'bg-amber-50' },
                     ].map((m, i) => (
-                        <div key={i} className="bg-white rounded-xl p-5 border border-slate-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1 animate-[fadeIn_0.4s_ease_both] cursor-pointer" style={{ animationDelay: `${i * 0.05}s` }}>
+                        <div key={i} className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1 animate-[fadeIn_0.4s_ease_both] cursor-pointer" style={{ animationDelay: `${i * 0.05}s` }}>
                             <div className="flex items-center justify-between mb-3.5">
                                 <span className="text-xs font-extrabold uppercase tracking-widest text-slate-500">{m.label}</span>
                                 {m.icon}
                             </div>
-                            <p className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1">{m.value}</p>
+                            <p className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight mb-1">{m.value}</p>
                             <p className="text-xs text-slate-400">{m.sub}</p>
                         </div>
                     ))}
                 </div>
 
-                <div className="grid grid-cols-[1fr_1fr_320px] gap-4 mb-6">
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.2s' }}>
+                <div className="grid grid-cols-1 xl:grid-cols-[1fr_1fr_320px] gap-4 mb-6">
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.2s' }}>
                             <div className="flex items-center gap-3.5 mb-3.5">
                                 <div className="w-12 h-12 bg-white rounded-xl border-2 border-slate-200 flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                     <TrendingUp className="w-5 text-blue-600" />
@@ -165,7 +172,7 @@ const DashboardPage: React.FC = () => {
                         )}
                     </div>
 
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.25s' }}>
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.25s' }}>
                             <div className="flex items-center gap-3.5 mb-3.5">
                                 <div>
                                     <h3 className="font-extrabold text-sm text-gray-900 mb-0.5">Outstanding Bills</h3>
@@ -204,7 +211,7 @@ const DashboardPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 flex flex-col gap-3 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.3s' }}>
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 flex flex-col gap-3 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.3s' }}>
                         <h3 className="font-extrabold text-sm text-gray-900 mb-1">Quick Actions</h3>
 
                         <button onClick={() => navigate('/bills')} className="w-full py-2 px-3.5 bg-green-200 text-green-900 border-1 border-green-400 rounded-lg font-bold text-xs flex items-center gap-2 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30">
@@ -230,8 +237,8 @@ const DashboardPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-[1fr_380px] gap-4">
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.35s' }}>
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4">
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.35s' }}>
                         <div className="flex items-center gap-2 mb-3.5">
                             <div className="w-12 h-12 bg-white rounded-xl border-2 border-slate-200 flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                 <Megaphone className="w-4 text-blue-600" />
@@ -266,7 +273,7 @@ const DashboardPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.4s' }}>
+                    <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-lg shadow-blue-600/20 animate-[fadeIn_0.4s_ease_both]" style={{ animationDelay: '0.4s' }}>
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="font-extrabold text-sm text-gray-900">Linked Properties</h3>
                             <div className="bg-sky-50 text-slate-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full">
