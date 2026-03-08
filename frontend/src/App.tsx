@@ -13,7 +13,6 @@ import AdminAccountApprovals from './admin/AdminAccountApprovals.tsx';
 import AdminBills from './admin/AdminBills.tsx';
 import AdminRequests from './admin/AdminRequests.tsx';
 import AdminUsers from './admin/AdminUsers.tsx';
-import AdminMeterReadings from './admin/AdminMeterReadings.tsx';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -70,8 +69,6 @@ function App() {
             <Route path="/admin/bills" element={<ProtectedRoute adminOnly><AdminBills /></ProtectedRoute>} />
             <Route path="/admin/requests" element={<ProtectedRoute adminOnly><AdminRequests /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
-            <Route path="/admin/meter-readings" element={<ProtectedRoute adminOnly><AdminMeterReadings /></ProtectedRoute>} />
-
             {/* Default */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>

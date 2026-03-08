@@ -21,7 +21,6 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
         { name: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
         { name: 'Users', icon: Users, path: '/admin/users' },
         { name: 'Account Approvals', icon: ShieldUser, path: '/admin/account-approvals' },
-        { name: 'Meter Readings', icon: Gauge, path: '/admin/meter-readings' },
         { name: 'Billing', icon: FileText, path: '/admin/bills' },
         { name: 'Requests', icon: AlertCircle, path: '/admin/requests' },
     ];

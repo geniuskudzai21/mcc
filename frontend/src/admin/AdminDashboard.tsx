@@ -202,7 +202,7 @@ const AdminDashboard: React.FC = () => {
                                             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                                 <FileText className="w-5 h-5 text-blue-600" />
                                             </div>
-                                            <div className="text-left">
+                                            <div className="flex flex-col items-start">
                                                 <span className="font-bold text-sm text-gray-700">{generateBillsMutation.isPending ? 'Generating...' : 'Generate Bills'}</span>
                                                 <span className="text-xs text-gray-500">Monthly billing</span>
                                             </div>
@@ -220,7 +220,7 @@ const AdminDashboard: React.FC = () => {
                                             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                                 <DollarSign className="w-5 h-5 text-green-600" />
                                             </div>
-                                            <div className="text-left">
+                                            <div className="flex flex-col items-start">
                                                 <span className="font-bold text-sm text-gray-700">Manage Tariffs</span>
                                                 <span className="text-xs text-gray-500">Service rates</span>
                                             </div>
@@ -238,7 +238,7 @@ const AdminDashboard: React.FC = () => {
                                             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                                 <Building2 className="w-5 h-5 text-purple-600" />
                                             </div>
-                                            <div className="text-left">
+                                            <div className="flex flex-col items-start">
                                                 <span className="font-bold text-sm text-gray-700">Property Audit</span>
                                                 <span className="text-xs text-gray-500">View properties</span>
                                             </div>
@@ -256,7 +256,7 @@ const AdminDashboard: React.FC = () => {
                                             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                                 <Megaphone className="w-5 h-5 text-orange-600" />
                                             </div>
-                                            <div className="text-left">
+                                            <div className="flex flex-col items-start">
                                                 <span className="font-bold text-sm text-gray-700">Announcements</span>
                                                 <span className="text-xs text-gray-500">Send notices</span>
                                             </div>
