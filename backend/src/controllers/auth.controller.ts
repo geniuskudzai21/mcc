@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { prisma } from '../config/database';
 import { env } from '../config/env';
 import { AuthRequest } from '../middlewares/auth.middleware';
@@ -135,6 +136,104 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
         }
 
         return res.status(404).json({ message: 'Identity not found' });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email } = req.body;
+
+        // Check if user exists
+        let user = await prisma.user.findUnique({ where: { email } });
+        let admin = null;
+        let userType = 'user';
+
+        if (!user) {
+            admin = await prisma.admin.findUnique({ where: { email } });
+            if (admin) userType = 'admin';
+        }
+
+        if (!user && !admin) {
+            return res.status(404).json({ message: 'No account found with this email address' });
+        }
+
+        // Invalidate any existing reset tokens for this email
+        await prisma.passwordReset.updateMany({
+            where: { email },
+            data: { used_at: new Date() }
+        });
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 3600000); // 1 hour from now
+
+        // Create password reset record
+        await prisma.passwordReset.create({
+            data: {
+                email,
+                token: resetToken,
+                expires_at: expiresAt,
+                user_id: user?.id,
+                admin_id: admin?.id
+            }
+        });
+
+        // In a real application, you would send an email here
+        // For now, we'll just return the token (for development purposes)
+        res.json({
+            message: 'Password reset instructions sent to your email',
+            // In production, remove this token from response
+            resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        // Find valid reset token
+        const resetRecord = await prisma.passwordReset.findFirst({
+            where: {
+                token,
+                expires_at: { gt: new Date() },
+                used_at: null
+            }
+        });
+
+        if (!resetRecord) {
+            return res.status(400).json({ message: 'Invalid or expired reset token' });
+        }
+
+        // Hash new password
+        const password_hash = await bcrypt.hash(newPassword, 12);
+
+        // Update user or admin password
+        if (resetRecord.user_id) {
+            await prisma.user.update({
+                where: { id: resetRecord.user_id },
+                data: { password_hash }
+            });
+        } else if (resetRecord.admin_id) {
+            await prisma.admin.update({
+                where: { id: resetRecord.admin_id },
+                data: { password_hash }
+            });
+        }
+
+        // Mark token as used
+        await prisma.passwordReset.update({
+            where: { id: resetRecord.id },
+            data: { used_at: new Date() }
+        });
+
+        res.json({ message: 'Password reset successfully' });
+
     } catch (err) {
         next(err);
     }

@@ -37,6 +37,7 @@ model User {
   properties    UserProperty[]
   payments      Payment[]
   requests      ServiceRequest[]
+  passwordResets PasswordReset[]
 }
 
 model Property {
@@ -126,6 +127,7 @@ model Admin {
   password_hash String
   role          AdminRole  @default(BILLING_OFFICER)
   audit_logs    AuditLog[]
+  passwordResets PasswordReset[]
 }
 
 model Tariff {
@@ -161,4 +163,17 @@ model AuditLog {
   entity_id  String
   timestamp  DateTime @default(now())
   admin      Admin    @relation(fields: [admin_id], references: [id])
+}
+
+model PasswordReset {
+  id         String   @id @default(uuid())
+  email      String
+  token      String   @unique
+  expires_at DateTime
+  created_at DateTime @default(now())
+  used_at    DateTime?
+  user_id    String?
+  admin_id   String?
+  user       User?    @relation(fields: [user_id], references: [id])
+  admin      Admin?   @relation(fields: [admin_id], references: [id])
 }

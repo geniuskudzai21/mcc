@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.tsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
 import DashboardPage from './pages/DashboardPage.tsx';
 import BillsPage from './pages/BillsPage.tsx';
 import BillDetailsPage from './pages/BillDetailsPage.tsx';
@@ -54,6 +56,8 @@ function App() {
             {/* Auth Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* Resident Routes */}
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
@@ -68,7 +72,7 @@ function App() {
             <Route path="/admin/account-approvals" element={<ProtectedRoute adminOnly><AdminAccountApprovals /></ProtectedRoute>} />
             <Route path="/admin/bills" element={<ProtectedRoute adminOnly><AdminBills /></ProtectedRoute>} />
             <Route path="/admin/requests" element={<ProtectedRoute adminOnly><AdminRequests /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />``
             {/* Default */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
