@@ -258,10 +258,10 @@ const AdminBills: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Bills Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+                    {/* Bills List - Block Layout */}
+                    <div className="space-y-2 my-8">
                         {filteredBills.length === 0 && (
-                            <div className="col-span-full bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                                 <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
                                     <FileText className="w-8 h-8 text-gray-400" />
                                 </div>
@@ -273,65 +273,65 @@ const AdminBills: React.FC = () => {
                         )}
                         
                         {filteredBills.map((bill: any) => (
-                            <div key={bill.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
+                            <div key={bill.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1 w-full">
+                                <div className="flex items-center justify-between p-4">
+                                    {/* Left Section - Bill Info */}
+                                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110 flex-shrink-0">
                                             {getStatusIcon(bill.status)}
                                         </div>
-                                        
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-105 ${getStatusColor(bill.status)}`}>
-                                            {getStatusIcon(bill.status)}
-                                            {bill.status.replace('_', ' ')}
-                                        </span>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                                                {bill.billing_month}/{bill.billing_year}
-                                            </h3>
-                                            <p className="text-sm text-gray-600 mb-1">
-                                                {bill.property?.address}
-                                            </p>
-                                            <p className="text-xs text-gray-500">
-                                                Account: {bill.property?.account_number}
-                                            </p>
-                                        </div>
-                                        
-                                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                                            <div className="flex items-center gap-1">
-                                                <Calendar className="w-4 h-4" />
-                                                <span className="text-xs">{new Date(bill.due_date).toLocaleDateString()}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <DollarSign className="w-4 h-4" />
-                                                <span className="font-bold text-lg">${parseFloat(bill.total_amount).toFixed(2)}</span>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-semibold text-gray-900 truncate">{bill.billing_month}/{bill.billing_year}</h3>
+                                            <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                <span className="flex items-center gap-1">
+                                                    <Home className="w-3 h-3" />
+                                                    <span className="truncate max-w-[200px]">{bill.property?.address}</span>
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {new Date(bill.due_date).toLocaleDateString()}
+                                                </span>
+                                                <span className="text-gray-400">Acc: {bill.property?.account_number}</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-2">
+                                    {/* Middle Section - Amount & Status */}
+                                    <div className="flex items-center gap-2 px-4 border-l border-r border-gray-200">
+                                        <DollarSign className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                                        <div className="text-sm">
+                                            <span className="font-bold text-gray-900">${parseFloat(bill.total_amount).toFixed(2)}</span>
+                                            <div className="flex items-center gap-1 mt-1">
+                                                <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-95 flex-shrink-0 ${getStatusColor(bill.status)}`}>
+                                                    {getStatusIcon(bill.status)}
+                                                    {bill.status.replace('_', ' ')}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Right Section - Actions */}
+                                    <div className="flex items-center gap-2 pl-4">
                                         {bill.status !== 'PAID' && (
                                             <button
                                                 onClick={() => markPaidMutation.mutate(bill.id)}
                                                 disabled={markPaidMutation.isPending}
-                                                className="flex-1 px-3 py-2 text-sm font-medium text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                                title="Mark Paid"
                                             >
                                                 <CreditCard className="w-4 h-4" />
-                                                Mark Paid
                                             </button>
                                         )}
                                         <button
                                             onClick={() => handleEdit(bill)}
-                                            className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-all duration-300 transform hover:scale-110 hover:rotate-12"
+                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
                                             title="Edit Bill"
                                         >
                                             <Edit2 className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(bill)}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-110 hover:rotate-12"
+                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
                                             title="Delete Bill"
                                         >
                                             <Trash2 className="w-4 h-4" />

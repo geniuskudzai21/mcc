@@ -12,7 +12,6 @@ import adminRoutes from './routes/admin.routes';
 import publicRoutes from './routes/public.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
-
 const app = express();
 
 // Middlewares
@@ -29,7 +28,6 @@ app.use('/payments', paymentRoutes);
 app.use('/requests', serviceRoutes);
 app.use('/admin', adminRoutes);
 app.use('/public', publicRoutes);
-
 
 // Health check
 app.get('/health', (req, res) => {
