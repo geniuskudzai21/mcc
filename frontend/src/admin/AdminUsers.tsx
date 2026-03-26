@@ -12,7 +12,6 @@ import {
     Home,
     CheckCircle2,
     AlertCircle,
-    Building2,
     DollarSign
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -155,15 +154,6 @@ const AdminUsers: React.FC = () => {
             case 'PENDING': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
             case 'REJECTED': return 'bg-red-100 text-red-800 border-red-200';
             default: return 'bg-gray-100 text-gray-800 border-gray-200';
-        }
-    };
-
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'VERIFIED': return <CheckCircle2 className="w-4 h-4" />;
-            case 'PENDING': return <Clock className="w-4 h-4" />;
-            case 'REJECTED': return <AlertCircle className="w-4 h-4" />;
-            default: return <Building2 className="w-4 h-4" />;
         }
     };
 

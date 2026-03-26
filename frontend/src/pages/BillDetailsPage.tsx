@@ -141,28 +141,28 @@ const BillDetailsPage: React.FC = () => {
                         Back to My Bills
                     </button>
 
-                    <div className="max-w-4xl mx-auto p-4 bg-white rounded-lg">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="max-w-4xl mx-auto p-3 sm:p-4 bg-white rounded-lg">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                         {/* Main Bill Content */}
                         <div className="lg:col-span-2 space-y-4">
                             {/* Header Card */}
                             <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-md">
-                                <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4">
-                                    <div className="flex justify-between items-start">
+                                <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 sm:p-5">
+                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                                         <div>
-                                            <h1 className="text-xl font-bold text-white mb-1">Municipal Bill</h1>
-                                            <p className="text-blue-100 text-sm">City of Mutare</p>
+                                            <h1 className="text-lg sm:text-xl font-bold text-white mb-1">Municipal Bill</h1>
+                                            <p className="text-blue-100 text-xs sm:text-sm">City of Mutare</p>
                                         </div>
                                         {bill.status === 'PAID' && (
-                                            <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                            <div className="bg-green-500 text-white px-2.5 py-1 rounded-full text-xs font-semibold self-start">
                                                 PAID
                                             </div>
                                         )}
                                     </div>
                                 </div>
                                 
-                                <div className="p-4 bg-gradient-to-b from-white to-slate-50">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="p-4 sm:p-5 bg-gradient-to-b from-white to-slate-50">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                                         {/* Account Information */}
                                         <div>
                                             <h3 className="text-xs font-semibold text-slate-900 mb-3 flex items-center gap-2">
@@ -259,9 +259,9 @@ const BillDetailsPage: React.FC = () => {
                             </div>
 
                             {/* Payment Methods */}
-                            <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-md">
+                            <div className="bg-white rounded-lg border border-slate-200 p-4 sm:p-5 shadow-md">
                                 <h3 className="text-base font-semibold text-slate-900 mb-3">Payment Methods</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div className="flex items-center gap-2 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
                                         <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
                                             <Smartphone className="w-4 h-4 text-red-600" />

@@ -118,15 +118,6 @@ const AdminAccountApprovals: React.FC = () => {
         }
     };
 
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'VERIFIED': return <CheckCircle2 className="w-4 h-4" />;
-            case 'REJECTED': return <X className="w-4 h-4" />;
-            case 'PENDING': return <Clock className="w-4 h-4" />;
-            default: return <AlertCircle className="w-4 h-4" />;
-        }
-    };
-
     const stats = {
         total: pendingUsers?.length || 0,
         withProperties: pendingUsers?.filter((u: any) => u.properties && u.properties.length > 0).length || 0,

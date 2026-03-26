@@ -3,7 +3,6 @@ import Layout from '../components/Layout';
 import {
     Search,
     CheckCircle2,
-    Calendar,
     CreditCard,
     X,
     Loader2,
@@ -12,11 +11,8 @@ import {
     Printer,
     TrendingUp,
     AlertCircle,
-    Clock,
     Home,
-    FileText,
-    Filter,
-    Download
+    FileText
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -160,91 +156,72 @@ const BillsPage: React.FC = () => {
     return (
         <Layout>
             {/* Header Section */}
-            <div className="mb-8">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+            <div className="mb-4 md:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900 mb-2">Municipal Bills</h1>
-                        <p className="text-slate-600">Manage and track all your property bills in one place</p>
+                        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 md:mb-2">Municipal Bills</h1>
+                        <p className="text-slate-600 text-sm">Manage and track all your property bills in one place</p>
                     </div>
-        
                 </div>
                 
                 {/* Enhanced Search and Filter Bar */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300">
-                    <div className="flex flex-col lg:flex-row gap-6">
+                <div className="bg-white rounded-xl border border-slate-200 p-3 md:p-6 mb-4 md:mb-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300">
+                    <div className="flex flex-col lg:flex-row gap-3 md:gap-6">
                         {/* Search Section */}
                         <div className="flex-1">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Search Bills</label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1 md:mb-2">Search Bills</label>
                             <div className="relative group">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
-                                    <Search className="w-5 h-5 text-gray-400" />
+                                <div className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
+                                    <Search className="w-4 md:w-5 h-4 md:h-5 text-gray-400" />
                                 </div>
                                 <input
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search by property, period, amount, or status..."
-                                    className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
+                                    placeholder="Search by property, period, amount..."
+                                    className="w-full pl-9 md:pl-12 pr-9 md:pr-12 py-2.5 md:py-3.5 bg-gray-50 border border-gray-200 rounded-lg md:rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
                                 />
                                 {searchQuery && (
                                     <button
                                         onClick={() => setSearchQuery('')}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
+                                        className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
                                     >
-                                        <X className="w-4 h-4" />
+                                        <X className="w-3 md:w-4 h-3 md:h-4" />
                                     </button>
                                 )}
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 transition-transform duration-200 group-focus-within:scale-x-100"></div>
                             </div>
                         </div>
                         
                         {/* Filter Section */}
-                        <div className="lg:w-48">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Status Filter</label>
+                        <div className="lg:w-40 md:w-48">
+                            <label className="block text-sm font-semibold text-gray-700 mb-1 md:mb-2">Status</label>
                             <select
                                 value={searchQuery === 'UNPAID' ? 'UNPAID' : searchQuery === 'OVERDUE' ? 'OVERDUE' : searchQuery === 'PAID' ? 'PAID' : 'all'}
                                 onChange={(e) => setSearchQuery(e.target.value === 'all' ? '' : e.target.value)}
-                                className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 appearance-none cursor-pointer hover:bg-gray-100"
+                                className="w-full px-3 md:px-4 py-2.5 md:py-3.5 bg-gray-50 border border-gray-200 rounded-lg md:rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200"
                             >
                                 <option value="all">All Status</option>
-                                <option value="UNPAID">Unpaid Bills</option>
-                                <option value="OVERDUE">Overdue Bills</option>
-                                <option value="PAID">Paid Bills</option>
+                                <option value="UNPAID">Unpaid</option>
+                                <option value="OVERDUE">Overdue</option>
+                                <option value="PAID">Paid</option>
                             </select>
                         </div>
                     </div>
-                    
-                    {/* Search Results Info */}
-                    {searchQuery && (
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm text-gray-600">
-                                    Found <span className="font-semibold text-gray-900">{filteredBills.length}</span> bill{filteredBills.length !== 1 ? 's' : ''} matching "<span className="font-medium text-blue-600">{searchQuery}</span>"
-                                </p>
-                                <button
-                                    onClick={() => setSearchQuery('')}
-                                    className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
-                                >
-                                    Clear Search
-                                </button>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
 
             {/* Bills Table */}
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-8 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-4 md:mb-8 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                 <div className="overflow-x-auto">
-                    <table className="w-full">
+                    <table className="w-full min-w-[600px]">
                         <thead className="bg-slate-50 border-b border-slate-200">
                             <tr>
-                                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Property Details</th>
-                                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Billing Period</th>
-                                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Amount</th>
-                                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Due Date</th>
-                                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Status</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-slate-700">Actions</th>
+                                <th className="text-left py-3 md:py-4 px-3 md:px-6 text-xs md:text-sm font-semibold text-slate-700">Property</th>
+                                <th className="text-left py-3 md:py-4 px-3 md:px-6 text-xs md:text-sm font-semibold text-slate-700">Period</th>
+                                <th className="text-left py-3 md:py-4 px-3 md:px-6 text-xs md:text-sm font-semibold text-slate-700">Amount</th>
+                                <th className="text-left py-3 md:py-4 px-3 md:px-6 text-xs md:text-sm font-semibold text-slate-700 hidden sm:table-cell">Due Date</th>
+                                <th className="text-left py-3 md:py-4 px-3 md:px-6 text-xs md:text-sm font-semibold text-slate-700">Status</th>
+                                <th className="text-right py-3 md:py-4 px-3 md:px-6 text-xs md:text-sm font-semibold text-slate-700">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -252,63 +229,54 @@ const BillsPage: React.FC = () => {
                                 if (!bill || !bill.id) return null;
                                 return (
                                 <tr key={bill.id} className="hover:bg-slate-50 transition-colors duration-300">
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-5 h-5 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 transition-transform duration-300 transform hover:scale-110">
-                                                <Home className="w-3 h-3 text-blue-600" />
+                                    <td className="py-3 md:py-4 px-3 md:px-6">
+                                        <div className="flex items-start gap-2 md:gap-3">
+                                            <div className="w-4 md:w-5 h-4 md:h-5 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <Home className="w-2.5 md:w-3 h-2.5 md:h-3 text-blue-600" />
                                             </div>
                                             <div>
                                                 <p className="font-semibold text-slate-900 text-sm">{bill.property?.address || 'N/A'}</p>
-                                                <p className="text-xs text-slate-500 mt-1">Acct: {bill.property?.account_number || 'N/A'}</p>
+                                                <p className="text-xs text-slate-500 mt-0.5 hidden md:block">Acct: {bill.property?.account_number || 'N/A'}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="w-4 h-4 text-slate-400" />
-                                            <span className="font-medium text-sm">{bill.billing_month}/{bill.billing_year}</span>
-                                        </div>
+                                    <td className="py-3 md:py-4 px-3 md:px-6">
+                                        <span className="font-medium text-sm">{bill.billing_month}/{bill.billing_year}</span>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <p className="font-bold text-lg text-slate-900">${(parseFloat(bill.total_amount) || 0).toFixed(2)}</p>
+                                    <td className="py-3 md:py-4 px-3 md:px-6">
+                                        <p className="font-bold text-base md:text-lg text-slate-900">${(parseFloat(bill.total_amount) || 0).toFixed(2)}</p>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="w-4 h-4 text-slate-400" />
-                                            <span className="text-sm text-slate-600">{bill.due_date ? new Date(bill.due_date).toLocaleDateString() : 'N/A'}</span>
-                                        </div>
+                                    <td className="py-3 md:py-4 px-3 md:px-6 hidden sm:table-cell">
+                                        <span className="text-sm text-slate-600">{bill.due_date ? new Date(bill.due_date).toLocaleDateString() : 'N/A'}</span>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-transform duration-300 transform hover:scale-105 ${
+                                    <td className="py-3 md:py-4 px-3 md:px-6">
+                                        <span className={`inline-flex items-center px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-medium ${
                                             bill.status === 'PAID' 
-                                                ? 'bg-green-100 text-green-800 border border-green-200' 
+                                                ? 'bg-green-100 text-green-800' 
                                                 : bill.status === 'OVERDUE' 
-                                                ? 'bg-red-100 text-red-800 border border-red-200'
-                                                : 'bg-blue-100 text-blue-800 border border-blue-200'
+                                                ? 'bg-red-100 text-red-800'
+                                                : 'bg-blue-100 text-blue-800'
                                         }`}>
-                                            {bill.status === 'PAID' && <CheckCircle2 className="w-3 h-3 mr-1" />}
-                                            {bill.status === 'OVERDUE' && <AlertCircle className="w-3 h-3 mr-1" />}
-                                            {bill.status === 'UNPAID' && <Clock className="w-3 h-3 mr-1" />}
                                             {bill.status || 'UNKNOWN'}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center justify-end gap-2">
+                                    <td className="py-3 md:py-4 px-3 md:px-6">
+                                        <div className="flex items-center justify-end gap-1 md:gap-2">
                                             <button
                                                 onClick={() => navigate(`/bills/${bill.id}`)}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                                className="flex items-center gap-1 px-2 md:px-3 py-1.5 text-xs md:text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                                             >
-                                                <FileText className="w-4 h-4" />
-                                                Details
+                                                <FileText className="w-3 md:w-4 h-3 md:h-4" />
+                                                <span className="hidden sm:inline">Details</span>
                                             </button>
                                             {bill.status !== 'PAID' && (
                                                 <button
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                                    className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-blue-600 text-white text-xs md:text-sm font-medium rounded-lg hover:bg-blue-700 transition-all"
                                                     onClick={() => handlePayBill(bill)}
                                                     disabled={payMutation.isPending}
                                                 >
-                                                    <CreditCard className="w-4 h-4" />
-                                                    {payMutation.isPending ? 'Processing...' : 'Pay Now'}
+                                                    <CreditCard className="w-3 md:w-4 h-3 md:h-4" />
+                                                    <span className="hidden sm:inline">{payMutation.isPending ? 'Processing...' : 'Pay'}</span>
                                                 </button>
                                             )}
                                         </div>
@@ -318,14 +286,11 @@ const BillsPage: React.FC = () => {
                             })}
                             {(filteredBills || []).length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="text-center py-12">
+                                    <td colSpan={6} className="text-center py-8 md:py-12">
                                         <div className="flex flex-col items-center">
-                                            <FileText className="w-12 h-12 text-slate-300 mb-3" />
+                                            <FileText className="w-8 md:w-12 h-8 md:h-12 text-slate-300 mb-3" />
                                             <p className="text-slate-500 font-medium">
-                                                {searchQuery ? 'No bills found matching your search' : 'No bills found for your account'}
-                                            </p>
-                                            <p className="text-slate-400 text-sm mt-1">
-                                                {searchQuery ? 'Try adjusting your search terms' : 'Check back later for new billing statements'}
+                                                {searchQuery ? 'No bills found' : 'No bills found for your account'}
                                             </p>
                                         </div>
                                     </td>
@@ -337,88 +302,83 @@ const BillsPage: React.FC = () => {
             </div>
 
             {/* Quick Actions and Info Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                 {/* Outstanding Summary Card */}
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 text-white shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="flex items-center justify-between mb-6">
+                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-4 md:p-6 text-white shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="flex items-center justify-between mb-4 md:mb-6">
                         <div>
-                            <h3 className="text-lg font-bold mb-1">Outstanding Balance</h3>
-                            <p className="text-slate-300 text-sm">Total amount due across all properties</p>
+                            <h3 className="text-base md:text-lg font-bold mb-1">Outstanding Balance</h3>
+                            <p className="text-slate-300 text-xs md:text-sm">Total amount due</p>
                         </div>
-                        <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                            <TrendingUp className="w-6 h-6 text-white" />
+                        <div className="w-10 md:w-12 h-10 md:h-12 rounded-lg flex items-center justify-center">
+                            <TrendingUp className="w-5 md:w-6 h-5 md:h-6 text-white" />
                         </div>
                     </div>
-                    <div className="mb-6">
-                        <p className="text-3xl font-bold mb-1">${totalOutstanding.toFixed(2)}</p>
-                        <p className="text-slate-400 text-sm">{unPaidBills.length} unpaid {unPaidBills.length === 1 ? 'bill' : 'bills'}</p>
+                    <div className="mb-4 md:mb-6">
+                        <p className="text-2xl md:text-3xl font-bold mb-1">${totalOutstanding.toFixed(2)}</p>
+                        <p className="text-slate-400 text-xs md:text-sm">{unPaidBills.length} unpaid {unPaidBills.length === 1 ? 'bill' : 'bills'}</p>
                     </div>
                     <button
-                        className="w-full bg-white text-slate-900 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30"
+                        className="w-full bg-white text-slate-900 py-2 md:py-3 rounded-lg font-semibold text-sm hover:bg-slate-100 transition-all disabled:opacity-50"
                         disabled={totalOutstanding <= 0 || payMutation.isPending}
                         onClick={handlePayBalance}
                     >
-                        {payMutation.isPending ? 'Processing...' : 'Pay All Outstanding'}
+                        {payMutation.isPending ? 'Processing...' : 'Pay All'}
                     </button>
                 </div>
 
                 {/* Security Features Card */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-bold text-slate-900">Payment Security</h3>
-                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                <div className="bg-white rounded-xl border border-slate-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="flex items-center justify-between mb-4 md:mb-6">
+                        <h3 className="text-base md:text-lg font-bold text-slate-900">Payment Security</h3>
+                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                             <ShieldCheck className="w-4 h-4 text-green-600" />
                         </div>
                     </div>
-                    <p className="text-sm text-slate-600 mb-6">All transactions are protected with industry-standard encryption and security measures.</p>
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-3 transition-transform duration-300 transform hover:scale-105">
-                            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                <CheckCircle2 className="w-3 h-3 text-green-600" />
+                    <p className="text-sm text-slate-600 mb-4 md:mb-6">All transactions are protected with industry-standard encryption.</p>
+                    <div className="space-y-2 md:space-y-3">
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <div className="w-5 md:w-6 h-5 md:h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <CheckCircle2 className="w-2.5 md:w-3 h-2.5 md:h-3 text-green-600" />
                             </div>
                             <div>
-                                <p className="text-sm font-semibold text-slate-900">256-bit SSL Encryption</p>
-                                <p className="text-xs text-slate-500">Bank-level security</p>
+                                <p className="text-xs md:text-sm font-semibold text-slate-900">256-bit SSL Encryption</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 transition-transform duration-300 transform hover:scale-105">
-                            <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                <FileText className="w-3 h-3 text-blue-600" />
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <div className="w-5 md:w-6 h-5 md:h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <FileText className="w-2.5 md:w-3 h-2.5 md:h-3 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-sm font-semibold text-slate-900">Instant Receipts</p>
-                                <p className="text-xs text-slate-500">Digital proof of payment</p>
+                                <p className="text-xs md:text-sm font-semibold text-slate-900">Instant Receipts</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Payment Methods Card */}
-                <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-bold text-slate-900">Payment Methods</h3>
-                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                <div className="bg-white rounded-xl border border-slate-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="flex items-center justify-between mb-4 md:mb-6">
+                        <h3 className="text-base md:text-lg font-bold text-slate-900">Payment Methods</h3>
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                             <CreditCard className="w-4 h-4 text-blue-600" />
                         </div>
                     </div>
-                    <p className="text-sm text-slate-600 mb-6">Choose from multiple convenient payment options.</p>
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-300 transform hover:scale-105 cursor-pointer">
-                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                                <CreditCard className="w-4 h-4 text-green-600" />
+                    <div className="space-y-2 md:space-y-3">
+                        <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 border border-slate-200 rounded-lg">
+                            <div className="w-6 md:w-8 h-6 md:h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <CreditCard className="w-3 md:w-4 h-3 md:h-4 text-green-600" />
                             </div>
                             <div className="flex-1">
-                                <p className="text-sm font-semibold text-slate-900">Credit/Debit Card</p>
-                                <p className="text-xs text-slate-500">Visa, Mastercard, etc.</p>
+                                <p className="text-xs md:text-sm font-semibold text-slate-900">Credit/Debit Card</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-300 transform hover:scale-105 cursor-pointer">
-                            <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                                <Smartphone className="w-4 h-4 text-red-600" />
+                        <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 border border-slate-200 rounded-lg">
+                            <div className="w-6 md:w-8 h-6 md:h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Smartphone className="w-3 md:w-4 h-3 md:h-4 text-red-600" />
                             </div>
                             <div className="flex-1">
-                                <p className="text-sm font-semibold text-slate-900">EcoCash</p>
-                                <p className="text-xs text-slate-500">Mobile money transfer</p>
+                                <p className="text-xs md:text-sm font-semibold text-slate-900">EcoCash</p>
                             </div>
                         </div>
                     </div>

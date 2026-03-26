@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import {
     TrendingUp, AlertCircle, Calendar, CheckCircle2,
     Home as HomeIcon, Bell, FileText,
-    ChevronRight, Wrench, Megaphone, CreditCard, Clock
+    ChevronRight, Wrench, Megaphone, CreditCard, Clock, Menu
 } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -80,16 +80,10 @@ const DashboardPage: React.FC = () => {
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
-    const regularNavItems = [
-        { name: 'Dashboard', icon: HomeIcon, path: '/dashboard' },
-        { name: 'My Bills', icon: FileText, path: '/bills' },
-        { name: 'Payments', icon: CreditCard, path: '/payments' },
-        { name: 'Requests', icon: AlertCircle, path: '/requests' },
-    ];
-
     return (
-        <Layout hideHeader>
+        <Layout>
             <div>
+            
                 <div className="relative overflow-hidden rounded-2xl p-4 sm:p-6 mb-6 justify-between z-10 flex flex-col sm:flex-row gap-4" style={{ background: NAVY }}>
                     <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:20px_20px] pointer-events-none" />
                     <div className="absolute top-0 left-0 right-0 h-[4px] bg-blue-600" />

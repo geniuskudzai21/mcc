@@ -3,8 +3,8 @@ import Layout from '../components/Layout';
 import {
     DollarSign, Users, AlertCircle, FileText,
     TrendingUp, Building2, X, Check, Megaphone,
-    Home, Calendar, Clock, CheckCircle2,
-    Activity, BarChart3, PieChart
+    Home, CheckCircle2,
+    Activity, BarChart3
 } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid,

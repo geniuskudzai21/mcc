@@ -179,7 +179,7 @@ For inquiries, contact Mutare City Council.
                 </div>
 
                 {/* Simple Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                         <div className="flex items-center justify-between">
                             <div>
@@ -218,8 +218,8 @@ For inquiries, contact Mutare City Council.
                 </div>
 
                 {/* Search and Filter */}
-                <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="flex flex-col md:flex-row gap-4">
+                <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -228,7 +228,7 @@ For inquiries, contact Mutare City Council.
                                     placeholder="Search payments..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
@@ -236,7 +236,7 @@ For inquiries, contact Mutare City Council.
                         <select
                             value={dateFilter}
                             onChange={(e) => setDateFilter(e.target.value as FilterOption)}
-                            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105"
+                            className="px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105"
                         >
                             <option value="all">All Time</option>
                             <option value="last7days">Last 7 Days</option>
@@ -264,40 +264,40 @@ For inquiries, contact Mutare City Council.
                     ) : (
                         filteredPayments.map((payment: Payment) => (
                             <div key={payment.id} className="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30">
-                                <div className="p-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                <div className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:items-center justify-between gap-4">
+                                        <div className="flex items-start gap-3 sm:gap-4">
+                                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110 flex-shrink-0">
                                                 {getStatusIcon(payment.status)}
                                             </div>
                                             
-                                            <div>
-                                                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                            <div className="min-w-0">
+                                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 truncate">
                                                     {payment.bill.property.address}
                                                 </h3>
-                                                <div className="flex items-center gap-4 text-sm text-gray-600">
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-gray-600">
                                                     <div className="flex items-center gap-1">
-                                                        <CreditCard className="w-4 h-4" />
+                                                        <CreditCard className="w-3.5 h-3.5" />
                                                         {payment.payment_method}
                                                     </div>
                                                     <div className="flex items-center gap-1">
-                                                        <Calendar className="w-4 h-4" />
+                                                        <Calendar className="w-3.5 h-3.5" />
                                                         {new Date(payment.paid_at).toLocaleDateString()}
                                                     </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Receipt className="w-4 h-4" />
-                                                        {payment.transaction_reference}
+                                                    <div className="flex items-center gap-1 truncate">
+                                                        <Receipt className="w-3.5 h-3.5" />
+                                                        <span className="truncate max-w-[120px]">{payment.transaction_reference}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-4">
+                                        <div className="flex flex-row sm:flex-col items-center sm:items-end gap-3 sm:gap-2 ml-11 sm:ml-0">
                                             <div className="text-right">
-                                                <p className="text-xl font-bold text-gray-900">
+                                                <p className="text-lg sm:text-xl font-bold text-gray-900">
                                                     ${parseFloat(payment.amount).toFixed(2)}
                                                 </p>
-                                                <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(payment.status)} transition-transform duration-300 transform hover:scale-105`}>
+                                                <span className={`inline-block px-2 py-0.5 sm:py-1 text-xs font-medium rounded-full border ${getStatusColor(payment.status)} transition-transform duration-300 transform hover:scale-105`}>
                                                     {payment.status}
                                                 </span>
                                             </div>

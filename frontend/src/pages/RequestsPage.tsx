@@ -126,19 +126,6 @@ const RequestsPage: React.FC = () => {
         }
     };
 
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'RESOLVED':
-                return <CheckCircle2 className="w-5 h-5 text-green-600" />;
-            case 'IN_PROGRESS':
-                return <Clock className="w-5 h-5 text-blue-600" />;
-            case 'PENDING':
-                return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
-            default:
-                return <MessageSquare className="w-5 h-5 text-gray-600" />;
-        }
-    };
-
     const closeModal = () => {
         setShowModal(false);
         setEditRequest(null);
@@ -192,15 +179,15 @@ const RequestsPage: React.FC = () => {
     return (
         <Layout>
             <div className="max-w-6xl mx-auto">
-                <div className="mb-8">
-                    <div className="flex items-center justify-between">
+                <div className="mb-6 sm:mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Requests</h1>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Service Requests</h1>
                             <p className="text-gray-600">Report and track municipal service issues</p>
                         </div>
                         <button
                             onClick={() => setShowModal(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30"
+                            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 text-sm sm:text-base"
                         >
                             <Plus className="w-5 h-5" />
                             New Request
@@ -209,20 +196,20 @@ const RequestsPage: React.FC = () => {
                 </div>
 
                 {/* Request Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-600 mb-1">Total Requests</p>
                                 <p className="text-2xl font-bold text-gray-900">{requests?.length || 0}</p>
                             </div>
-                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <MessageSquare className="w-6 h-6 text-blue-600" />
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-600 mb-1">Pending</p>
@@ -230,13 +217,13 @@ const RequestsPage: React.FC = () => {
                                     {requests?.filter((r: any) => r.status === 'PENDING').length || 0}
                                 </p>
                             </div>
-                            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                                <Clock className="w-6 h-6 text-yellow-600" />
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-600 mb-1">Resolved</p>
@@ -244,8 +231,8 @@ const RequestsPage: React.FC = () => {
                                     {requests?.filter((r: any) => r.status === 'RESOLVED').length || 0}
                                 </p>
                             </div>
-                            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                <CheckCircle2 className="w-6 h-6 text-green-600" />
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                             </div>
                         </div>
                     </div>
@@ -254,13 +241,13 @@ const RequestsPage: React.FC = () => {
                 {/* Request List */}
                 <div className="space-y-4">
                     {requests?.length === 0 ? (
-                        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                            <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">No service requests</h3>
-                            <p className="text-gray-600 mb-6">You haven't submitted any service requests yet</p>
+                        <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                            <MessageSquare className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No service requests</h3>
+                            <p className="text-gray-600 mb-6 text-sm sm:text-base">You haven't submitted any service requests yet</p>
                             <button
                                 onClick={() => setShowModal(true)}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
                             >
                                 <Plus className="w-5 h-5" />
                                 Create Your First Request
@@ -269,41 +256,41 @@ const RequestsPage: React.FC = () => {
                     ) : (
                         requests.map((request: any) => (
                             <div key={request.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-start gap-4">
-                                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${categoryColors[request.category] || 'bg-gray-100 text-gray-700'} shadow-md transition-transform duration-300 transform hover:scale-110`}>
+                                <div className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                                        <div className="flex items-start gap-3 sm:gap-4">
+                                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${categoryColors[request.category] || 'bg-gray-100 text-gray-700'} shadow-md transition-transform duration-300 transform hover:scale-110`}>
                                                 {categoryIcons[request.category] || <AlertTriangle className="w-5 h-5" />}
                                             </div>
                                             
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <h3 className="text-lg font-semibold text-gray-900">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                                                         {request.category}
                                                     </h3>
-                                                    <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(request.status)} transition-transform duration-300 transform hover:scale-105`}>
+                                                    <span className={`inline-block px-2 py-0.5 sm:py-1 text-xs font-medium rounded-full border ${getStatusColor(request.status)} transition-transform duration-300 transform hover:scale-105`}>
                                                         {request.status}
                                                     </span>
                                                 </div>
                                                 
-                                                <p className="text-gray-600 mb-3">
+                                                <p className="text-gray-600 mb-3 text-sm sm:text-base">
                                                     {request.description}
                                                 </p>
                                                 
-                                                <div className="flex items-center gap-4 text-sm text-gray-500">
+                                                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500">
                                                     <div className="flex items-center gap-1">
-                                                        <MapPin className="w-4 h-4" />
+                                                        <MapPin className="w-3.5 h-4" />
                                                         {request.property.address}
                                                     </div>
                                                     <div className="flex items-center gap-1">
-                                                        <Calendar className="w-4 h-4" />
+                                                        <Calendar className="w-3.5 h-4" />
                                                         {new Date(request.created_at).toLocaleDateString()}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 ml-11 sm:ml-0 sm:mt-2">
                                             {request.status === 'PENDING' && (
                                                 <>
                                                     <button
@@ -333,8 +320,8 @@ const RequestsPage: React.FC = () => {
 
             {/* New/Edit Request Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
                         <div className="p-4 border-b border-gray-200">
                             <div className="flex items-center justify-between">
                                 <div>
@@ -417,14 +404,14 @@ const RequestsPage: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={closeModal}
-                                    className="flex-1 px-3 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105"
+                                    className="flex-1 px-3 py-2.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={!category || !propertyId || !description || submitting}
-                                    className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
+                                    className="flex-1 px-3 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
                                 >
                                     {submitting ? 'Processing...' : (editRequest ? 'Update' : 'Submit')}
                                 </button>

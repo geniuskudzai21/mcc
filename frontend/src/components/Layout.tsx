@@ -1,7 +1,7 @@
 import React, { type ReactNode, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-    Home, FileText, CreditCard, MessageSquare,
+    FileText, CreditCard, MessageSquare,
     User as UserIcon, LogOut, LayoutDashboard,
     AlertCircle, Users, ShieldUser, Menu, X
 } from 'lucide-react';
@@ -11,9 +11,10 @@ interface LayoutProps {
     children: ReactNode;
     isAdmin?: boolean;
     hideHeader?: boolean;
+    onMenuClick?: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader = false }) => {
+const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader = false, onMenuClick }) => {
     const { user, logout } = useAuth();
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -233,7 +234,7 @@ const Layout: React.FC<LayoutProps> = ({ children, isAdmin = false, hideHeader =
                         {/* Mobile hamburger menu */}
                         <div className="flex items-center gap-2">
                             <button
-                                onClick={() => setSidebarOpen(true)}
+                                onClick={() => onMenuClick ? onMenuClick() : setSidebarOpen(true)}
                                 className="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
                             >
                                 <Menu className="w-5 h-5 text-slate-600" />
