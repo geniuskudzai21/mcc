@@ -16,7 +16,7 @@ The system provides a seamless interface for residents to manage their municipal
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: React 18 (Vite)
+- **Framework**: React 19 (Vite)
 - **Styling**: TailwindCSS
 - **State Management**: React Query
 - **Routing**: React Router
