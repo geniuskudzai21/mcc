@@ -83,7 +83,6 @@ const DashboardPage: React.FC = () => {
     return (
         <Layout>
             <div>
-            
                 <div className="relative overflow-hidden rounded-2xl p-4 sm:p-6 mb-6 justify-between z-10 flex flex-col sm:flex-row gap-4" style={{ background: NAVY }}>
                     <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:20px_20px] pointer-events-none" />
                     <div className="absolute top-0 left-0 right-0 h-[4px] bg-blue-600" />
