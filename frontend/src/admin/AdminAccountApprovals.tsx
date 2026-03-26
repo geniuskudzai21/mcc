@@ -2,19 +2,15 @@ import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import {
     User,
-    Building2,
-    Hash,
+    Mail,
+    Phone,
     Check,
     X,
     Search,
     AlertCircle,
-    Calendar,
     Users,
     Clock,
-    CheckCircle2,
     TrendingUp,
-    Mail,
-    Phone,
     Home
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -142,84 +138,84 @@ const AdminAccountApprovals: React.FC = () => {
         <Layout isAdmin>
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-6">
+                <div className="mb-6 md:mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-6">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Account Approvals</h1>
-                            <p className="text-gray-600">Review and approve citizen account registrations</p>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">Account Approvals</h1>
+                            <p className="text-gray-600 text-sm">Review and approve citizen account registrations</p>
                         </div>
                     </div>
                     
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 my-6 md:my-8">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">Total Pending</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">Total Pending</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.total}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <Users className="w-6 h-6 text-blue-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Users className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">With Properties</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats.withProperties}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">With Properties</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.withProperties}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <Home className="w-6 h-6 text-green-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Home className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">No Properties</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats.withoutProperties}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">No Properties</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.withoutProperties}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <AlertCircle className="w-6 h-6 text-yellow-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <AlertCircle className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">Recent (7 days)</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats.recent}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">Recent (7 days)</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.recent}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <TrendingUp className="w-6 h-6 text-purple-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Enhanced Search Bar */}
-                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 my-8">
+                    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-4 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 my-6 md:my-8">
                         <div className="relative group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
-                                <Search className="w-5 h-5 text-gray-400" />
+                            <div className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
+                                <Search className="w-4 md:w-5 h-4 md:h-5 text-gray-400" />
                             </div>
                             <input
                                 type="text"
                                 placeholder="Search by name, email, phone, or property..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
+                                className="w-full pl-9 md:pl-12 pr-9 md:pr-12 py-2 md:py-3 bg-gray-50 border border-gray-200 rounded-lg md:rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
                             />
                             {searchTerm && (
                                 <button
                                     onClick={() => setSearchTerm('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
+                                    className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
                                 >
-                                    <X className="w-4 h-4" />
+                                    <X className="w-3 md:w-4 h-3 md:h-4" />
                                 </button>
                             )}
                             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 transition-transform duration-200 group-focus-within:scale-x-100"></div>
@@ -227,14 +223,14 @@ const AdminAccountApprovals: React.FC = () => {
                     </div>
 
                     {/* User Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 my-6 md:my-8">
                         {filteredUsers.length === 0 && (
-                            <div className="col-span-full bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
-                                    <Users className="w-8 h-8 text-gray-400" />
+                            <div className="col-span-full bg-white rounded-xl border border-gray-200 p-8 md:p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
+                                    <Users className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
                                 </div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">No pending accounts</h3>
-                                <p className="text-gray-600">
+                                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">No pending accounts</h3>
+                                <p className="text-gray-600 text-sm">
                                     {searchTerm ? 'Try adjusting your search terms' : 'All user accounts have been processed'}
                                 </p>
                             </div>
@@ -242,70 +238,63 @@ const AdminAccountApprovals: React.FC = () => {
                         
                         {filteredUsers.map((user: any) => (
                             <div key={user.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
-                                            <User className="w-6 h-6 text-gray-600" />
+                                <div className="p-4 md:p-6">
+                                    <div className="flex items-start justify-between mb-3 md:mb-4">
+                                        <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 transform hover:scale-110">
+                                            <User className="w-5 h-5 md:w-6 md:h-6 text-gray-600" />
                                         </div>
                                         
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-105 bg-yellow-100 text-yellow-800 border-yellow-200">
-                                            <Clock className="w-4 h-4" />
-                                            PENDING
+                                        <span className="inline-flex items-center px-2 md:px-3 py-1 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-105 bg-yellow-100 text-yellow-800 border-yellow-200">
+                                            <Clock className="w-3 md:w-4 h-3 md:h-4" />
+                                            <span className="ml-1">PENDING</span>
                                         </span>
                                     </div>
 
-                                    <div className="space-y-3">
+                                    <div className="space-y-2 md:space-y-3">
                                         <div>
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-1 truncate">
                                                 {user.name}
                                             </h3>
                                             <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                    <Mail className="w-4 h-4" />
-                                                    <span className="text-xs">{user.email}</span>
+                                                <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                                                    <Mail className="w-3 md:w-4 h-3 md:h-4 flex-shrink-0" />
+                                                    <span className="truncate">{user.email}</span>
                                                 </div>
                                                 {user.phone && (
-                                                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                        <Phone className="w-4 h-4" />
-                                                        <span className="text-xs">{user.phone}</span>
+                                                    <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+                                                        <Phone className="w-3 md:w-4 h-3 md:h-4 flex-shrink-0" />
+                                                        <span className="truncate">{user.phone}</span>
                                                     </div>
                                                 )}
-                                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                    <Hash className="w-4 h-4" />
-                                                    <span className="text-xs">{user.id.slice(0, 8)}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                    <Calendar className="w-4 h-4" />
-                                                    <span className="text-xs">{new Date(user.created_at).toLocaleDateString()}</span>
-                                                </div>
                                             </div>
                                         </div>
                                         
-                                        <div className="border-t border-gray-100 pt-3">
-                                            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                                <Home className="w-4 h-4" />
-                                                Properties ({user.properties?.length || 0})
+                                        <div className="border-t border-gray-100 pt-2 md:pt-3">
+                                            <h4 className="text-xs md:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                                <Home className="w-3 md:w-4 h-3 md:h-4" />
+                                                <span>Properties ({user.properties?.length || 0})</span>
                                             </h4>
                                             {user.properties && user.properties.length > 0 ? (
                                                 <div className="space-y-2">
-                                                    {user.properties.map((up: any) => (
+                                                    {user.properties.slice(0, 2).map((up: any) => (
                                                         <div key={up.id} className="bg-gray-50 rounded-lg p-2">
                                                             <div className="flex items-center justify-between mb-1">
                                                                 <span className="text-xs font-medium text-gray-700">
-                                                            Account: {up.property.account_number}
-                                                        </span>
-                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-105 ${getStatusColor(up.status)}`}>
-                                                            {getStatusIcon(up.status)}
-                                                            {up.status}
-                                                        </span>
-                                                    </div>
-                                                    <div className="text-xs text-gray-600">
-                                                        <div>Stand: {up.property.stand_number}</div>
-                                                        <div>{up.property.suburb}</div>
-                                                        <div className="truncate">{up.property.address}</div>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                                    {up.property.account_number}
+                                                                </span>
+                                                                <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(up.status)}`}>
+                                                                    {up.status}
+                                                                </span>
+                                                            </div>
+                                                            <div className="text-xs text-gray-600 hidden md:block">
+                                                                <div>Stand: {up.property.stand_number}</div>
+                                                                <div>{up.property.suburb}</div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    {user.properties.length > 2 && (
+                                                        <p className="text-xs text-gray-500">+{user.properties.length - 2} more</p>
+                                                    )}
                                                 </div>
                                             ) : (
                                                 <p className="text-xs text-gray-500 italic">No properties linked</p>
@@ -313,22 +302,22 @@ const AdminAccountApprovals: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 mt-3 md:mt-4">
                                         <button
                                             onClick={() => handleApprove(user)}
                                             disabled={approveUserMutation.isPending}
-                                            className="flex-1 px-3 py-2 text-sm font-medium text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                            className="flex-1 px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
                                         >
-                                            <Check className="w-4 h-4" />
-                                            Approve
+                                            <Check className="w-3 md:w-4 h-3 md:h-4" />
+                                            <span className="ml-1">Approve</span>
                                         </button>
                                         <button
                                             onClick={() => handleReject(user)}
                                             disabled={rejectUserMutation.isPending}
-                                            className="flex-1 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                            className="flex-1 px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
                                         >
-                                            <X className="w-4 h-4" />
-                                            Reject
+                                            <X className="w-3 md:w-4 h-3 md:h-4" />
+                                            <span className="ml-1">Reject</span>
                                         </button>
                                     </div>
                                 </div>
@@ -338,12 +327,12 @@ const AdminAccountApprovals: React.FC = () => {
 
             {/* Approve Confirmation Modal */}
             {showApproveModal && selectedUser && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
-                        <div className="p-6 border-b border-gray-200">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 md:p-6 border-b border-gray-200">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">Approve User Account</h3>
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Approve User Account</h3>
                                     <p className="text-sm text-gray-600">Confirm account approval</p>
                                 </div>
                                 <button 
@@ -355,14 +344,14 @@ const AdminAccountApprovals: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 text-center">
-                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Check className="w-8 h-8 text-green-600" />
+                        <div className="p-4 md:p-6 text-center">
+                            <div className="w-12 md:w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                                <Check className="w-6 md:w-8 h-6 md:h-8 text-green-600" />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
                                 Approve {selectedUser.name}?
                             </h3>
-                            <p className="text-gray-600 mb-4">
+                            <p className="text-gray-600 text-sm mb-3 md:mb-4">
                                 This will allow the user to receive bills and access all municipal services.
                             </p>
                             <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
@@ -371,20 +360,20 @@ const AdminAccountApprovals: React.FC = () => {
                             </div>
                         </div>
                         
-                        <div className="p-6 border-t border-gray-200">
-                            <div className="flex gap-3">
+                        <div className="p-4 md:p-6 border-t border-gray-200">
+                            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                                 <button
                                     onClick={() => setShowApproveModal(false)}
-                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={confirmApprove}
                                     disabled={approveUserMutation.isPending}
-                                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 text-sm"
                                 >
-                                    {approveUserMutation.isPending ? 'Approving...' : 'Approve Account'}
+                                    {approveUserMutation.isPending ? 'Approving...' : 'Approve'}
                                 </button>
                             </div>
                         </div>
@@ -394,12 +383,12 @@ const AdminAccountApprovals: React.FC = () => {
 
             {/* Reject Confirmation Modal */}
             {showRejectModal && selectedUser && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
-                        <div className="p-6 border-b border-gray-200">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 md:p-6 border-b border-gray-200">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">Reject User Account</h3>
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Reject User Account</h3>
                                     <p className="text-sm text-gray-600">Confirm account rejection</p>
                                 </div>
                                 <button 
@@ -411,14 +400,14 @@ const AdminAccountApprovals: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 text-center">
-                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <AlertCircle className="w-8 h-8 text-red-600" />
+                        <div className="p-4 md:p-6 text-center">
+                            <div className="w-12 md:w-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                                <AlertCircle className="w-6 md:w-8 h-6 md:h-8 text-red-600" />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
                                 Reject {selectedUser.name}?
                             </h3>
-                            <p className="text-gray-600 mb-4">
+                            <p className="text-gray-600 text-sm mb-3 md:mb-4">
                                 This will deny the user access to municipal services.
                             </p>
                             <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
@@ -427,20 +416,20 @@ const AdminAccountApprovals: React.FC = () => {
                             </div>
                         </div>
                         
-                        <div className="p-6 border-t border-gray-200">
-                            <div className="flex gap-3">
+                        <div className="p-4 md:p-6 border-t border-gray-200">
+                            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                                 <button
                                     onClick={() => setShowRejectModal(false)}
-                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={confirmReject}
                                     disabled={rejectUserMutation.isPending}
-                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 text-sm"
                                 >
-                                    {rejectUserMutation.isPending ? 'Rejecting...' : 'Reject Account'}
+                                    {rejectUserMutation.isPending ? 'Rejecting...' : 'Reject'}
                                 </button>
                             </div>
                         </div>

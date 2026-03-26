@@ -102,7 +102,6 @@ const RegisterPage: React.FC = () => {
                         )}
 
                         <form onSubmit={handleRegister} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {/* Personal Information Column */}
                             <div className="space-y-2">
                                 <div className="bg-blue-900 rounded-lg p-4 mb-2 border border-slate-200">
                                     <div className="flex items-center gap-2 text-white text-xs">
@@ -216,7 +215,6 @@ const RegisterPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Property Information Column */}
                             <div className="space-y-2">
                                 <div className="bg-blue-900 rounded-lg p-4 mb-2 border border-slate-200">
                                     <div className="flex items-center gap-2 text-white text-xs">

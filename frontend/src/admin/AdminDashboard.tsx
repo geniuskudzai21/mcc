@@ -90,80 +90,80 @@ const AdminDashboard: React.FC = () => {
         <Layout isAdmin>
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-6">
+                <div className="mb-6 md:mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-6">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-                            <p className="text-gray-600">Municipal services overview and management</p>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">Admin Dashboard</h1>
+                            <p className="text-gray-600 text-sm">Municipal services overview and management</p>
                         </div>
                     </div>
                     
                     {/* Enhanced Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 my-6 md:my-8">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">Daily Collection</p>
-                                    <p className="text-2xl font-bold text-gray-900">${formatNumber(metrics?.revenueToday)}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">Daily Collection</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">${formatNumber(metrics?.revenueToday)}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <DollarSign className="w-6 h-6 text-blue-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <DollarSign className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">Outstanding Arrears</p>
-                                    <p className="text-2xl font-bold text-gray-900">${formatNumber(metrics?.outstanding)}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">Outstanding Arrears</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">${formatNumber(metrics?.outstanding)}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <AlertCircle className="w-6 h-6 text-orange-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <AlertCircle className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">Active Residents</p>
-                                    <p className="text-2xl font-bold text-gray-900">{metrics?.totalUsers || 0}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">Active Residents</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{metrics?.totalUsers || 0}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <Users className="w-6 h-6 text-green-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Users className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">Pending Requests</p>
-                                    <p className="text-2xl font-bold text-gray-900">{metrics?.pendingRequests || 0}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">Pending Requests</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{metrics?.pendingRequests || 0}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <Activity className="w-6 h-6 text-red-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-red-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Activity className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Main Content Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 my-6 md:my-8">
                         {/* Chart Section */}
                         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                            <div className="p-6">
-                                <div className="flex items-center justify-between mb-6">
+                            <div className="p-4 md:p-6">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-6">
                                     <div>
-                                        <h3 className="text-xl font-bold text-gray-900">Monthly Collections</h3>
+                                        <h3 className="text-lg md:text-xl font-bold text-gray-900">Monthly Collections</h3>
                                         <p className="text-sm text-gray-600">Current month: ${formatNumber(metrics?.revenueMonth)}</p>
                                     </div>
                                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                         <BarChart3 className="w-5 h-5 text-blue-600" />
                                     </div>
                                 </div>
-                                <div className="h-[300px] w-full">
+                                <div className="h-[250px] md:h-[300px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart data={data}>
                                             <defs>
@@ -185,84 +185,84 @@ const AdminDashboard: React.FC = () => {
 
                         {/* Administrative Tasks */}
                         <div className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                            <div className="p-6">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-xl font-bold text-gray-900">Quick Actions</h3>
+                            <div className="p-4 md:p-6">
+                                <div className="flex items-center justify-between mb-4 md:mb-6">
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Quick Actions</h3>
                                     <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
                                         <Activity className="w-5 h-5 text-purple-600" />
                                     </div>
                                 </div>
                                 <div className="space-y-3">
                                     <button 
-                                        className="w-full p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 transform hover:scale-105 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-600/20"
+                                        className="w-full p-3 md:p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-600/20"
                                         onClick={() => setShowGenerateBillsModal(true)} 
                                         disabled={generateBillsMutation.isPending}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                                <FileText className="w-5 h-5 text-blue-600" />
+                                        <div className="flex items-center gap-2 md:gap-3">
+                                            <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                                <FileText className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                                             </div>
                                             <div className="flex flex-col items-start">
-                                                <span className="font-bold text-sm text-gray-700">{generateBillsMutation.isPending ? 'Generating...' : 'Generate Bills'}</span>
-                                                <span className="text-xs text-gray-500">Monthly billing</span>
+                                                <span className="font-bold text-xs md:text-sm text-gray-700">{generateBillsMutation.isPending ? 'Generating...' : 'Generate Bills'}</span>
+                                                <span className="text-xs text-gray-500 hidden sm:inline">Monthly billing</span>
                                             </div>
                                         </div>
-                                        <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                            <Check className="w-4 h-4 text-white" />
+                                        <div className="w-5 h-5 md:w-6 md:h-6 bg-blue-600 rounded-full flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                            <Check className="w-3 h-3 md:w-4 md:h-4 text-white" />
                                         </div>
                                     </button>
 
                                     <button 
-                                        className="w-full p-4 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 transform hover:scale-105 hover:from-green-100 hover:to-green-200 hover:border-green-300 hover:shadow-lg hover:shadow-green-600/20"
+                                        className="w-full p-3 md:p-4 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:from-green-100 hover:to-green-200 hover:border-green-300 hover:shadow-lg hover:shadow-green-600/20"
                                         onClick={() => setShowTariffModal(true)}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                                <DollarSign className="w-5 h-5 text-green-600" />
+                                        <div className="flex items-center gap-2 md:gap-3">
+                                            <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                                <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
                                             </div>
                                             <div className="flex flex-col items-start">
-                                                <span className="font-bold text-sm text-gray-700">Manage Tariffs</span>
-                                                <span className="text-xs text-gray-500">Service rates</span>
+                                                <span className="font-bold text-xs md:text-sm text-gray-700">Manage Tariffs</span>
+                                                <span className="text-xs text-gray-500 hidden sm:inline">Service rates</span>
                                             </div>
                                         </div>
-                                        <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                            <TrendingUp className="w-4 h-4 text-white" />
+                                        <div className="w-5 h-5 md:w-6 md:h-6 bg-green-600 rounded-full flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                            <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-white" />
                                         </div>
                                     </button>
 
                                     <button 
-                                        className="w-full p-4 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 transform hover:scale-105 hover:from-purple-100 hover:to-purple-200 hover:border-purple-300 hover:shadow-lg hover:shadow-purple-600/20"
+                                        className="w-full p-3 md:p-4 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:from-purple-100 hover:to-purple-200 hover:border-purple-300 hover:shadow-lg hover:shadow-purple-600/20"
                                         onClick={() => setShowPropertyModal(true)}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                                <Building2 className="w-5 h-5 text-purple-600" />
+                                        <div className="flex items-center gap-2 md:gap-3">
+                                            <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                                <Building2 className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
                                             </div>
                                             <div className="flex flex-col items-start">
-                                                <span className="font-bold text-sm text-gray-700">Property Audit</span>
-                                                <span className="text-xs text-gray-500">View properties</span>
+                                                <span className="font-bold text-xs md:text-sm text-gray-700">Property Audit</span>
+                                                <span className="text-xs text-gray-500 hidden sm:inline">View properties</span>
                                             </div>
                                         </div>
-                                        <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                                <Home className="w-4 h-4 text-white" />
+                                        <div className="w-5 h-5 md:w-6 md:h-6 bg-purple-600 rounded-full flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                                <Home className="w-3 h-3 md:w-4 md:h-4 text-white" />
                                             </div>
                                     </button>
 
                                     <button 
-                                        className="w-full p-4 bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 transform hover:scale-105 hover:from-orange-100 hover:to-orange-200 hover:border-orange-300 hover:shadow-lg hover:shadow-orange-600/20"
+                                        className="w-full p-3 md:p-4 bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl flex items-center justify-between cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:from-orange-100 hover:to-orange-200 hover:border-orange-300 hover:shadow-lg hover:shadow-orange-600/20"
                                         onClick={() => setShowAnnouncementModal(true)}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                                <Megaphone className="w-5 h-5 text-orange-600" />
+                                        <div className="flex items-center gap-2 md:gap-3">
+                                            <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                                <Megaphone className="w-4 h-4 md:w-5 md:h-5 text-orange-600" />
                                             </div>
                                             <div className="flex flex-col items-start">
-                                                <span className="font-bold text-sm text-gray-700">Announcements</span>
-                                                <span className="text-xs text-gray-500">Send notices</span>
+                                                <span className="font-bold text-xs md:text-sm text-gray-700">Announcements</span>
+                                                <span className="text-xs text-gray-500 hidden sm:inline">Send notices</span>
                                             </div>
                                         </div>
-                                        <div className="w-6 h-6 bg-orange-600 rounded-full flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                                <CheckCircle2 className="w-4 h-4 text-white" />
+                                        <div className="w-5 h-5 md:w-6 md:h-6 bg-orange-600 rounded-full flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                                <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-white" />
                                             </div>
                                     </button>
                                 </div>
@@ -272,12 +272,12 @@ const AdminDashboard: React.FC = () => {
 
             {/* Enhanced Modals */}
             {showTariffModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-2xl mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
-                        <div className="p-6 border-b border-gray-200">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 md:p-6 border-b border-gray-200 sticky top-0 bg-white">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">Manage Tariffs</h3>
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Manage Tariffs</h3>
                                     <p className="text-sm text-gray-600">Configure service rates</p>
                                 </div>
                                 <button 
@@ -289,51 +289,51 @@ const AdminDashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 space-y-6">
+                        <div className="p-4 md:p-6 space-y-4 md:space-y-6">
                             <div>
-                                <h4 className="text-lg font-semibold text-gray-900 mb-4">Add New Tariff</h4>
-                                <div className="flex gap-3">
+                                <h4 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Add New Tariff</h4>
+                                <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                                     <input 
                                         type="text" 
-                                        placeholder="Service type (e.g., Water, Sewer, Refuse)" 
+                                        placeholder="Service type" 
                                         value={newTariff.service_type} 
                                         onChange={(e) => setNewTariff({ ...newTariff, service_type: e.target.value })} 
-                                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                        className="flex-1 px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                                     />
                                     <input 
                                         type="number" 
-                                        placeholder="Cost per unit" 
+                                        placeholder="Cost" 
                                         value={newTariff.cost_per_unit} 
                                         onChange={(e) => setNewTariff({ ...newTariff, cost_per_unit: e.target.value })} 
-                                        className="w-32 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                        className="w-full sm:w-24 md:w-32 px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                                     />
                                     <button 
                                         onClick={() => createTariffMutation.mutate()} 
                                         disabled={!newTariff.service_type || !newTariff.cost_per_unit} 
-                                        className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium text-sm disabled:opacity-50 hover:bg-blue-700 transition-colors"
+                                        className="px-4 md:px-6 py-2 md:py-3 bg-blue-600 text-white rounded-lg font-medium text-sm disabled:opacity-50 hover:bg-blue-700 transition-colors whitespace-nowrap"
                                     >
-                                        Add Tariff
+                                        Add
                                     </button>
                                 </div>
                             </div>
                             
                             <div>
-                                <h4 className="text-lg font-semibold text-gray-900 mb-4">Current Tariffs</h4>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full">
+                                <h4 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Current Tariffs</h4>
+                                <div className="overflow-x-auto -mx-4 md:mx-0">
+                                    <table className="w-full min-w-[300px]">
                                         <thead>
                                             <tr className="bg-gray-50 border-b border-gray-200">
-                                                <th className="text-left p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Service</th>
-                                                <th className="text-right p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Cost</th>
-                                                <th className="text-right p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Effective Date</th>
+                                                <th className="text-left p-2 md:p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Service</th>
+                                                <th className="text-right p-2 md:p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Cost</th>
+                                                <th className="text-right p-2 md:p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider hidden sm:table-cell">Effective Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {tariffs?.map((t: any) => (
                                                 <tr key={t.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                                    <td className="p-3 text-sm font-medium text-gray-900">{t.service_type}</td>
-                                                    <td className="p-3 text-sm text-right font-mono">${parseFloat(t.cost_per_unit).toFixed(2)}</td>
-                                                    <td className="p-3 text-sm text-right text-gray-600">{new Date(t.effective_date).toLocaleDateString()}</td>
+                                                    <td className="p-2 md:p-3 text-sm font-medium text-gray-900">{t.service_type}</td>
+                                                    <td className="p-2 md:p-3 text-sm text-right font-mono">${parseFloat(t.cost_per_unit).toFixed(2)}</td>
+                                                    <td className="p-2 md:p-3 text-sm text-right text-gray-600 hidden sm:table-cell">{new Date(t.effective_date).toLocaleDateString()}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -346,12 +346,12 @@ const AdminDashboard: React.FC = () => {
             )}
 
             {showPropertyModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-4xl mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
-                        <div className="p-6 border-b border-gray-200">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 md:p-6 border-b border-gray-200 sticky top-0 bg-white">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">Property Audit</h3>
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Property Audit</h3>
                                     <p className="text-sm text-gray-600">Review registered properties</p>
                                 </div>
                                 <button 
@@ -363,26 +363,26 @@ const AdminDashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-6">
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
+                        <div className="p-4 md:p-6">
+                            <div className="overflow-x-auto -mx-4 md:mx-0">
+                                <table className="w-full min-w-[500px]">
                                     <thead>
                                         <tr className="bg-gray-50 border-b border-gray-200">
-                                            <th className="text-left p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Stand</th>
-                                            <th className="text-left p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Address</th>
-                                            <th className="text-left p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Owner</th>
-                                            <th className="text-left p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Account</th>
-                                            <th className="text-left p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Users</th>
+                                            <th className="text-left p-2 md:p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Stand</th>
+                                            <th className="text-left p-2 md:p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Address</th>
+                                            <th className="text-left p-2 md:p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">Owner</th>
+                                            <th className="text-left p-2 md:p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider hidden sm:table-cell">Account</th>
+                                            <th className="text-left p-2 md:p-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">Users</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {properties?.map((p: any) => (
                                             <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                                <td className="p-3 text-sm font-mono">{p.stand_number}</td>
-                                                <td className="p-3 text-sm">{p.address}, {p.suburb}</td>
-                                                <td className="p-3 text-sm font-medium">{p.owner_name}</td>
-                                                <td className="p-3 text-sm font-mono">{p.account_number}</td>
-                                                <td className="p-3 text-sm">
+                                                <td className="p-2 md:p-3 text-sm font-mono">{p.stand_number}</td>
+                                                <td className="p-2 md:p-3 text-sm">{p.address}, {p.suburb}</td>
+                                                <td className="p-2 md:p-3 text-sm font-medium hidden md:table-cell">{p.owner_name}</td>
+                                                <td className="p-2 md:p-3 text-sm font-mono hidden sm:table-cell">{p.account_number}</td>
+                                                <td className="p-2 md:p-3 text-sm">
                                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                         {p.users?.length || 0}
                                                     </span>
@@ -398,12 +398,12 @@ const AdminDashboard: React.FC = () => {
             )}
 
             {showAnnouncementModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-lg mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
-                        <div className="p-6 border-b border-gray-200">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 md:p-6 border-b border-gray-200 sticky top-0 bg-white">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">Send Announcement</h3>
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Send Announcement</h3>
                                     <p className="text-sm text-gray-600">Broadcast to all users</p>
                                 </div>
                                 <button 
@@ -415,44 +415,44 @@ const AdminDashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-6">
-                            <p className="text-sm text-gray-600 mb-6">This announcement will be sent to all registered users.</p>
-                            <div className="space-y-4">
+                        <div className="p-4 md:p-6">
+                            <p className="text-sm text-gray-600 mb-4 md:mb-6">This announcement will be sent to all registered users.</p>
+                            <div className="space-y-3 md:space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">Title</label>
                                     <input 
                                         type="text" 
                                         placeholder="Announcement title" 
                                         value={announcement.title} 
                                         onChange={(e) => setAnnouncement({ ...announcement, title: e.target.value })} 
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                        className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">Message</label>
                                     <textarea 
-                                        rows={4} 
+                                        rows={3} 
                                         placeholder="Enter your announcement message..." 
                                         value={announcement.body} 
                                         onChange={(e) => setAnnouncement({ ...announcement, body: e.target.value })} 
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
+                                        className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
                                     />
                                 </div>
                             </div>
                             
-                            <div className="flex gap-3 mt-6">
+                            <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-4 md:mt-6">
                                 <button 
                                     onClick={() => setShowAnnouncementModal(false)} 
-                                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     onClick={() => createAnnouncementMutation.mutate()} 
                                     disabled={!announcement.title || !announcement.body || createAnnouncementMutation.isPending} 
-                                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-3 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
                                 >
-                                    {createAnnouncementMutation.isPending ? 'Sending...' : 'Send to All Users'}
+                                    {createAnnouncementMutation.isPending ? 'Sending...' : 'Send to All'}
                                 </button>
                             </div>
                         </div>
@@ -462,12 +462,12 @@ const AdminDashboard: React.FC = () => {
 
             {/* Generate Bills Confirmation Modal */}
             {showGenerateBillsModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
-                        <div className="p-6 border-b border-gray-200">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 md:p-6 border-b border-gray-200">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">Generate Monthly Bills</h3>
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Generate Monthly Bills</h3>
                                     <p className="text-sm text-gray-600">Confirm bill generation</p>
                                 </div>
                                 <button 
@@ -479,14 +479,14 @@ const AdminDashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 text-center">
-                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <FileText className="w-8 h-8 text-blue-600" />
+                        <div className="p-4 md:p-6 text-center">
+                            <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                                <FileText className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
                                 Generate Monthly Bills?
                             </h3>
-                            <p className="text-gray-600 mb-4">
+                            <p className="text-gray-600 text-sm mb-3 md:mb-4">
                                 This will generate bills for all properties based on current meter readings and tariffs.
                             </p>
                             <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
@@ -495,11 +495,11 @@ const AdminDashboard: React.FC = () => {
                             </div>
                         </div>
                         
-                        <div className="p-6 border-t border-gray-200">
-                            <div className="flex gap-3">
+                        <div className="p-4 md:p-6 border-t border-gray-200">
+                            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                                 <button
                                     onClick={() => setShowGenerateBillsModal(false)}
-                                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -509,7 +509,7 @@ const AdminDashboard: React.FC = () => {
                                         setShowGenerateBillsModal(false);
                                     }}
                                     disabled={generateBillsMutation.isPending}
-                                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-3 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
                                 >
                                     {generateBillsMutation.isPending ? 'Generating...' : 'Generate Bills'}
                                 </button>

@@ -8,15 +8,11 @@ import {
     Edit,
     Trash2,
     X,
-    Calendar,
     Users,
-    TrendingUp,
     Home,
     CheckCircle2,
-    Clock,
     AlertCircle,
     Building2,
-    FileText,
     DollarSign
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -189,85 +185,84 @@ const AdminUsers: React.FC = () => {
         <Layout isAdmin>
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-6">
+                <div className="mb-6 md:mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-6">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">User Management</h1>
-                            <p className="text-gray-600">Manage registered users in the system</p>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">User Management</h1>
+                            <p className="text-gray-600 text-sm">Manage registered users in the system</p>
                         </div>
                     </div>
                     
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 my-6 md:my-8">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">Total Users</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">Total Users</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.total}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <Users className="w-6 h-6 text-blue-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Users className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">With Properties</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats.withProperties}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">With Properties</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.withProperties}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <Home className="w-6 h-6 text-green-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <Home className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">No Properties</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats.noProperties}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">No Properties</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.noProperties}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <AlertCircle className="w-6 h-6 text-yellow-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <AlertCircle className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
                                 </div>
                             </div>
                         </div>
 
-            
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">Verified Properties</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats.verified}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-1">Verified Properties</p>
+                                    <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.verified}</p>
                                 </div>
-                                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
-                                    <CheckCircle2 className="w-6 h-6 text-indigo-600" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110">
+                                    <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Enhanced Search Bar */}
-                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 my-8">
+                    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-4 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 my-6 md:my-8">
                         <div className="relative group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
-                                <Search className="w-5 h-5 text-gray-400" />
+                            <div className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-600">
+                                <Search className="w-4 md:w-5 h-4 md:h-5 text-gray-400" />
                             </div>
                             <input
                                 type="text"
                                 placeholder="Search by name, email, or phone..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
+                                className="w-full pl-9 md:pl-12 pr-9 md:pr-12 py-2 md:py-3 bg-gray-50 border border-gray-200 rounded-lg md:rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
                             />
                             {searchTerm && (
                                 <button
                                     onClick={() => setSearchTerm('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
+                                    className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-lg hover:bg-gray-100"
                                 >
-                                    <X className="w-4 h-4" />
+                                    <X className="w-3 md:w-4 h-3 md:h-4" />
                                 </button>
                             )}
                             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transform scale-x-0 transition-transform duration-200 group-focus-within:scale-x-100"></div>
@@ -275,14 +270,14 @@ const AdminUsers: React.FC = () => {
                     </div>
 
                     {/* User List - Block Layout */}
-                    <div className="space-y-2 my-8">
+                    <div className="space-y-2 my-6 md:my-8">
                         {filteredUsers.length === 0 && (
-                            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
-                                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
-                                    <Users className="w-8 h-8 text-gray-400" />
+                            <div className="bg-white rounded-xl border border-gray-200 p-8 md:p-12 text-center shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1">
+                                <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 transition-transform duration-300 transform hover:scale-110">
+                                    <Users className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
                                 </div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">No users found</h3>
-                                <p className="text-gray-600">
+                                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">No users found</h3>
+                                <p className="text-gray-600 text-sm">
                                     {searchTerm ? 'Try adjusting your search terms' : 'No users registered yet'}
                                 </p>
                             </div>
@@ -292,49 +287,45 @@ const AdminUsers: React.FC = () => {
                             const props = getUserProperties(user.id);
                             return (
                                 <div key={user.id} className="bg-white rounded-xl border border-gray-200 shadow-lg shadow-blue-600/20 hover:shadow-xl hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-1 w-full">
-                                    <div className="flex items-center justify-between p-4">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 gap-3">
                                         {/* Left Section - User Info */}
-                                        <div className="flex items-center gap-4 flex-1 min-w-0">
-                                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110 flex-shrink-0">
-                                                <User className="w-5 h-5 text-blue-600" />
+                                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                                            <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-100 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-110 flex-shrink-0">
+                                                <User className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h3 className="font-semibold text-gray-900 truncate">{user.name}</h3>
-                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                <h3 className="font-semibold text-gray-900 truncate text-sm md:text-base">{user.name}</h3>
+                                                <div className="flex flex-wrap items-center gap-x-2 md:gap-x-3 text-xs text-gray-500">
                                                     <span className="flex items-center gap-1">
                                                         <Mail className="w-3 h-3" />
-                                                        <span className="truncate max-w-[200px]">{user.email}</span>
+                                                        <span className="truncate max-w-[150px] md:max-w-[200px]">{user.email}</span>
                                                     </span>
                                                     {user.phone && (
                                                         <span className="flex items-center gap-1">
                                                             <Phone className="w-3 h-3" />
-                                                            {user.phone}
+                                                            <span className="md:hidden">{user.phone.slice(0, 8)}...</span>
+                                                            <span className="hidden md:inline">{user.phone}</span>
                                                         </span>
                                                     )}
-                                                    <span className="flex items-center gap-1">
-                                                        <Calendar className="w-3 h-3" />
-                                                        {new Date(user.created_at).toLocaleDateString()}
-                                                    </span>
-                                                    <span className="text-gray-400">ID: {user.id.slice(0, 8)}</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Middle Section - Properties */}
-                                        <div className="flex items-center gap-2 px-4 border-l border-r border-gray-200">
-                                            <Home className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                                            <div className="text-sm">
-                                                <span className="font-medium text-gray-700">{props.length} Properties</span>
+                                        <div className="flex items-center gap-2 sm:px-3 md:px-4 border-t sm:border-t-0 border-gray-200 pt-2 sm:pt-0">
+                                            <Home className="w-3 md:w-4 h-3 md:h-4 text-gray-500 flex-shrink-0" />
+                                            <div className="text-xs md:text-sm">
+                                                <span className="font-medium text-gray-700">{props.length}</span>
+                                                <span className="text-gray-500 hidden sm:inline"> Properties</span>
                                                 {props.length > 0 && (
-                                                    <div className="flex items-center gap-1 mt-1">
+                                                    <div className="flex items-center gap-1 mt-1 flex-wrap">
                                                         {props.slice(0, 2).map((p: any) => (
-                                                            <span key={p.id} className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium border transition-transform duration-300 transform hover:scale-95 flex-shrink-0 ${getStatusColor(p.status)}`}>
-                                                                {getStatusIcon(p.status)}
+                                                            <span key={p.id} className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(p.status)}`}>
                                                                 {p.property.account_number}
                                                             </span>
                                                         ))}
                                                         {props.length > 2 && (
-                                                            <span className="text-xs text-gray-500">+{props.length - 2} more</span>
+                                                            <span className="text-xs text-gray-500">+{props.length - 2}</span>
                                                         )}
                                                     </div>
                                                 )}
@@ -342,27 +333,27 @@ const AdminUsers: React.FC = () => {
                                         </div>
 
                                         {/* Right Section - Actions */}
-                                        <div className="flex items-center gap-2 pl-4">
+                                        <div className="flex items-center gap-1 md:gap-2 border-t sm:border-t-0 border-gray-200 pt-2 sm:pt-0">
                                             <button
                                                 onClick={() => handleGenerateBill(user)}
-                                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                                className="p-1.5 md:p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
                                                 title="Generate Bill"
                                             >
-                                                <DollarSign className="w-4 h-4" />
+                                                <DollarSign className="w-3 md:w-4 h-3 md:h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleEdit(user)}
-                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                                className="p-1.5 md:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
                                                 title="Edit User"
                                             >
-                                                <Edit className="w-4 h-4" />
+                                                <Edit className="w-3 md:w-4 h-3 md:h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(user)}
-                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
+                                                className="p-1.5 md:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm shadow-blue-600/10 hover:shadow-md hover:shadow-blue-600/20"
                                                 title="Delete User"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-3 md:w-4 h-3 md:h-4" />
                                             </button>
                                         </div>
                                     </div>
@@ -373,12 +364,12 @@ const AdminUsers: React.FC = () => {
 
             {/* Edit Modal */}
             {showEditModal && selectedUser && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-lg mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
-                        <div className="p-6 border-b border-gray-200">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 md:p-6 border-b border-gray-200 sticky top-0 bg-white">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">Edit User</h3>
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Edit User</h3>
                                     <p className="text-sm text-gray-600">Update user information</p>
                                 </div>
                                 <button 
@@ -390,48 +381,48 @@ const AdminUsers: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 space-y-4">
+                        <div className="p-4 md:p-6 space-y-3 md:space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">Full Name</label>
                                 <input
                                     type="text"
                                     value={editForm.name}
                                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">Email Address</label>
                                 <input
                                     type="email"
                                     value={editForm.email}
                                     onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">Phone Number</label>
                                 <input
                                     type="tel"
                                     value={editForm.phone}
                                     onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
                         </div>
                         
-                        <div className="p-6 border-t border-gray-200">
-                            <div className="flex gap-3">
+                        <div className="p-4 md:p-6 border-t border-gray-200">
+                            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                                 <button
                                     onClick={() => setShowEditModal(false)}
-                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={confirmEdit}
                                     disabled={updateUserMutation.isPending}
-                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm"
                                 >
                                     {updateUserMutation.isPending ? 'Saving...' : 'Save Changes'}
                                 </button>
@@ -443,14 +434,14 @@ const AdminUsers: React.FC = () => {
 
             {/* Delete Confirmation */}
             {showDeleteModal && selectedUser && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
-                        <div className="p-6 text-center">
-                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Trash2 className="w-8 h-8 text-red-600" />
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 md:p-6 text-center">
+                            <div className="w-12 md:w-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                                <Trash2 className="w-6 md:w-8 h-6 md:h-8 text-red-600" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Delete User</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">Delete User</h3>
+                            <p className="text-gray-600 text-sm mb-3 md:mb-4">
                                 Are you sure you want to delete <strong>{selectedUser.name}</strong>? This action cannot be undone.
                             </p>
                             <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
@@ -459,18 +450,18 @@ const AdminUsers: React.FC = () => {
                             </div>
                         </div>
                         
-                        <div className="p-6 border-t border-gray-200">
-                            <div className="flex gap-3">
+                        <div className="p-4 md:p-6 border-t border-gray-200">
+                            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                                 <button
                                     onClick={() => setShowDeleteModal(false)}
-                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={confirmDelete}
                                     disabled={deleteUserMutation.isPending}
-                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 text-sm"
                                 >
                                     {deleteUserMutation.isPending ? 'Deleting...' : 'Delete User'}
                                 </button>
@@ -482,12 +473,12 @@ const AdminUsers: React.FC = () => {
 
             {/* Generate Bill Modal */}
             {showGenerateBillModal && selectedUser && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md mx-4 shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
-                        <div className="p-6 border-b border-gray-200">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-blue-600/30 animate-in fade-in zoom-in duration-300">
+                        <div className="p-4 md:p-6 border-b border-gray-200">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">Generate Bill</h3>
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900">Generate Bill</h3>
                                     <p className="text-sm text-gray-600">Generate bill for user</p>
                                 </div>
                                 <button 
@@ -499,14 +490,14 @@ const AdminUsers: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 text-center">
-                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <DollarSign className="w-8 h-8 text-green-600" />
+                        <div className="p-4 md:p-6 text-center">
+                            <div className="w-12 md:w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                                <DollarSign className="w-6 md:w-8 h-6 md:h-8 text-green-600" />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
                                 Generate Bill for {selectedUser.name}?
                             </h3>
-                            <p className="text-gray-600 mb-4">
+                            <p className="text-gray-600 text-sm mb-3 md:mb-4">
                                 This will generate a bill for all properties linked to this user for the current billing period.
                             </p>
                             <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
@@ -516,18 +507,18 @@ const AdminUsers: React.FC = () => {
                             </div>
                         </div>
                         
-                        <div className="p-6 border-t border-gray-200">
-                            <div className="flex gap-3">
+                        <div className="p-4 md:p-6 border-t border-gray-200">
+                            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                                 <button
                                     onClick={() => setShowGenerateBillModal(false)}
-                                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={confirmGenerateBill}
                                     disabled={generateBillMutation.isPending}
-                                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                                    className="flex-1 px-3 md:px-4 py-2 md:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 text-sm"
                                 >
                                     {generateBillMutation.isPending ? 'Generating...' : 'Generate Bill'}
                                 </button>
